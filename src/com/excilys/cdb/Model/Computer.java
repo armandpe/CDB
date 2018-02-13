@@ -13,9 +13,7 @@ public class Computer {
 	private Timestamp discontinued;
 	private long companyId;
 	
-	public Computer() {
-		this(0, "Unnamed", null, null, 0);
-	}
+	public Computer() {}
 	
 	public Computer(long id, String name, Timestamp introduced, 
 			Timestamp discontinued, long companyId) {

@@ -1,6 +1,7 @@
 package com.excilys.cdb.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.excilys.cdb.DAO.ComputerDAO;
 import com.excilys.cdb.Model.Computer;
@@ -23,9 +24,9 @@ public class ComputerService {
 		return dao.getAll();
 	}
 	
-	public Computer getItem(long id) {
+	public Optional<Computer> getById(long id) {
 		ComputerDAO dao = ComputerDAO.getInstance();
-		return dao.getItem(id);
+		return dao.getById(id);
 	}
 	
 	public List<Computer> getItems(String paramName, String paramValue) {

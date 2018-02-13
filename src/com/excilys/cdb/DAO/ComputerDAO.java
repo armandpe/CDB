@@ -1,24 +1,18 @@
 package com.excilys.cdb.DAO;
 
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Optional;
 
-import com.excilys.cdb.ConnectionManager.ConnectionManager;
 import com.excilys.cdb.Model.Computer;;
 
-public class ComputerDAO {
-	
-	
+public class ComputerDAO extends DAO<Computer> {
 	
 	private static ComputerDAO computerDAO;
 	
-	private Connection connection;
-	
-	private ComputerDAO() {}
+	private ComputerDAO() {
+		table = "computer";
+	}
 	
 	public static ComputerDAO getInstance() {
 		if(computerDAO == null) {
@@ -28,7 +22,8 @@ public class ComputerDAO {
 		return computerDAO;
 	}
 	
-	private Computer buildItem(ResultSet rs) {
+	@Override
+	protected Optional<Computer> buildItem(ResultSet rs) {
 		try {
 			Computer c = new Computer();
 			c.setId(rs.getLong("id"));
@@ -36,111 +31,19 @@ public class ComputerDAO {
 			c.setIntroduced(rs.getTimestamp("introduced"));
 			c.setDiscontinued(rs.getTimestamp("discontinued"));
 			c.setCompanyId(rs.getLong("company_id"));
-			return c;
+			return Optional.of(c);
 		}catch(SQLException e) {
 			e.printStackTrace();
 			System.out.println(e.getMessage());
-			return null;
+			return Optional.ofNullable(null);
 		}
 	}
-	
-	public List<Computer> getAll(){
-		ConnectionManager cManager = ConnectionManager.getInstance(); 
-		Connection connection = cManager.getConnection();
-		 
-		//computer - company
-		String query = "SELECT id, name, introduced, "
-				+ "discontinued, company_id FROM computer;";
-		ResultSet sqlResults = null;
-		
-		ArrayList<Computer> result = new ArrayList<>();
-		
-		try {
-			Statement stmt = connection.createStatement();
-			sqlResults = stmt.executeQuery(query);
-		}catch(Exception e) { 
-			e.printStackTrace();
-			System.out.println("Erreur requete : " + e.getMessage());
-		}
-		
-		try {
-		while(sqlResults.next()) {
-			Computer c = buildItem(sqlResults);
-			if(c != null)
-				result.add(c);
-		}
-		}catch(SQLException e) {
-			e.printStackTrace();
-			System.out.println("Erreur resultat SQL : " + e.getMessage());
-		}
-		
-		cManager.closeConnection();
-		return result;
+
+	@Override
+	protected String[] getSQLArgs() {
+		String[] res = {"id", "name", "introduced", "discontinued", "company_id"};
+		return res;
 	}
-	
-	public Computer getItem(long id){
-		ConnectionManager cManager = ConnectionManager.getInstance(); 
-		Connection connection = cManager.getConnection();
-		 
-		//computer - company
-		String query = "SELECT id, name, introduced, "
-				+ "discontinued, company_id FROM computer WHERE id =" + id + ";";
-		ResultSet sqlResults = null;
-		
-		Computer result = null;
-		
-		try {
-			Statement stmt = connection.createStatement();
-			sqlResults = stmt.executeQuery(query);
-		}catch(Exception e) { 
-			e.printStackTrace();
-			System.out.println("Erreur requete : " + e.getMessage());
-		}
-		
-		try {
-			sqlResults.next();
-			result = buildItem(sqlResults);
-		}catch(SQLException e) {
-			e.printStackTrace();
-			System.out.println("Erreur resultat SQL : " + e.getMessage());
-		}
-		
-		cManager.closeConnection();
-		return result;
-	}
-	
-	public List<Computer> getItems(String paramName, String paramValue) {
-		ConnectionManager cManager = ConnectionManager.getInstance(); 
-		Connection connection = cManager.getConnection();
-		 
-		//computer - company
-		String query = "SELECT id, name, introduced, "
-				+ "discontinued, company_id FROM computer WHERE "+ paramName + "=" + paramValue + ";";
-		ResultSet sqlResults = null;
-		
-		ArrayList<Computer> result = new ArrayList<>();
-		
-		try {
-			Statement stmt = connection.createStatement();
-			sqlResults = stmt.executeQuery(query);
-		}catch(Exception e) { 
-			e.printStackTrace();
-			System.out.println("Erreur requete : " + e.getMessage());
-		}
-		
-		try {
-		while(sqlResults.next()) {
-			Computer c = buildItem(sqlResults);
-			if(c != null)
-				result.add(c);
-		}
-		}catch(SQLException e) {
-			e.printStackTrace();
-			System.out.println("Erreur resultat SQL : " + e.getMessage());
-		}
-		
-		cManager.closeConnection();
-		return result;
-	}
-	
+
+
 }

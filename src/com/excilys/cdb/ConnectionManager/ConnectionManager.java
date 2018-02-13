@@ -8,7 +8,7 @@ import java.sql.SQLException;
 public class ConnectionManager {
 
 	private static ConnectionManager connectionManager;
-	private static String url = "jdbc:mysql://127.0.0.1:3306/computer-database-db";
+	private static String url = "jdbc:mysql://127.0.0.1:3306/computer-database-db?useSSL=false";
 	private static String login = "admincdb";
 	private static String password = "qwerty1234";
 	private Connection connection;

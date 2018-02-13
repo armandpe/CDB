@@ -1,6 +1,7 @@
 package com.excilys.cdb;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.excilys.cdb.Model.Computer;
 import com.excilys.cdb.Service.ComputerService;
@@ -19,7 +20,10 @@ public class Main {
 			System.out.println(c);
 		}
 		
-		System.out.println(s.getItem(573));
+		Optional<Computer> c = s.getById(573);
+		
+		if(c.isPresent())
+			System.out.println(c.get());
 		
 		System.out.println(s.getItems("id", "574"));
 	}
