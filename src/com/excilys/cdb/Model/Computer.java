@@ -5,10 +5,19 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class Computer implements ModelClass {
+	@SQLName(name = "id")
 	private long id;
+	
+	@SQLName(name = "name")
 	private String name;
+	
+	@SQLName(name = "introduced")
 	private LocalDate introduced;
+	
+	@SQLName(name = "discontinued")
 	private LocalDate discontinued;
+	
+	@SQLName(name = "company_id")
 	private long companyId;
 	
 	public Computer() {}

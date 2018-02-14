@@ -2,6 +2,8 @@ package com.excilys.cdb.DAO;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import com.excilys.cdb.Model.Computer;;
@@ -10,9 +12,7 @@ public class ComputerDAO extends DAO<Computer> {
 	
 	private static ComputerDAO computerDAO;
 	
-	private ComputerDAO() {
-		table = "computer";
-	}
+	private ComputerDAO() {}
 	
 	public static ComputerDAO getInstance() {
 		if(computerDAO == null) {
@@ -39,11 +39,31 @@ public class ComputerDAO extends DAO<Computer> {
 		}
 	}
 
-	@Override
-	protected String[] getSQLArgs() {
-		String[] res = {"id", "name", "introduced", "discontinued", "company_id"};
-		return res;
+	
+	protected long createComputer(Computer c) {
+		String query = "INSERT INTO " + getTable() + "(";
+		
+		return 0;
+	}
+	
+	protected long updateComputer(Computer c) {
+
+		return 0;
+	}
+	
+	protected long deleteComputer(long id) {
+
+		return 0;
 	}
 
+	@Override
+	protected String getTable() {
+		return "computer";
+	}
+
+	@Override
+	public String getModelClassFullName() {
+		return Computer.class.getName();
+	}
 
 }

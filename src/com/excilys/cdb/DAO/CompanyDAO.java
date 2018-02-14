@@ -5,14 +5,13 @@ import java.sql.SQLException;
 import java.util.Optional;
 
 import com.excilys.cdb.Model.Company;
+import com.excilys.cdb.Model.Computer;
 
 public class CompanyDAO extends DAO<Company> {
 	
 	private static CompanyDAO companyDAO;
 	
-	private CompanyDAO() {
-		table = "company";
-	}
+	private CompanyDAO() {}
 	
 	public static CompanyDAO getInstance() {
 		if(companyDAO == null) {
@@ -34,10 +33,15 @@ public class CompanyDAO extends DAO<Company> {
 			return Optional.ofNullable(null);
 		}
 	}
+	
+	@Override
+	protected String getTable() {
+		return "company";
+	}
 
 	@Override
-	protected String[] getSQLArgs() {
-		String[] res = {"id", "name"};
-		return res;
+	public String getModelClassFullName() {
+		return Company.class.getName();
 	}
+
 }

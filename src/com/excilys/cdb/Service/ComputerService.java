@@ -10,13 +10,18 @@ public class ComputerService extends Service<Computer, ComputerDAO>{
 	
 	private static ComputerService service;
 	
-	private ComputerService() { daoClassName = "com.excilys.cdb.DAO.ComputerDAO"; }
+	private ComputerService() {}
 	
 	public static ComputerService getInstance() {
 		if(service == null) {
 			service = new ComputerService();
 		}
 		return service;
+	}
+
+	@Override
+	public String getDaoClassFullName() {
+		return ComputerDAO.class.getName();
 	}
 	
 	

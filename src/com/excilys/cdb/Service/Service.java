@@ -12,6 +12,8 @@ public abstract class Service<T extends ModelClass, U extends DAO<T>> {
 
 	String daoClassName;
 	
+	public abstract String getDaoClassFullName();
+	
 	public DAO<T> getDAO()
 	{
 		Class c = null;
@@ -19,7 +21,7 @@ public abstract class Service<T extends ModelClass, U extends DAO<T>> {
 		Method method = null;
 		
 		try {
-			c = Class.forName(daoClassName);
+			c = Class.forName(getDaoClassFullName());
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

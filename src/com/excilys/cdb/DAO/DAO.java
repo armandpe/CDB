@@ -1,23 +1,49 @@
 package com.excilys.cdb.DAO;
 
+import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import com.excilys.cdb.ConnectionManager.ConnectionManager;
 import com.excilys.cdb.Model.ModelClass;
+import com.excilys.cdb.Model.SQLName;
 
 public abstract class DAO<T extends ModelClass> {
 	
-	protected String table;
+	protected abstract String getTable();
 	
-	protected String className;
+	public abstract String getModelClassFullName();
 	
-	protected abstract String[] getSQLArgs();
+	public Map<String, String> getMapperSQLFields(){
+		HashMap<String, String> res = new HashMap<String,String>();
+		Field[] fields = {};
+		
+		try {
+			fields = Class.forName(getModelClassFullName()).getDeclaredFields();
+		} catch (SecurityException | ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		for(Field field : fields) {
+			if(field.isAnnotationPresent(SQLName.class))
+				res.put(field.getAnnotation(SQLName.class).name(), field.getName());
+		}
+		
+		return res;
+	}
+	
+	protected String[] getSQLArgs() {
+		String[] template = {};
+		return this.getMapperSQLFields().keySet().toArray(template);
+	}
 	
 	protected abstract Optional<T> buildItem(ResultSet result);
 	
@@ -33,7 +59,7 @@ public abstract class DAO<T extends ModelClass> {
 			
 			query = query.substring(0, query.length()-1);
 			
-			query += " FROM " + table + " WHERE "+ paramName + " = " + paramValue + ";";
+			query += " FROM " + getTable() + " WHERE "+ paramName + " = " + paramValue + ";";
 			
 			
 			ResultSet sqlResults = null;
@@ -76,7 +102,7 @@ public abstract class DAO<T extends ModelClass> {
 		
 		query = query.substring(0, query.length()-1);
 		
-		query += " FROM " + table + " WHERE id = " + id + ";";
+		query += " FROM " + getTable() + " WHERE id = " + id + ";";
 				
 		ResultSet sqlResults = null;
 		
@@ -114,7 +140,7 @@ public abstract class DAO<T extends ModelClass> {
 		
 		query = query.substring(0, query.length()-1);
 		
-		query += " FROM " + table + ";";
+		query += " FROM " + getTable() + ";";
 		
 		ResultSet sqlResults = null;
 		
@@ -143,9 +169,6 @@ public abstract class DAO<T extends ModelClass> {
 		cManager.closeConnection();
 		return result;
 	}
-	
-	
-	
 	
 }
  
