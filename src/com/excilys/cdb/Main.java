@@ -41,6 +41,8 @@ public class Main {
 		
 		System.out.println(companyService.getItems("id", "37"));
 		
+		System.out.println("Fonctions disponibles :\n list computers ()\n list companies ()\n computer details (id)\n create computer (name, introduced, discontinued, company_id)\n update computer (id, parameters to change)\n delete computer (id)");
+        System.out.println("ENTREZ LA COMMANDE");
 	}
 	
 	

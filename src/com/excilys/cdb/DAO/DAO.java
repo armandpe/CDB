@@ -47,17 +47,22 @@ public abstract class DAO<T extends ModelClass> {
 	
 	protected abstract Optional<T> buildItem(ResultSet result);
 	
+	public String a2Str(String[] array) {
+		String res = "";
+		for(String s : array)
+			res += s + ',';
+	
+		res = res.substring(0, res.length()-1);
+		
+		return res;
+	}
+	
 	public List<T> getItems(String paramName, String paramValue){
 		{
 			ConnectionManager cManager = ConnectionManager.getInstance(); 
 			Connection connection = cManager.getConnection();
 			 
-			String query = "SELECT ";
-			
-			for(String s : getSQLArgs())
-					query += s + ',';
-			
-			query = query.substring(0, query.length()-1);
+			String query = "SELECT " + a2Str(getSQLArgs());
 			
 			query += " FROM " + getTable() + " WHERE "+ paramName + " = " + paramValue + ";";
 			
@@ -95,12 +100,7 @@ public abstract class DAO<T extends ModelClass> {
 		ConnectionManager cManager = ConnectionManager.getInstance(); 
 		Connection connection = cManager.getConnection();
 		 
-		String query = "SELECT ";
-		
-		for(String s : getSQLArgs())
-				query += s + ',';
-		
-		query = query.substring(0, query.length()-1);
+		String query = "SELECT " + a2Str(getSQLArgs());
 		
 		query += " FROM " + getTable() + " WHERE id = " + id + ";";
 				
@@ -133,12 +133,7 @@ public abstract class DAO<T extends ModelClass> {
 		ConnectionManager cManager = ConnectionManager.getInstance(); 
 		Connection connection = cManager.getConnection();
 		 
-		String query = "SELECT ";
-		
-		for(String s : getSQLArgs())
-				query += s + ',';
-		
-		query = query.substring(0, query.length()-1);
+		String query = "SELECT " + a2Str(getSQLArgs());
 		
 		query += " FROM " + getTable() + ";";
 		
