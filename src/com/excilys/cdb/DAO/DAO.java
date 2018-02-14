@@ -5,6 +5,10 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,7 +17,7 @@ import java.util.Optional;
 
 import com.excilys.cdb.ConnectionManager.ConnectionManager;
 import com.excilys.cdb.Model.ModelClass;
-import com.excilys.cdb.Model.SQLName;
+import com.excilys.cdb.Model.SQLInfo;
 
 public abstract class DAO<T extends ModelClass> {
 	
@@ -33,8 +37,8 @@ public abstract class DAO<T extends ModelClass> {
 		}
 		
 		for(Field field : fields) {
-			if(field.isAnnotationPresent(SQLName.class))
-				res.put(field.getAnnotation(SQLName.class).name(), field.getName());
+			if(field.isAnnotationPresent(SQLInfo.class))
+				res.put(field.getAnnotation(SQLInfo.class).name(), field.getName());
 		}
 		
 		return res;
@@ -163,6 +167,34 @@ public abstract class DAO<T extends ModelClass> {
 		
 		cManager.closeConnection();
 		return result;
+	}
+	
+	public static String toSQLFormat(Object o) {
+		
+		if(o == null)
+			return null;
+		
+		Class<? extends Object> c = o.getClass();
+		
+		if(c == String.class) {
+			System.out.println("str");
+			return "\"" + o.toString()+ "\"";
+		}
+		else if(c == LocalDateTime.class) {
+			System.out.println("datetime");
+			LocalDateTime t = (LocalDateTime) o;
+			return String.valueOf(t.toEpochSecond(null));
+		}
+		else if(c == LocalDate.class) {
+			System.out.println("date");
+			LocalDate t = (LocalDate) o;
+			return String.valueOf(t.atStartOfDay(ZoneId.systemDefault()).toEpochSecond());
+		}
+		else {
+			System.out.println("classique");
+			return o.toString();
+		}
+		
 	}
 	
 }

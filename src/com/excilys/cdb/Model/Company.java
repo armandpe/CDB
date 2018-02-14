@@ -2,10 +2,10 @@ package com.excilys.cdb.Model;
 
 public class Company implements ModelClass {
 	
-	@SQLName(name = "id")
+	@SQLInfo(name = "id")
 	private long id;
 	
-	@SQLName(name = "name")
+	@SQLInfo(name = "name")
 	private String name;
 	
 	public Company() {}

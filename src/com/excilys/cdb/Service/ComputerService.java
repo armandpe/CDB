@@ -24,5 +24,7 @@ public class ComputerService extends Service<Computer, ComputerDAO>{
 		return ComputerDAO.class.getName();
 	}
 	
-	
+	public int createComputer(Computer c) {
+		return ((ComputerDAO) getDAO()).createComputer(c);
+	}
 }
