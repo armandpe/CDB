@@ -1,6 +1,6 @@
 package com.excilys.cdb.Model;
 
-public class Company {
+public class Company implements ModelClass {
 	
 	private long id;
 	private String name;
@@ -14,7 +14,7 @@ public class Company {
 	
 	@Override
 	public String toString() {
-		String res = "Company " + this.name + "(" + this.id + ") : \n";
+		String res = "Company " + this.name + "(" + this.id + ")\n";
 		
 		return res;
 	}

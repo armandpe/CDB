@@ -28,8 +28,8 @@ public class ComputerDAO extends DAO<Computer> {
 			Computer c = new Computer();
 			c.setId(rs.getLong("id"));
 			c.setName(rs.getString("name"));
-			c.setIntroduced(rs.getTimestamp("introduced"));
-			c.setDiscontinued(rs.getTimestamp("discontinued"));
+			c.setIntroduced( rs.getTimestamp("introduced").toLocalDateTime().toLocalDate());
+			c.setDiscontinued(rs.getTimestamp("discontinued").toLocalDateTime().toLocalDate());
 			c.setCompanyId(rs.getLong("company_id"));
 			return Optional.of(c);
 		}catch(SQLException e) {

@@ -6,11 +6,11 @@ import java.util.Optional;
 import com.excilys.cdb.DAO.ComputerDAO;
 import com.excilys.cdb.Model.Computer;
 
-public class ComputerService {
+public class ComputerService extends Service<Computer, ComputerDAO>{
 	
 	private static ComputerService service;
 	
-	private ComputerService() {}
+	private ComputerService() { daoClassName = "com.excilys.cdb.DAO.ComputerDAO"; }
 	
 	public static ComputerService getInstance() {
 		if(service == null) {
@@ -19,19 +19,5 @@ public class ComputerService {
 		return service;
 	}
 	
-	public List<Computer> getAll(){
-		ComputerDAO dao = ComputerDAO.getInstance();
-		return dao.getAll();
-	}
-	
-	public Optional<Computer> getById(long id) {
-		ComputerDAO dao = ComputerDAO.getInstance();
-		return dao.getById(id);
-	}
-	
-	public List<Computer> getItems(String paramName, String paramValue) {
-		ComputerDAO dao = ComputerDAO.getInstance();
-		return dao.getItems(paramName, paramValue);
-	}
 	
 }

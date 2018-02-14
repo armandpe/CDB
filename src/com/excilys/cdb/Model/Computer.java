@@ -1,22 +1,20 @@
 package com.excilys.cdb.Model;
 
 import java.lang.reflect.Field;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.util.Properties;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
-public class Computer {
+public class Computer implements ModelClass {
 	private long id;
 	private String name;
-	private Timestamp introduced;
-	private Timestamp discontinued;
+	private LocalDate introduced;
+	private LocalDate discontinued;
 	private long companyId;
 	
 	public Computer() {}
 	
-	public Computer(long id, String name, Timestamp introduced, 
-			Timestamp discontinued, long companyId) {
+	public Computer(long id, String name, LocalDate introduced, 
+			LocalDate discontinued, long companyId) {
 		this.id = id;
 		this.name = name;
 		this.introduced = introduced;
@@ -60,19 +58,19 @@ public class Computer {
 		this.name = name;
 	}
 
-	public Timestamp getIntroduced() {
+	public LocalDate getIntroduced() {
 		return introduced;
 	}
 
-	public void setIntroduced(Timestamp introduced) {
-		this.introduced = introduced;
+	public void setIntroduced(LocalDate localDate) {
+		this.introduced = localDate;
 	}
 
-	public Timestamp getDiscontinued() {
+	public LocalDate getDiscontinued() {
 		return discontinued;
 	}
 
-	public void setDiscontinued(Timestamp discontinued) {
+	public void setDiscontinued(LocalDate discontinued) {
 		this.discontinued = discontinued;
 	}
 

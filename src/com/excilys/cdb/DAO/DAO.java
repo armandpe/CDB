@@ -9,12 +9,17 @@ import java.util.List;
 import java.util.Optional;
 
 import com.excilys.cdb.ConnectionManager.ConnectionManager;
+import com.excilys.cdb.Model.ModelClass;
 
-public abstract class DAO<T> {
+public abstract class DAO<T extends ModelClass> {
 	
 	protected String table;
 	
+	protected String className;
+	
 	protected abstract String[] getSQLArgs();
+	
+	protected abstract Optional<T> buildItem(ResultSet result);
 	
 	public List<T> getItems(String paramName, String paramValue){
 		{
@@ -139,7 +144,8 @@ public abstract class DAO<T> {
 		return result;
 	}
 	
-	protected abstract Optional<T> buildItem(ResultSet result);
+	
+	
 	
 }
  
