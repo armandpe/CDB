@@ -1,5 +1,5 @@
 /bin/
-/.classpath
-/.project
-/.git
-/.settings
+.classpath
+.project
+.git
+.settings
