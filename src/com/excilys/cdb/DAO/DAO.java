@@ -5,10 +5,6 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Timestamp;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -51,7 +47,7 @@ public abstract class DAO<T extends ModelClass> {
 	
 	protected abstract Optional<T> buildItem(ResultSet result);
 	
-	public String a2Str(String[] array) {
+	public String arrayToString(String[] array) {
 		String res = "";
 		for(String s : array)
 			res += s + ',';
@@ -66,7 +62,7 @@ public abstract class DAO<T extends ModelClass> {
 			ConnectionManager cManager = ConnectionManager.getInstance(); 
 			Connection connection = cManager.getConnection();
 			 
-			String query = "SELECT " + a2Str(getSQLArgs());
+			String query = "SELECT " + arrayToString(getSQLArgs());
 			
 			query += " FROM " + getTable() + " WHERE "+ paramName + " = " + paramValue + ";";
 			
@@ -104,7 +100,7 @@ public abstract class DAO<T extends ModelClass> {
 		ConnectionManager cManager = ConnectionManager.getInstance(); 
 		Connection connection = cManager.getConnection();
 		 
-		String query = "SELECT " + a2Str(getSQLArgs());
+		String query = "SELECT " + arrayToString(getSQLArgs());
 		
 		query += " FROM " + getTable() + " WHERE id = " + id + ";";
 				
@@ -137,7 +133,7 @@ public abstract class DAO<T extends ModelClass> {
 		ConnectionManager cManager = ConnectionManager.getInstance(); 
 		Connection connection = cManager.getConnection();
 		 
-		String query = "SELECT " + a2Str(getSQLArgs());
+		String query = "SELECT " + arrayToString(getSQLArgs());
 		
 		query += " FROM " + getTable() + ";";
 		

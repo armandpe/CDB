@@ -1,9 +1,9 @@
 package com.excilys.cdb.Service;
 
 import com.excilys.cdb.DAO.CompanyDAO;
-import com.excilys.cdb.DAO.ComputerDAO;
 import com.excilys.cdb.Model.Company;
 
+@ServiceClass(name = "companies")
 public class CompanyService extends Service<Company, CompanyDAO>{
 	
 	private static CompanyService service;

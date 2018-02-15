@@ -21,8 +21,6 @@ import com.excilys.cdb.ConnectionManager.ConnectionManager;
 import com.excilys.cdb.Model.Computer;
 import com.excilys.cdb.Model.SQLInfo;
 
-import jdk.internal.util.xml.impl.Pair;
-
 public class ComputerDAO extends DAO<Computer> {
 
 	private static ComputerDAO computerDAO;
@@ -97,7 +95,7 @@ public class ComputerDAO extends DAO<Computer> {
 	private String generateCreateQuery(LinkedHashMap<String, SimpleEntry<Class<?>, Object>> paramValues, Set<String> keys) {
 
 		String[] template = {};
-		String query = "INSERT INTO " + getTable() + " ( " + a2Str(paramValues.keySet().toArray(template)) + " ) VALUES ( ";
+		String query = "INSERT INTO " + getTable() + " ( " + arrayToString(paramValues.keySet().toArray(template)) + " ) VALUES ( ";
 
 		for(int i = 0; i < keys.size(); ++i)
 			query += "?,";
@@ -176,7 +174,7 @@ public class ComputerDAO extends DAO<Computer> {
 
 	}
 
-	public long updateComputer(Computer computer) {
+	public int updateComputer(Computer computer) {
 		ConnectionManager cManager = ConnectionManager.getInstance(); 
 		Connection connection = cManager.getConnection();
 		Map<String, String> mapperSQLFields = getMapperSQLFields();
@@ -184,7 +182,7 @@ public class ComputerDAO extends DAO<Computer> {
 
 		LinkedHashMap<String, SimpleEntry<Class<?>, Object>> fieldsClassValues = generateFieldsClassValues(mapperSQLFields, computer);
 
-		String primaryKey = getPrimaryKey(computer);
+		String primaryKey = getPrimaryKeyName(Computer.class);
 		
 		HashMap<String, Integer> keyOrder = getKeyOrder(fieldsClassValues, primaryKey);
 		
@@ -221,13 +219,13 @@ public class ComputerDAO extends DAO<Computer> {
 		return keyOrder;
 	}
 
-	private String getPrimaryKey(Object o) {
+	private String getPrimaryKeyName(Class<?> objectClass) {
 		
-		Field[] fields = o.getClass().getDeclaredFields();
+		Field[] fields = objectClass.getDeclaredFields();
 		
 		for(Field field : fields) {
 			if(field.isAnnotationPresent(SQLInfo.class) && field.getAnnotation(SQLInfo.class).primaryKey())
-				return field.getName();
+				return field.getAnnotation(SQLInfo.class).name();
 		}
 		return null;
 	}
@@ -248,9 +246,25 @@ public class ComputerDAO extends DAO<Computer> {
 		return query;
 	}
 
-	protected long deleteComputer(long id) {
+	public int deleteComputer(long id) {
+		return deleteByPrimaryKey(id);
+	}
+	
+	public int deleteByPrimaryKey(Object primaryKeyValue) {
+		ConnectionManager cManager = ConnectionManager.getInstance(); 
+		Connection connection = cManager.getConnection();
+		
+		String primaryKey = getPrimaryKeyName(Computer.class);
+		
+		String query = "DELETE FROM " + getTable() + " WHERE " + primaryKey + " = ?";
 
-		return 0;
+		LinkedHashMap<String, SimpleEntry<Class<?>, Object>> fieldsClassValues = new LinkedHashMap<>();
+		fieldsClassValues.put(primaryKey, new SimpleEntry<Class<?>, Object>(primaryKeyValue.getClass(), primaryKeyValue));
+		
+		HashMap<String, Integer> keyOrder = new HashMap<>();
+		keyOrder.put(primaryKey, 1);
+		
+		return executeStatement(query, fieldsClassValues, keyOrder, connection);
 	}
 
 	@Override

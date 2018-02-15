@@ -16,7 +16,7 @@ public abstract class Service<T extends ModelClass, U extends DAO<T>> {
 	
 	public DAO<T> getDAO()
 	{
-		Class c = null;
+		Class<?> c = null;
 		DAO<T> dao = null;
 		Method method = null;
 		
@@ -44,16 +44,19 @@ public abstract class Service<T extends ModelClass, U extends DAO<T>> {
 		return dao;
 	}
 	
+	@ServiceMethod(name = "Get the list of all elements")
 	public List<T> getAll(){
 		DAO<T> dao = getDAO();
 		return dao.getAll();
 	}
 	
+	@ServiceMethod(name = "Get an element (by id)")
 	public Optional<T> getById(long id) {
 		DAO<T> dao = getDAO();
 		return dao.getById(id);
 	}
 	
+	@ServiceMethod(name = "Get the list of all elements verifying a condition")
 	public List<T> getItems(String paramName, String paramValue) {
 		DAO<T> dao = getDAO();
 		return dao.getItems(paramName, paramValue);

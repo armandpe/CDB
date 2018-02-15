@@ -5,7 +5,6 @@ import java.sql.SQLException;
 import java.util.Optional;
 
 import com.excilys.cdb.Model.Company;
-import com.excilys.cdb.Model.Computer;
 
 public class CompanyDAO extends DAO<Company> {
 	

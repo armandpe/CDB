@@ -2,7 +2,6 @@ package com.excilys.cdb.Model;
 
 import java.lang.reflect.Field;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 public class Computer implements ModelClass {
 	@SQLInfo(name = "id", primaryKey = true)
