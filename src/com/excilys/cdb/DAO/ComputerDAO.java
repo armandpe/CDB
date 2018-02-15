@@ -19,6 +19,7 @@ import java.util.Set;
 
 import com.excilys.cdb.ConnectionManager.ConnectionManager;
 import com.excilys.cdb.Model.Computer;
+import com.excilys.cdb.Model.SQLInfo;
 
 import jdk.internal.util.xml.impl.Pair;
 
@@ -54,68 +55,71 @@ public class ComputerDAO extends DAO<Computer> {
 			return Optional.ofNullable(null);
 		}
 	}
-	
-	public int createComputer(Computer c) {
 
+	public int createComputer(Computer computer) {
 		ConnectionManager cManager = ConnectionManager.getInstance(); 
 		Connection connection = cManager.getConnection();
-		Map<String, String> map = getMapperSQLFields();
-		String[] template = {};
+		Map<String, String> mapperSQLFields = getMapperSQLFields();
+		Set<String> keys = mapperSQLFields.keySet();
 
-		LinkedHashMap<String, SimpleEntry<Class<?>, Object>> paramValues = new LinkedHashMap<>();
+		LinkedHashMap<String, SimpleEntry<Class<?>, Object>> fieldsClassValues = generateFieldsClassValues(mapperSQLFields, computer);
 
-		Set<String> keys = map.keySet();
-		
+		HashMap<String, Integer> keyOrder = getKeyOrder(fieldsClassValues);
+
+		String query = generateCreateQuery(fieldsClassValues, keys);
+
+		return executeStatement(query, fieldsClassValues, keyOrder, connection);
+	}
+
+	private LinkedHashMap<String, SimpleEntry<Class<?>, Object>> generateFieldsClassValues(Map<String, String> mapperSQLFields, Computer computer) {
+		LinkedHashMap<String, SimpleEntry<Class<?>, Object>> fieldsClassValues = new LinkedHashMap<>();
+
 		Class<?> fieldClass = null;
 
-		for(Entry<String, String> entry : map.entrySet())
+		for(Entry<String, String> entry : mapperSQLFields.entrySet())
 		{
 			Object value = null;
 			try {
 				Field field = Computer.class.getDeclaredField(entry.getValue());
 				field.setAccessible(true);
-				value = field.get(c);
+				value = field.get(computer);
 				fieldClass = field.getType();
 			} catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
-			paramValues.put(entry.getKey(), new SimpleEntry<Class<?>, Object>(fieldClass, value));
-			
+			fieldsClassValues.put(entry.getKey(), new SimpleEntry<Class<?>, Object>(fieldClass, value));
 		}
 
-		HashMap<String, Integer> keyOrder = new HashMap<>(); 
+		return fieldsClassValues;
+	}
 
-		int i = 0;
-		for( Entry<String, SimpleEntry<Class<?>, Object>> entry : paramValues.entrySet())
-		{
-			keyOrder.put(entry.getKey(), ++i);
-		}
+	private String generateCreateQuery(LinkedHashMap<String, SimpleEntry<Class<?>, Object>> paramValues, Set<String> keys) {
 
+		String[] template = {};
 		String query = "INSERT INTO " + getTable() + " ( " + a2Str(paramValues.keySet().toArray(template)) + " ) VALUES ( ";
 
-		for(i = 0; i < keys.size(); ++i)
+		for(int i = 0; i < keys.size(); ++i)
 			query += "?,";
 
 		query = query.substring(0, query.length()-1);
 
 		query += " )";
 
-		return executeStatement(query, paramValues, keyOrder, connection);
+		return query;
 	}
-	
-	private int executeStatement(String query, LinkedHashMap<String, SimpleEntry<Class<?>, Object>> paramValues, HashMap<String, Integer> keyOrder, Connection connection) {
+
+	private int executeStatement(String query, LinkedHashMap<String, SimpleEntry<Class<?>, Object>> fieldsClassValues, HashMap<String, Integer> keyOrder, Connection connection) {
 		PreparedStatement ps;
-		
+
 		int result = -1;
-		
+
 		try {
 			ps = connection.prepareStatement(query);
 
-			for(Entry<String, SimpleEntry<Class<?>, Object>> entry : paramValues.entrySet())
+			for(Entry<String, SimpleEntry<Class<?>, Object>> fieldClassValue : fieldsClassValues.entrySet())
 			{
-				addValueToStatement(ps, entry, keyOrder);
+				addValueToStatement(ps, fieldClassValue, keyOrder);
 			}
 
 			System.out.println(query);
@@ -124,24 +128,24 @@ public class ComputerDAO extends DAO<Computer> {
 			e.printStackTrace();
 			System.out.println("Erreur requete : " + e.getMessage());
 		}
-		
+
 		try {
 			connection.close();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		return result;
 	}
 
-	public void addValueToStatement(PreparedStatement ps, Entry<String, SimpleEntry<Class<?>, Object>> entry, Map<String, Integer> keyOrder) throws SQLException {
+	public void addValueToStatement(PreparedStatement ps, Entry<String, SimpleEntry<Class<?>, Object>> fieldClassValue, Map<String, Integer> keyOrder) throws SQLException {
 
-		Object value = entry.getValue().getValue();
+		Object value = fieldClassValue.getValue().getValue();
 
-		Class<?> c = entry.getValue().getKey();
+		Class<?> c = fieldClassValue.getValue().getKey();
 
-		int order = keyOrder.get(entry.getKey());
+		int order = keyOrder.get(fieldClassValue.getKey());
 
 		if(c == String.class) {
 			ps.setString(order, (String) value);
@@ -167,29 +171,85 @@ public class ComputerDAO extends DAO<Computer> {
 		else {
 			System.out.println("Type non définit : " + c.getName());
 		}
-		
+
 	}
 
-//	String query = "UPDATE computer SET name= ?, instroduced=? , discontinued=? ,company_id= ? WHERE id =?";
-//    PreparedStatement ps;
-//   SingletonConn con= SingletonConn.INSTANCE;        
-//   con.initConn();
-//   try {
-//       
-//       ps = con.getConn().prepareStatement(query);
-//       ps.setString(1, obj.getName());
-//       ps.setTimestamp(2,obj.getIntroduced());
-//       ps.setTimestamp(3, obj.getDiscontinued());
-//       ps.setLong(4,obj.getCompany_id());
-//       ps.setLong(5,obj.getId());
-//       ps.executeUpdate();
-//       
-//       con.closeConn();
-//       return true;
-	
-	protected long updateComputer(Computer c) {
+	protected long updateComputer(Computer computer) {
+		ConnectionManager cManager = ConnectionManager.getInstance(); 
+		Connection connection = cManager.getConnection();
+		Map<String, String> mapperSQLFields = getMapperSQLFields();
+		Set<String> keys = mapperSQLFields.keySet();
 
-		return 0;
+		LinkedHashMap<String, SimpleEntry<Class<?>, Object>> fieldsClassValues = generateFieldsClassValues(mapperSQLFields, computer);
+
+		String primaryKey = getPrimaryKey(computer);
+		
+		HashMap<String, Integer> keyOrder = getKeyOrder(fieldsClassValues, primaryKey);
+		
+		String query = generateUpdateQuery(fieldsClassValues, keys, primaryKey);
+
+		return executeStatement(query, fieldsClassValues, keyOrder, connection);
+	}
+	
+	private HashMap<String, Integer> getKeyOrder(LinkedHashMap<String, SimpleEntry<Class<?>, Object>> fieldsClassValues){
+		HashMap<String, Integer> keyOrder = new HashMap<>(); 
+
+		int i = 0;
+		for( Entry<String, SimpleEntry<Class<?>, Object>> entry : fieldsClassValues.entrySet())
+		{
+			keyOrder.put(entry.getKey(), ++i);
+		}
+
+		return keyOrder;
+	}
+	
+	private HashMap<String, Integer> getKeyOrder(LinkedHashMap<String, SimpleEntry<Class<?>, Object>> fieldsClassValues,
+			String primaryKey) {
+		HashMap<String, Integer> keyOrder = new HashMap<>(); 
+
+		int i = 0;
+		for( Entry<String, SimpleEntry<Class<?>, Object>> entry : fieldsClassValues.entrySet())
+		{
+			if(entry.getKey() != primaryKey)
+				keyOrder.put(entry.getKey(), ++i);
+		}
+		
+		keyOrder.put(primaryKey, ++i);
+
+		return keyOrder;
+	}
+
+	private String getPrimaryKey(Object o) {
+		
+		Field[] fields = o.getClass().getDeclaredFields();
+		
+		for(Field field : fields) {
+			if(field.isAnnotationPresent(SQLInfo.class) && field.getAnnotation(SQLInfo.class).primaryKey())
+				return field.getName();
+		}
+		return null;
+	}
+	
+	
+	//	String query = "UPDATE computer SET name= ?, instroduced=? , discontinued=? ,company_id= ? WHERE id =?";
+	//       ps = con.getConn().prepareStatement(query);
+	//       ps.setString(1, obj.getName());
+	//       ps.executeUpdate();
+	//       con.closeConn();
+	private String generateUpdateQuery(LinkedHashMap<String, SimpleEntry<Class<?>, Object>> paramValues, Set<String> keys, String primaryKey) {
+
+		String query = "UPDATE " + getTable() + " SET ";
+		
+		for(String name : paramValues.keySet()) {
+			if(name != primaryKey)
+				query += name + " = ?,";
+		}
+
+		query = query.substring(0, query.length()-1);
+
+		query += " WHERE " + primaryKey + " = ?";
+
+		return query;
 	}
 
 	protected long deleteComputer(long id) {
