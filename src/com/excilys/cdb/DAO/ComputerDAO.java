@@ -9,7 +9,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -19,6 +19,8 @@ import java.util.Set;
 
 import com.excilys.cdb.ConnectionManager.ConnectionManager;
 import com.excilys.cdb.Model.Computer;
+
+import jdk.internal.util.xml.impl.Pair;
 
 public class ComputerDAO extends DAO<Computer> {
 
@@ -42,7 +44,7 @@ public class ComputerDAO extends DAO<Computer> {
 			c.setName(rs.getString("name"));
 			Timestamp temp = rs.getTimestamp("introduced");
 			c.setIntroduced(temp == null ? null : temp.toLocalDateTime().toLocalDate());
-			temp = rs.getTimestamp("introduced");
+			temp = rs.getTimestamp("discontinued");
 			c.setDiscontinued(temp == null ? null : temp.toLocalDateTime().toLocalDate());
 			c.setCompanyId(rs.getLong("company_id"));
 			return Optional.of(c);
@@ -52,27 +54,7 @@ public class ComputerDAO extends DAO<Computer> {
 			return Optional.ofNullable(null);
 		}
 	}
-
-
-	public void Nat() {
-		//		String query= "INSERT INTO computer ( name, introduced, discontinued ,company_id) VALUES (?, ?, ?, ?)";
-		//        PreparedStatement ps;
-		//       SingletonConn con= SingletonConn.INSTANCE;        
-		//       con.initConn();
-		//       try {
-		//           
-		//           ps = con.getConn().prepareStatement(query);
-		//           ps.setString(1, obj.getName());
-		//           ps.setTimestamp(2,obj.getIntroduced());
-		//           ps.setTimestamp(3, obj.getDiscontinued());
-		//           ps.setLong(4,obj.getCompany_id());
-		//           ps.executeUpdate();
-		//           tatement stmt = connection.createStatement();
-
-		//           con.closeConn();
-		//           return true;
-	}
-
+	
 	public int createComputer(Computer c) {
 
 		ConnectionManager cManager = ConnectionManager.getInstance(); 
@@ -80,9 +62,11 @@ public class ComputerDAO extends DAO<Computer> {
 		Map<String, String> map = getMapperSQLFields();
 		String[] template = {};
 
-		LinkedHashMap<String, Object> paramValues = new LinkedHashMap<>();
+		LinkedHashMap<String, SimpleEntry<Class<?>, Object>> paramValues = new LinkedHashMap<>();
 
 		Set<String> keys = map.keySet();
+		
+		Class<?> fieldClass = null;
 
 		for(Entry<String, String> entry : map.entrySet())
 		{
@@ -91,18 +75,20 @@ public class ComputerDAO extends DAO<Computer> {
 				Field field = Computer.class.getDeclaredField(entry.getValue());
 				field.setAccessible(true);
 				value = field.get(c);
+				fieldClass = field.getType();
 			} catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-
-			paramValues.put(entry.getKey(), value);
+			
+			paramValues.put(entry.getKey(), new SimpleEntry<Class<?>, Object>(fieldClass, value));
+			
 		}
 
 		HashMap<String, Integer> keyOrder = new HashMap<>(); 
 
 		int i = 0;
-		for(Entry<String, Object> entry : paramValues.entrySet())
+		for( Entry<String, SimpleEntry<Class<?>, Object>> entry : paramValues.entrySet())
 		{
 			keyOrder.put(entry.getKey(), ++i);
 		}
@@ -116,31 +102,44 @@ public class ComputerDAO extends DAO<Computer> {
 
 		query += " )";
 
+		return executeStatement(query, paramValues, keyOrder, connection);
+	}
+	
+	private int executeStatement(String query, LinkedHashMap<String, SimpleEntry<Class<?>, Object>> paramValues, HashMap<String, Integer> keyOrder, Connection connection) {
 		PreparedStatement ps;
-
+		
+		int result = -1;
+		
 		try {
 			ps = connection.prepareStatement(query);
 
-			for(Entry<String, Object> entry : paramValues.entrySet())
+			for(Entry<String, SimpleEntry<Class<?>, Object>> entry : paramValues.entrySet())
 			{
 				addValueToStatement(ps, entry, keyOrder);
 			}
 
 			System.out.println(query);
-			return ps.executeUpdate();
+			result = ps.executeUpdate();
 		}catch(Exception e) { 
 			e.printStackTrace();
 			System.out.println("Erreur requete : " + e.getMessage());
-			return -1;
 		}
-
+		
+		try {
+			connection.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return result;
 	}
 
-	public void addValueToStatement(PreparedStatement ps, Entry<String, Object> entry, Map<String, Integer> keyOrder) throws SQLException {
+	public void addValueToStatement(PreparedStatement ps, Entry<String, SimpleEntry<Class<?>, Object>> entry, Map<String, Integer> keyOrder) throws SQLException {
 
-		Object value = entry.getValue();
+		Object value = entry.getValue().getValue();
 
-		Class<? extends Object> c = value.getClass();
+		Class<?> c = entry.getValue().getKey();
 
 		int order = keyOrder.get(entry.getKey());
 
@@ -159,17 +158,35 @@ public class ComputerDAO extends DAO<Computer> {
 			else
 				ps.setDate(order, null);	
 		}
-		else if(c == Integer.class) {
+		else if(c == Integer.class || c == int.class) {
 			ps.setInt(order, (Integer) value);
 		}
-		else if(c == Long.class) {
+		else if(c == Long.class || c == long.class) {
 			ps.setLong(order, (Long) value);
+		}
+		else {
+			System.out.println("Type non définit : " + c.getName());
 		}
 		
 	}
 
-
-
+//	String query = "UPDATE computer SET name= ?, instroduced=? , discontinued=? ,company_id= ? WHERE id =?";
+//    PreparedStatement ps;
+//   SingletonConn con= SingletonConn.INSTANCE;        
+//   con.initConn();
+//   try {
+//       
+//       ps = con.getConn().prepareStatement(query);
+//       ps.setString(1, obj.getName());
+//       ps.setTimestamp(2,obj.getIntroduced());
+//       ps.setTimestamp(3, obj.getDiscontinued());
+//       ps.setLong(4,obj.getCompany_id());
+//       ps.setLong(5,obj.getId());
+//       ps.executeUpdate();
+//       
+//       con.closeConn();
+//       return true;
+	
 	protected long updateComputer(Computer c) {
 
 		return 0;

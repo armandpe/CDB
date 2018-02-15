@@ -9,4 +9,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface SQLInfo {
 	String name();
+	boolean primaryKey() default false;
 }

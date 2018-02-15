@@ -168,34 +168,6 @@ public abstract class DAO<T extends ModelClass> {
 		cManager.closeConnection();
 		return result;
 	}
-	
-	public static String toSQLFormat(Object o) {
-		
-		if(o == null)
-			return null;
-		
-		Class<? extends Object> c = o.getClass();
-		
-		if(c == String.class) {
-			System.out.println("str");
-			return "\"" + o.toString()+ "\"";
-		}
-		else if(c == LocalDateTime.class) {
-			System.out.println("datetime");
-			LocalDateTime t = (LocalDateTime) o;
-			return String.valueOf(t.toEpochSecond(null));
-		}
-		else if(c == LocalDate.class) {
-			System.out.println("date");
-			LocalDate t = (LocalDate) o;
-			return String.valueOf(t.atStartOfDay(ZoneId.systemDefault()).toEpochSecond());
-		}
-		else {
-			System.out.println("classique");
-			return o.toString();
-		}
-		
-	}
-	
+
 }
  

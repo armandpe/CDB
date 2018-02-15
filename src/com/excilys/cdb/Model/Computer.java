@@ -5,7 +5,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class Computer implements ModelClass {
-	@SQLInfo(name = "id")
+	@SQLInfo(name = "id", primaryKey = true)
 	private long id;
 	
 	@SQLInfo(name = "name")
@@ -33,11 +33,7 @@ public class Computer implements ModelClass {
 	
 	public Computer(String name, LocalDate introduced, 
 			LocalDate discontinued, long companyId) {
-		this.id = id;
-		this.name = name;
-		this.introduced = introduced;
-		this.discontinued = discontinued;
-		this.companyId = companyId;
+		this(0, name, introduced, discontinued, companyId);
 	}
 	
 	@Override
