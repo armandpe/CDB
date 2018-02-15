@@ -144,7 +144,9 @@ public class ComputerDAO extends DAO<Computer> {
 		Object value = fieldClassValue.getValue().getValue();
 
 		Class<?> c = fieldClassValue.getValue().getKey();
-
+		
+		System.out.println(keyOrder);
+		
 		int order = keyOrder.get(fieldClassValue.getKey());
 
 		if(c == String.class) {
@@ -174,7 +176,7 @@ public class ComputerDAO extends DAO<Computer> {
 
 	}
 
-	protected long updateComputer(Computer computer) {
+	public long updateComputer(Computer computer) {
 		ConnectionManager cManager = ConnectionManager.getInstance(); 
 		Connection connection = cManager.getConnection();
 		Map<String, String> mapperSQLFields = getMapperSQLFields();
@@ -210,7 +212,7 @@ public class ComputerDAO extends DAO<Computer> {
 		int i = 0;
 		for( Entry<String, SimpleEntry<Class<?>, Object>> entry : fieldsClassValues.entrySet())
 		{
-			if(entry.getKey() != primaryKey)
+			if(!entry.getKey().equals(primaryKey))
 				keyOrder.put(entry.getKey(), ++i);
 		}
 		
@@ -230,18 +232,12 @@ public class ComputerDAO extends DAO<Computer> {
 		return null;
 	}
 	
-	
-	//	String query = "UPDATE computer SET name= ?, instroduced=? , discontinued=? ,company_id= ? WHERE id =?";
-	//       ps = con.getConn().prepareStatement(query);
-	//       ps.setString(1, obj.getName());
-	//       ps.executeUpdate();
-	//       con.closeConn();
 	private String generateUpdateQuery(LinkedHashMap<String, SimpleEntry<Class<?>, Object>> paramValues, Set<String> keys, String primaryKey) {
 
 		String query = "UPDATE " + getTable() + " SET ";
 		
 		for(String name : paramValues.keySet()) {
-			if(name != primaryKey)
+			if(!name.equals(primaryKey))
 				query += name + " = ?,";
 		}
 

@@ -18,9 +18,12 @@ public class Main {
 		ComputerService computerService = ComputerService.getInstance();
 		CompanyService companyService = CompanyService.getInstance();
 		
-		computerService.createComputer(new Computer("NullCmpt3", LocalDate.of(1996, 10, 24), null, 40));
+		Computer computer = computerService.getById(587).get();
 		
-
+		computer.setName("updated");
+		
+		computerService.updateComputer(computer);
+		
 		System.out.println(computerService.getAll());
 		
 //		
