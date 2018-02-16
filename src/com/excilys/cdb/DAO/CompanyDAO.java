@@ -5,16 +5,12 @@ import java.sql.SQLException;
 import java.util.Optional;
 
 import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 
-import com.excilys.cdb.Main;
 import com.excilys.cdb.Model.Company;
 
 public class CompanyDAO extends DAO<Company> {
 	
 	private static CompanyDAO companyDAO;
-	
-	final static Logger logger = Logger.getLogger(ComputerDAO.class);
 	
 	private CompanyDAO() {}
 	

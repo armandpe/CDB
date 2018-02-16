@@ -7,8 +7,6 @@ import java.sql.SQLException;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
-import com.excilys.cdb.Main;
-
 
 public class ConnectionManager {
 	
@@ -33,25 +31,13 @@ public class ConnectionManager {
 		
 		try {
 			connection = DriverManager.getConnection(url, login, password);
-		} catch (SQLException e1) {
+		} catch (SQLException e) {
 			final StackTraceElement[] ste = Thread.currentThread().getStackTrace();
 			String methodName = ste[1].getMethodName(); 
 			logger.log(Level.ERROR, "Error in method " + methodName + " : " + e.getMessage());
 		}
 		
 		return connection;
-	}
-
-	public void closeConnection() {
-		try {
-			Connection c = connection;
-			if (c != null)
-				c.close();
-		} catch (SQLException e) {
-			final StackTraceElement[] ste = Thread.currentThread().getStackTrace();
-			String methodName = ste[1].getMethodName(); 
-			logger.log(Level.ERROR, "Error in method " + methodName + " : " + e.getMessage());
-		}
 	}
 
 }

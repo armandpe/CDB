@@ -14,6 +14,9 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import org.apache.log4j.Level;
+
 import java.util.Optional;
 import java.util.Set;
 
@@ -55,8 +58,6 @@ public class ComputerDAO extends DAO<Computer> {
 	}
 
 	public int createComputer(Computer computer) {
-		ConnectionManager cManager = ConnectionManager.getInstance(); 
-		Connection connection = cManager.getConnection();
 		Map<String, String> mapperSQLFields = getMapperSQLFields();
 		Set<String> keys = mapperSQLFields.keySet();
 
@@ -66,7 +67,7 @@ public class ComputerDAO extends DAO<Computer> {
 
 		String query = generateCreateQuery(fieldsClassValues, keys);
 
-		return executeStatement(query, fieldsClassValues, keyOrder, connection);
+		return executeStatement(query, fieldsClassValues, keyOrder);
 	}
 
 	private LinkedHashMap<String, SimpleEntry<Class<?>, Object>> generateFieldsClassValues(Map<String, String> mapperSQLFields, Computer computer) {
@@ -83,8 +84,9 @@ public class ComputerDAO extends DAO<Computer> {
 				value = field.get(computer);
 				fieldClass = field.getType();
 			} catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				final StackTraceElement[] ste = Thread.currentThread().getStackTrace();
+				String methodName = ste[1].getMethodName(); 
+				logger.log(Level.ERROR, "Error in method " + methodName + " : " + e.getMessage());
 			}
 			fieldsClassValues.put(entry.getKey(), new SimpleEntry<Class<?>, Object>(fieldClass, value));
 		}
@@ -107,33 +109,42 @@ public class ComputerDAO extends DAO<Computer> {
 		return query;
 	}
 
-	private int executeStatement(String query, LinkedHashMap<String, SimpleEntry<Class<?>, Object>> fieldsClassValues, HashMap<String, Integer> keyOrder, Connection connection) {
+	private int executeStatement(String query, LinkedHashMap<String, SimpleEntry<Class<?>, Object>> fieldsClassValues, HashMap<String, Integer> keyOrder) {
 		PreparedStatement ps;
-
+		ConnectionManager cManager = ConnectionManager.getInstance();
 		int result = -1;
+		
+		try(Connection connection = cManager.getConnection()){			
 
-		try {
-			ps = connection.prepareStatement(query);
+			try {
+				ps = connection.prepareStatement(query);
 
-			for(Entry<String, SimpleEntry<Class<?>, Object>> fieldClassValue : fieldsClassValues.entrySet())
-			{
-				addValueToStatement(ps, fieldClassValue, keyOrder);
+				for(Entry<String, SimpleEntry<Class<?>, Object>> fieldClassValue : fieldsClassValues.entrySet())
+				{
+					addValueToStatement(ps, fieldClassValue, keyOrder);
+				}
+
+				System.out.println(query);
+				result = ps.executeUpdate();
+				ps.close();
+			}catch(Exception e) { 
+				final StackTraceElement[] ste = Thread.currentThread().getStackTrace();
+				String methodName = ste[1].getMethodName(); 
+				logger.log(Level.ERROR, "Error in method " + methodName + " : " + e.getMessage());
 			}
 
-			System.out.println(query);
-			result = ps.executeUpdate();
-		}catch(Exception e) { 
-			e.printStackTrace();
-			System.out.println("Erreur requete : " + e.getMessage());
+			try {
+				connection.close();
+			} catch (SQLException e) {
+				final StackTraceElement[] ste = Thread.currentThread().getStackTrace();
+				String methodName = ste[1].getMethodName(); 
+				logger.log(Level.ERROR, "Error in method " + methodName + " : " + e.getMessage());
+			}
+		} catch (SQLException e1) {
+			final StackTraceElement[] ste = Thread.currentThread().getStackTrace();
+			String methodName = ste[1].getMethodName(); 
+			logger.log(Level.ERROR, "Error in method " + methodName + " : " + e1.getMessage());
 		}
-
-		try {
-			connection.close();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
 		return result;
 	}
 
@@ -142,9 +153,9 @@ public class ComputerDAO extends DAO<Computer> {
 		Object value = fieldClassValue.getValue().getValue();
 
 		Class<?> c = fieldClassValue.getValue().getKey();
-		
+
 		System.out.println(keyOrder);
-		
+
 		int order = keyOrder.get(fieldClassValue.getKey());
 
 		if(c == String.class) {
@@ -169,28 +180,28 @@ public class ComputerDAO extends DAO<Computer> {
 			ps.setLong(order, (Long) value);
 		}
 		else {
-			System.out.println("Type non définit : " + c.getName());
+			final StackTraceElement[] ste = Thread.currentThread().getStackTrace();
+			String methodName = ste[1].getMethodName(); 
+			logger.log(Level.ERROR, "Error in method " + methodName + " : " + "Undefined type " + c.getName());
 		}
 
 	}
 
 	public int updateComputer(Computer computer) {
-		ConnectionManager cManager = ConnectionManager.getInstance(); 
-		Connection connection = cManager.getConnection();
 		Map<String, String> mapperSQLFields = getMapperSQLFields();
 		Set<String> keys = mapperSQLFields.keySet();
 
 		LinkedHashMap<String, SimpleEntry<Class<?>, Object>> fieldsClassValues = generateFieldsClassValues(mapperSQLFields, computer);
 
 		String primaryKey = getPrimaryKeyName(Computer.class);
-		
+
 		HashMap<String, Integer> keyOrder = getKeyOrder(fieldsClassValues, primaryKey);
-		
+
 		String query = generateUpdateQuery(fieldsClassValues, keys, primaryKey);
 
-		return executeStatement(query, fieldsClassValues, keyOrder, connection);
+		return executeStatement(query, fieldsClassValues, keyOrder);
 	}
-	
+
 	private HashMap<String, Integer> getKeyOrder(LinkedHashMap<String, SimpleEntry<Class<?>, Object>> fieldsClassValues){
 		HashMap<String, Integer> keyOrder = new HashMap<>(); 
 
@@ -202,7 +213,7 @@ public class ComputerDAO extends DAO<Computer> {
 
 		return keyOrder;
 	}
-	
+
 	private HashMap<String, Integer> getKeyOrder(LinkedHashMap<String, SimpleEntry<Class<?>, Object>> fieldsClassValues,
 			String primaryKey) {
 		HashMap<String, Integer> keyOrder = new HashMap<>(); 
@@ -213,27 +224,27 @@ public class ComputerDAO extends DAO<Computer> {
 			if(!entry.getKey().equals(primaryKey))
 				keyOrder.put(entry.getKey(), ++i);
 		}
-		
+
 		keyOrder.put(primaryKey, ++i);
 
 		return keyOrder;
 	}
 
 	private String getPrimaryKeyName(Class<?> objectClass) {
-		
+
 		Field[] fields = objectClass.getDeclaredFields();
-		
+
 		for(Field field : fields) {
 			if(field.isAnnotationPresent(SQLInfo.class) && field.getAnnotation(SQLInfo.class).primaryKey())
 				return field.getAnnotation(SQLInfo.class).name();
 		}
 		return null;
 	}
-	
+
 	private String generateUpdateQuery(LinkedHashMap<String, SimpleEntry<Class<?>, Object>> paramValues, Set<String> keys, String primaryKey) {
 
 		String query = "UPDATE " + getTable() + " SET ";
-		
+
 		for(String name : paramValues.keySet()) {
 			if(!name.equals(primaryKey))
 				query += name + " = ?,";
@@ -249,22 +260,19 @@ public class ComputerDAO extends DAO<Computer> {
 	public int deleteComputer(long id) {
 		return deleteByPrimaryKey(id);
 	}
-	
+
 	public int deleteByPrimaryKey(Object primaryKeyValue) {
-		ConnectionManager cManager = ConnectionManager.getInstance(); 
-		Connection connection = cManager.getConnection();
-		
 		String primaryKey = getPrimaryKeyName(Computer.class);
-		
+
 		String query = "DELETE FROM " + getTable() + " WHERE " + primaryKey + " = ?";
 
 		LinkedHashMap<String, SimpleEntry<Class<?>, Object>> fieldsClassValues = new LinkedHashMap<>();
 		fieldsClassValues.put(primaryKey, new SimpleEntry<Class<?>, Object>(primaryKeyValue.getClass(), primaryKeyValue));
-		
+
 		HashMap<String, Integer> keyOrder = new HashMap<>();
 		keyOrder.put(primaryKey, 1);
-		
-		return executeStatement(query, fieldsClassValues, keyOrder, connection);
+
+		return executeStatement(query, fieldsClassValues, keyOrder);
 	}
 
 	@Override

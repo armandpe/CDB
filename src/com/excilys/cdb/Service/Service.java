@@ -64,10 +64,4 @@ public abstract class Service<T extends ModelClass, U extends DAO<T>> {
 		DAO<T> dao = getDAO();
 		return dao.getById(id);
 	}
-	
-	@ServiceMethod(name = "Get the list of all elements verifying a condition")
-	public List<T> getItems(@ParamDescription(name = "parameter name") String paramName, @ParamDescription(name = "parameter value") String paramValue) {
-		DAO<T> dao = getDAO();
-		return dao.getItems(paramName, paramValue);
-	}
 }
