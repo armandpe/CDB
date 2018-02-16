@@ -4,6 +4,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.ArrayList;
@@ -49,7 +50,8 @@ public class Main {
 				choice = sc.nextInt();
 				sc.nextLine();
 			}catch(InputMismatchException e) {
-
+				sc.nextLine();
+				continue;
 			}
 
 			if(choice == 0)
@@ -143,59 +145,93 @@ public class Main {
 			if(param.isAnnotationPresent(ParamDescription.class))
 				name = param.getAnnotation(ParamDescription.class).name();
 
-			print("Enter the " + name + " :");
+			Object defaultReturn = new Object();
+			Object result = defaultReturn;
+			boolean firstTime = true;
 
-			if(acceptedTypesList.contains(param.getType())) {
-				parameters.add(AskParameter(param, sc));
-			} else {
-				Class<?> type = param.getType();
-				Constructor<?>[] cs = type.getConstructors();
-				Constructor<?> maxArgs = cs[0];
-
-				for(Constructor<?> c : cs) {
-					if(c.getParameterCount() > maxArgs.getParameterCount())
-						maxArgs = c;
-				}
+			while(result == defaultReturn) {
 				try {
-					parameters.add(maxArgs.newInstance(AskParameters(maxArgs.getParameters(), sc).toArray()));
+					if(!firstTime)
+						print("Entry error - please try again...");
+					firstTime = false;
+					print("Enter the " + name + " :");
+					if(acceptedTypesList.contains(param.getType())) {
+						result = AskParameter(param, sc);
+					} else {
+
+						result = AskOtherParameter(parameters, param, sc);
+					}
 				} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
-						| InvocationTargetException e) {
+						| InvocationTargetException | InputMismatchException e) {
 					final StackTraceElement[] ste = Thread.currentThread().getStackTrace();
 					String methodName = ste[1].getMethodName(); 
-					logger.log(Level.ERROR, "Error in method " + methodName + " : " + e.getMessage());
+					logger.log(Level.ERROR, "Error in method " + methodName + e.getMessage() == null ? "" : " : " + e.getMessage());
+					result = defaultReturn;
 				}
 			}
+			parameters.add(result);
 		}
 		return parameters;
 	}
 
-	private static Object AskParameter(Parameter param, Scanner sc) {
+	private static Object AskOtherParameter(LinkedList<Object> parameters, Parameter param, Scanner sc) throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+		Class<?> type = param.getType();
+		Constructor<?>[] cs = type.getConstructors();
+		Constructor<?> maxArgs = cs[0];
 
-		if(param.getType() == long.class || param.getType() == Long.class) {
-			long l = sc.nextLong();
-			sc.nextLine();
-			return l;
-
-		} else if(param.getType() == LocalDate.class) {
-			print("Enter the year :");
-			int year = sc.nextInt();
-			sc.nextLine();
-
-			print("Enter the month :");
-			Month month = Month.of(sc.nextInt());
-			sc.nextLine();
-
-			print("Enter the day :");
-			int dayOfMonth = sc.nextInt();
-			sc.nextLine();
-
-			return LocalDate.of(year, month, dayOfMonth);
-		} else if(param.getType() == String.class) {
-			return sc.nextLine();
+		for(Constructor<?> c : cs) {
+			if(c.getParameterCount() > maxArgs.getParameterCount())
+				maxArgs = c;
 		}
+		return maxArgs.newInstance(AskParameters(maxArgs.getParameters(), sc).toArray());
+	}
 
-		return null;
 
+	private static Object AskParameter(Parameter param, Scanner sc) throws InputMismatchException {
+		try {
+			if(param.getType() == long.class || param.getType() == Long.class) {
+				long l = sc.nextLong();
+				sc.nextLine();
+
+				return l;
+
+			} else if(param.getType() == LocalDate.class) {
+				int year = 0;
+				Month month = Month.of(1);
+				int dayOfMonth = 0;
+
+				try {
+					print("Enter the year :");
+					year = sc.nextInt();
+					sc.nextLine();
+
+					print("Enter the month :");
+					month = Month.of(sc.nextInt());
+					sc.nextLine();
+
+					print("Enter the day :");
+					dayOfMonth = sc.nextInt();
+					sc.nextLine();
+				}catch(InputMismatchException |DateTimeException e) {
+					sc.nextLine();
+					throw new InputMismatchException("The input is invalid for a date");
+				}
+
+				return LocalDate.of(year, month, dayOfMonth);
+			} else if(param.getType() == String.class) {
+				return sc.nextLine();
+			}
+
+			return null;
+		}catch(InputMismatchException e) {
+			if(e.getMessage() == null) {
+				sc.nextLine();
+				throw new InputMismatchException("The input is invalid for the type " + param.getType());
+			}
+			else {
+				throw e;
+			}
+		}
 	}
 
 	private static void print(String s) {

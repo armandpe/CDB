@@ -58,6 +58,12 @@ public class Computer implements ModelClass {
 		this.introduced = introduced;
 		this.discontinued = discontinued;
 		this.companyId = companyId;
+		
+		if(this.introduced == null ||this.discontinued == null || introduced.compareTo(discontinued) > 0)
+			throw new IllegalArgumentException("Introduced date superior to discontinued date");
+		if(introduced.getYear() < 1970 || discontinued.getYear() < 1970) {
+			throw new IllegalArgumentException("A date was inferior to 1970 - not managed by the database");
+		}
 	}
 
 	public Computer(String name,  LocalDate introduced, LocalDate discontinued,  long companyId) {
@@ -78,7 +84,6 @@ public class Computer implements ModelClass {
 				String methodName = ste[1].getMethodName(); 
 				logger.log(Level.ERROR, "Error in method " + methodName + " : " + e.getMessage());
 			}
-
 		}
 
 		return res;
