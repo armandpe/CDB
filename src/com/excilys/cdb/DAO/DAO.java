@@ -11,11 +11,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.apache.log4j.Logger;
+
+import com.excilys.cdb.Main;
 import com.excilys.cdb.ConnectionManager.ConnectionManager;
 import com.excilys.cdb.Model.ModelClass;
 import com.excilys.cdb.Model.SQLInfo;
 
 public abstract class DAO<T extends ModelClass> {
+	
+	final Logger logger = Logger.getLogger(this.getClass());
 	
 	protected abstract String getTable();
 	

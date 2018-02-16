@@ -5,6 +5,9 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+
 import com.excilys.cdb.ParamDescription;
 import com.excilys.cdb.DAO.DAO;
 import com.excilys.cdb.Model.ModelClass;
@@ -12,6 +15,8 @@ import com.excilys.cdb.Model.ModelClass;
 public abstract class Service<T extends ModelClass, U extends DAO<T>> {
 
 	String daoClassName;
+	
+	final Logger logger = Logger.getLogger(this.getClass());
 	
 	public abstract String getDaoClassFullName();
 	
@@ -24,22 +29,25 @@ public abstract class Service<T extends ModelClass, U extends DAO<T>> {
 		try {
 			c = Class.forName(getDaoClassFullName());
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			final StackTraceElement[] ste = Thread.currentThread().getStackTrace();
+			String methodName = ste[1].getMethodName(); 
+			logger.log(Level.ERROR, "Error in method " + methodName + " : " + e.getMessage());
 		}
 		
 		try {
 			method = c.getMethod("getInstance");
 		} catch (NoSuchMethodException | SecurityException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			final StackTraceElement[] ste = Thread.currentThread().getStackTrace();
+			String methodName = ste[1].getMethodName(); 
+			logger.log(Level.ERROR, "Error in method " + methodName + " : " + e.getMessage());
 		}
 		
 		try {
 			dao = (DAO<T>) method.invoke(null);
 		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			final StackTraceElement[] ste = Thread.currentThread().getStackTrace();
+			String methodName = ste[1].getMethodName(); 
+			logger.log(Level.ERROR, "Error in method " + methodName + " : " + e.getMessage());
 		}
 		
 		return dao;

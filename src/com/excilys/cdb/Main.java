@@ -8,7 +8,6 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.InputMismatchException;
 import java.util.LinkedHashMap;
@@ -19,13 +18,19 @@ import java.util.Map.Entry;
 import java.util.Scanner;
 import java.util.Set;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+
 import com.excilys.cdb.Service.CompanyService;
 import com.excilys.cdb.Service.ComputerService;
 import com.excilys.cdb.Service.Service;
 import com.excilys.cdb.Service.ServiceClass;
 import com.excilys.cdb.Service.ServiceMethod;
 
+
 public class Main {
+
+	final static Logger logger = Logger.getLogger(Main.class);
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
@@ -57,7 +62,9 @@ public class Main {
 			}
 
 			print(applyChoice(choice, servicesMethods, sc).toString());
-			for(int i = 0; i<10; ++i)
+			print("\n Press ENTER");
+			sc.nextLine();
+			for(int i = 0; i < 10; ++i)
 				print("");
 		}
 
@@ -87,37 +94,38 @@ public class Main {
 		Parameter[] params = chosenMethod.getParameters();
 
 		Object[] parameters = AskParameters(params, sc).toArray();
-		
-		
-		
+
 		try {
 			return chosenMethod.invoke(getServiceInstance(usedClass), parameters);
 		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			final StackTraceElement[] ste = Thread.currentThread().getStackTrace();
+			String methodName = ste[1].getMethodName(); 
+			logger.log(Level.ERROR, "Error in method " + methodName + " : " + e.getMessage());
 		}
 		return "Error";
 	}
 
 	private static Service<?, ?> getServiceInstance(Class<?> serviceClass){
-		
+
 		Service<?,?> service = null;
-		
+
 		Method method = null;
 		try {
 			method = serviceClass.getMethod("getInstance");
 		} catch (NoSuchMethodException | SecurityException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			final StackTraceElement[] ste = Thread.currentThread().getStackTrace();
+			String methodName = ste[1].getMethodName(); 
+			logger.log(Level.ERROR, "Error in method " + methodName + " : " + e.getMessage());
 		}
-		
+
 		try {
 			service = (Service<?,?>) method.invoke(null);
 		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			final StackTraceElement[] ste = Thread.currentThread().getStackTrace();
+			String methodName = ste[1].getMethodName(); 
+			logger.log(Level.ERROR, "Error in method " + methodName + " : " + e.getMessage());
 		}
-		
+
 		return service;
 	}
 
@@ -125,76 +133,69 @@ public class Main {
 	private static List<?> AskParameters(Parameter[] params, Scanner sc) {
 		Class<?>[] acceptedTypes = { long.class, Long.class, LocalDate.class, String.class };
 		ArrayList<Class<?>> acceptedTypesList = new ArrayList<>(Arrays.asList(acceptedTypes));
-		
+
 		LinkedList<Object> parameters = new LinkedList<>();
-		
+
 		for(Parameter param : params) {
-			
+
 			String name = param.getName();
-			
+
 			if(param.isAnnotationPresent(ParamDescription.class))
-					name = param.getAnnotation(ParamDescription.class).name();
-			
+				name = param.getAnnotation(ParamDescription.class).name();
+
 			print("Enter the " + name + " :");
-			
+
 			if(acceptedTypesList.contains(param.getType())) {
 				parameters.add(AskParameter(param, sc));
 			} else {
 				Class<?> type = param.getType();
 				Constructor<?>[] cs = type.getConstructors();
 				Constructor<?> maxArgs = cs[0];
-				
+
 				for(Constructor<?> c : cs) {
 					if(c.getParameterCount() > maxArgs.getParameterCount())
 						maxArgs = c;
 				}
 				try {
 					parameters.add(maxArgs.newInstance(AskParameters(maxArgs.getParameters(), sc).toArray()));
-				} catch (InstantiationException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (IllegalAccessException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (IllegalArgumentException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (InvocationTargetException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}	
+				} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+						| InvocationTargetException e) {
+					final StackTraceElement[] ste = Thread.currentThread().getStackTrace();
+					String methodName = ste[1].getMethodName(); 
+					logger.log(Level.ERROR, "Error in method " + methodName + " : " + e.getMessage());
+				}
 			}
 		}
 		return parameters;
 	}
 
 	private static Object AskParameter(Parameter param, Scanner sc) {
-		
+
 		if(param.getType() == long.class || param.getType() == Long.class) {
 			long l = sc.nextLong();
 			sc.nextLine();
 			return l;
-			
+
 		} else if(param.getType() == LocalDate.class) {
 			print("Enter the year :");
 			int year = sc.nextInt();
 			sc.nextLine();
-			
+
 			print("Enter the month :");
 			Month month = Month.of(sc.nextInt());
 			sc.nextLine();
-			
+
 			print("Enter the day :");
 			int dayOfMonth = sc.nextInt();
 			sc.nextLine();
-			
+
 			return LocalDate.of(year, month, dayOfMonth);
 		} else if(param.getType() == String.class) {
 			return sc.nextLine();
 		}
-		
+
 		return null;
-		
+
 	}
 
 	private static void print(String s) {
@@ -203,7 +204,7 @@ public class Main {
 
 	private static int PrintChoices(Class<?>[] services, Map<Class<?>, Method[]> servicesMethods) {
 		print("Here is the command list :");
-
+		print("\t0 - Exit the program");
 		int i = 0;
 		for(Class<?> serviceClass : services) {
 			print("For " + serviceClass.getAnnotation(ServiceClass.class).name() + " : ");
@@ -235,17 +236,5 @@ public class Main {
 		}
 
 		return result;		
-	}
-
-	private static <K,V> HashMap<K, Integer> getKeyOrder(LinkedHashMap<K,V> map) {
-		HashMap<K, Integer> keyOrder = new HashMap<>(); 
-
-		int i = 0;
-		for( Entry<K,V> entry : map.entrySet())
-		{
-			keyOrder.put(entry.getKey(), i++);
-		}
-
-		return keyOrder;
 	}
 }

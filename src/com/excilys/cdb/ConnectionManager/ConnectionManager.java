@@ -4,8 +4,15 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+
+import com.excilys.cdb.Main;
+
 
 public class ConnectionManager {
+	
+	final Logger logger = Logger.getLogger(this.getClass());
 
 	private static ConnectionManager connectionManager;
 	private static String url = "jdbc:mysql://127.0.0.1:3306/computer-database-db?useSSL=false";
@@ -27,8 +34,9 @@ public class ConnectionManager {
 		try {
 			connection = DriverManager.getConnection(url, login, password);
 		} catch (SQLException e1) {
-			e1.printStackTrace();
-			System.out.println("Erreur connexion : " + e1.getMessage());
+			final StackTraceElement[] ste = Thread.currentThread().getStackTrace();
+			String methodName = ste[1].getMethodName(); 
+			logger.log(Level.ERROR, "Error in method " + methodName + " : " + e.getMessage());
 		}
 		
 		return connection;
@@ -40,8 +48,9 @@ public class ConnectionManager {
 			if (c != null)
 				c.close();
 		} catch (SQLException e) {
-			e.printStackTrace();
-			System.out.println("Erreur fermeture connection : " + e.getMessage());
+			final StackTraceElement[] ste = Thread.currentThread().getStackTrace();
+			String methodName = ste[1].getMethodName(); 
+			logger.log(Level.ERROR, "Error in method " + methodName + " : " + e.getMessage());
 		}
 	}
 
