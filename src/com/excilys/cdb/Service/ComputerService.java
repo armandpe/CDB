@@ -1,5 +1,6 @@
 package com.excilys.cdb.Service;
 
+import com.excilys.cdb.ParamDescription;
 import com.excilys.cdb.DAO.ComputerDAO;
 import com.excilys.cdb.Model.Computer;
 
@@ -23,17 +24,18 @@ public class ComputerService extends Service<Computer, ComputerDAO>{
 	}
 	
 	@ServiceMethod(name = "Add a new computer")
-	public int createComputer(Computer computer) {
+	public int createComputer(@ParamDescription(name = "computer to add (id is automatically set)") Computer computer) {
+		computer.setId(0);
 		return ((ComputerDAO) getDAO()).createComputer(computer);
 	}
 	
 	@ServiceMethod(name = "Update a computer")
-	public int updateComputer(Computer computer) {
+	public int updateComputer(@ParamDescription(name = "computer to update") Computer computer) {
 		return ((ComputerDAO) getDAO()).updateComputer(computer);
 	}
 	
 	@ServiceMethod(name = "Remove a computer (based on id)")
-	public int deleteComputer(long id) {
+	public int deleteComputer(@ParamDescription(name = "id of the computer ") long id) {
 		return ((ComputerDAO) getDAO()).deleteComputer(id);
 	}
 }

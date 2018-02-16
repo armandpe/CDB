@@ -129,6 +129,14 @@ public class Main {
 		LinkedList<Object> parameters = new LinkedList<>();
 		
 		for(Parameter param : params) {
+			
+			String name = param.getName();
+			
+			if(param.isAnnotationPresent(ParamDescription.class))
+					name = param.getAnnotation(ParamDescription.class).name();
+			
+			print("Enter the " + name + " :");
+			
 			if(acceptedTypesList.contains(param.getType())) {
 				parameters.add(AskParameter(param, sc));
 			} else {
@@ -141,7 +149,7 @@ public class Main {
 						maxArgs = c;
 				}
 				try {
-					parameters.add(maxArgs.newInstance(AskParameters(maxArgs.getParameters(), sc)));
+					parameters.add(maxArgs.newInstance(AskParameters(maxArgs.getParameters(), sc).toArray()));
 				} catch (InstantiationException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -157,13 +165,10 @@ public class Main {
 				}	
 			}
 		}
-		
 		return parameters;
 	}
 
 	private static Object AskParameter(Parameter param, Scanner sc) {
-		
-		print("Parameter " + param.getName() + " :");
 		
 		if(param.getType() == long.class || param.getType() == Long.class) {
 			long l = sc.nextLong();

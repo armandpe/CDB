@@ -3,6 +3,8 @@ package com.excilys.cdb.Model;
 import java.lang.reflect.Field;
 import java.time.LocalDate;
 
+import com.excilys.cdb.ParamDescription;
+
 public class Computer implements ModelClass {
 	@SQLInfo(name = "id", primaryKey = true)
 	private long id;
@@ -21,8 +23,8 @@ public class Computer implements ModelClass {
 	
 	public Computer() {}
 	
-	public Computer(long id, String name, LocalDate introduced, 
-			LocalDate discontinued, long companyId) {
+	public Computer(@ParamDescription(name = "computer id") long id, @ParamDescription(name = "computer name") String name, @ParamDescription(name = "date of introdution") LocalDate introduced, 
+			@ParamDescription(name = "date of discontinuation") LocalDate discontinued, @ParamDescription(name = "company id") long companyId) {
 		this.id = id;
 		this.name = name;
 		this.introduced = introduced;
@@ -30,8 +32,7 @@ public class Computer implements ModelClass {
 		this.companyId = companyId;
 	}
 	
-	public Computer(String name, LocalDate introduced, 
-			LocalDate discontinued, long companyId) {
+	public Computer(String name,  LocalDate introduced, LocalDate discontinued,  long companyId) {
 		this(0, name, introduced, discontinued, companyId);
 	}
 	
