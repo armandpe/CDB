@@ -90,7 +90,7 @@ public abstract class DAO<T extends ModelClass> {
 		long id = (long) objects[0];
 		Connection connection = (Connection) objects[1];
 
-		Optional<T> result = Optional.ofNullable(null);
+		Optional<T> result = Optional.empty();
 
 		String query = "SELECT " + arrayToString(getSQLArgs());
 		query += " FROM " + getTable() + " WHERE id = " + id + ";";
@@ -294,31 +294,44 @@ public abstract class DAO<T extends ModelClass> {
 			ps.setString(order, (String) value);
 		}
 		else if(c == LocalDateTime.class) {
-			if(value != null)
+			if(!isNull(value))
 				ps.setDate(order, Date.valueOf(((LocalDateTime) value).toLocalDate()));
 			else
 				ps.setDate(order, null);
 		}
 		else if(c == LocalDate.class) {
-			if(value != null)
+			if(!isNull(value))
 				ps.setDate(order, Date.valueOf((LocalDate) value));
 			else
 				ps.setDate(order, null);
 		}
 		else if(c == Integer.class || c == int.class) {
-			if(value != null) {
+			if(!isNull(value)) {
 				ps.setInt(order, (Integer) value);
 			}else {
-				ps.setNull(4, Types.INTEGER);
+				ps.setNull(order, Types.INTEGER);
 			}
 		}
 		else if(c == Long.class || c == long.class) {
-			ps.setLong(order, (Long) value);
+			if(!isNull(value)) {
+				ps.setLong(order, (Long) value);
+			} else {
+				ps.setNull(order, Types.LONGNVARCHAR);;
+			}
 		}
 		else {
 			logger.log(Level.ERROR, "Error in method " + Main.getMethodName() + " : no implementation for type " + c.getName());
 		}
 
+	}
+	
+	public static boolean isNull(Object o) {
+		if(o == null)
+			return true;
+		if(o instanceof Optional) {
+			return !((Optional<?>) o).isPresent();
+		}
+		return false;
 	}
 
 

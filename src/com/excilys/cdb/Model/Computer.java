@@ -1,6 +1,7 @@
 package com.excilys.cdb.Model;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 import org.apache.log4j.Logger;
 
@@ -39,41 +40,48 @@ public class Computer implements ModelClass {
 	private String name;
 
 	@SQLInfo(name = "introduced")
-	private LocalDate introduced;
+	private Optional<LocalDate> introduced;
 
 	@SQLInfo(name = "discontinued")
-	private LocalDate discontinued;
+	private Optional<LocalDate> discontinued;
 
 	@SQLInfo(name = "company_id")
-	private long companyId;
+	private Optional<Long> companyId;
 
 	public Computer() {}
 
-	public Computer(@ParamDescription(name = "computer id") long id, @ParamDescription(name = "computer name") String name, @ParamDescription(name = "date of introdution") LocalDate introduced, 
-			@ParamDescription(name = "date of discontinuation") LocalDate discontinued, @ParamDescription(name = "company id") long companyId) {
+	public Computer(@ParamDescription(name = "computer id") long id, 
+					@ParamDescription(name = "computer name") String name, 
+					@ParamDescription(name = "date of introdution", optional = true) Optional<LocalDate> introduced, 
+					@ParamDescription(name = "date of discontinuation", optional = true) Optional<LocalDate> discontinued, 
+					@ParamDescription(name = "company id", optional = true) Optional<Long> companyId) {
 		this.id = id;
 		this.name = name;
 		this.introduced = introduced;
 		this.discontinued = discontinued;
 		this.companyId = companyId;
 		
-		if(this.introduced == null ||this.discontinued == null || introduced.compareTo(discontinued) > 0)
+		if(this.introduced.isPresent() && this.discontinued.isPresent() && introduced.get().compareTo(discontinued.get()) > 0)
 			throw new IllegalArgumentException("Introduced date superior to discontinued date");
-		if(introduced.getYear() < 1970 || discontinued.getYear() < 1970) {
+		if((introduced.isPresent() && introduced.get().getYear() < 1970) || (discontinued.isPresent() && discontinued.get().getYear() < 1970)) {
 			throw new IllegalArgumentException("A date was inferior to 1970 - not managed by the database");
 		}
 	}
 
-	public Computer(String name,  LocalDate introduced, LocalDate discontinued,  long companyId) {
+	public Computer(String name,  Optional<LocalDate> introduced, Optional<LocalDate> discontinued,  Optional<Long> companyId) {
 		this(0, name, introduced, discontinued, companyId);
 	}
 
 	@Override
 	public String toString() {
-		return "Computer [id=" + id + ", name=" + name + ", introduced=" + introduced + ", discontinued=" + discontinued
-				+ ", companyId=" + companyId + "]\n";
+		return "Computer [id=" + id + 
+				", name=" + name + 
+				(introduced.isPresent() ? ", introduced=" + introduced.get() : "") + 
+				(discontinued.isPresent() ? ", discontinued=" + discontinued.get() : "") + 
+				(companyId.isPresent() ? ", companyId=" + companyId.get() : "") + 
+				"]\n";
 	}
-
+	
 	public long getId() {
 		return id;
 	}
@@ -90,27 +98,27 @@ public class Computer implements ModelClass {
 		this.name = name;
 	}
 
-	public LocalDate getIntroduced() {
+	public Optional<LocalDate> getIntroduced() {
 		return introduced;
 	}
 
-	public void setIntroduced(LocalDate localDate) {
+	public void setIntroduced(Optional<LocalDate> localDate) {
 		this.introduced = localDate;
 	}
 
-	public LocalDate getDiscontinued() {
+	public Optional<LocalDate> getDiscontinued() {
 		return discontinued;
 	}
 
-	public void setDiscontinued(LocalDate discontinued) {
+	public void setDiscontinued(Optional<LocalDate> discontinued) {
 		this.discontinued = discontinued;
 	}
 
-	public long getCompanyId() {
+	public Optional<Long> getCompanyId() {
 		return companyId;
 	}
 
-	public void setCompanyId(long companyId) {
+	public void setCompanyId(Optional<Long> companyId) {
 		this.companyId = companyId;
 	}
 

@@ -4,6 +4,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.lang.reflect.ParameterizedType;
 import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.Month;
@@ -15,12 +16,14 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Scanner;
 import java.util.Set;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
+import com.excilys.cdb.Model.Computer;
 import com.excilys.cdb.Service.CompanyService;
 import com.excilys.cdb.Service.ComputerService;
 import com.excilys.cdb.Service.Service;
@@ -204,7 +207,7 @@ public class Main {
 	}
 
 	private static List<?> AskParameters(Parameter[] params, Scanner sc) {
-		Class<?>[] acceptedTypes = { long.class, Long.class, LocalDate.class, String.class };
+		Class<?>[] acceptedTypes = { long.class, Long.class, LocalDate.class, String.class, Optional.class };
 		ArrayList<Class<?>> acceptedTypesList = new ArrayList<>(Arrays.asList(acceptedTypes));
 
 		LinkedList<Object> parameters = new LinkedList<>();
@@ -248,13 +251,11 @@ public class Main {
 							result = AskOtherParameter(parameters, param, sc);
 						}
 					} else {
-						result = null;
+						result = Optional.empty();
 					}
 
 				} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
 						| InvocationTargetException | InputMismatchException e) {
-					if(sc.hasNextLine())
-						sc.nextLine();
 					logger.log(Level.ERROR, "Error in method " + getMethodName() + e.getMessage() == null ? "" : " : " + e.getMessage());
 					result = defaultReturn;
 				}
@@ -278,6 +279,15 @@ public class Main {
 
 	private static Object AskParameter(Parameter param, Scanner sc) throws InputMismatchException {
 		try {
+			
+			Class<?> paramClass = param.getType();
+			boolean isOptional = false;
+			
+			if(param.getType() == Optional.class) {
+				paramClass = (Class<?>) ((ParameterizedType) param.getParameterizedType()).getActualTypeArguments()[0];
+				isOptional = true;
+			}
+			
 			if(param.getType() == long.class || param.getType() == Long.class) {
 				long l = sc.nextLong();
 				sc.nextLine();
@@ -309,7 +319,8 @@ public class Main {
 				return LocalDate.of(year, month, dayOfMonth);
 			} else if(param.getType() == String.class) {
 				return sc.nextLine();
-			}
+			} 
+			
 
 			return null;
 		}catch(InputMismatchException e) {

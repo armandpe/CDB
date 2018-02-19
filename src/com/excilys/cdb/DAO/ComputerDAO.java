@@ -37,10 +37,10 @@ public class ComputerDAO extends DAO<Computer> {
 			c.setId(rs.getLong("id"));
 			c.setName(rs.getString("name"));
 			Timestamp temp = rs.getTimestamp("introduced");
-			c.setIntroduced(temp == null ? null : temp.toLocalDateTime().toLocalDate());
+			c.setIntroduced(Optional.ofNullable(temp == null ? null : temp.toLocalDateTime().toLocalDate()));
 			temp = rs.getTimestamp("discontinued");
-			c.setDiscontinued(temp == null ? null : temp.toLocalDateTime().toLocalDate());
-			c.setCompanyId(rs.getLong("company_id"));
+			c.setDiscontinued(Optional.ofNullable(temp == null ? null : temp.toLocalDateTime().toLocalDate()));
+			c.setCompanyId(Optional.ofNullable(rs.getLong("company_id")));
 			return Optional.of(c);
 		}catch(SQLException e) {
 			e.printStackTrace();
