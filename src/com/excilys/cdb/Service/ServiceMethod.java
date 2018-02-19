@@ -10,4 +10,6 @@ import java.lang.annotation.Target;
 @Target(METHOD)
 public @interface ServiceMethod {
 	String name();
+	boolean forUser() default true; //If false, you must manually specify the behavior of the function
+	String fullName() default ""; //Specify if forUser is false, must be unique
 }

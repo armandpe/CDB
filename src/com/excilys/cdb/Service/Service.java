@@ -53,15 +53,20 @@ public abstract class Service<T extends ModelClass, U extends DAO<T>> {
 		return dao;
 	}
 	
-	@ServiceMethod(name = "Get the list of all elements")
-	public List<T> getAll(){
+	@ServiceMethod(name = "Get the list of all elements", forUser = false, fullName = "com.excilys.cdb.Service.getAll")
+	public List<T> getAll(long offset, long limit){
 		DAO<T> dao = getDAO();
-		return dao.getAll();
+		return dao.getAll(offset, limit);
 	}
 	
 	@ServiceMethod(name = "Get an element (by id)")
 	public Optional<T> getById(@ParamDescription(name = "element id") long id) {
 		DAO<T> dao = getDAO();
 		return dao.getById(id);
+	}
+	
+	public long getCount() {
+		DAO<T> dao = getDAO();
+		return dao.getCount();
 	}
 }

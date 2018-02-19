@@ -1,16 +1,14 @@
 package com.excilys.cdb.Model;
 
-import java.lang.reflect.Field;
 import java.time.LocalDate;
 
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import com.excilys.cdb.ParamDescription;
 
 public class Computer implements ModelClass {
 	
-	final Logger logger = Logger.getLogger(this.getClass());
+	static final Logger logger = Logger.getLogger(Computer.class);
 	
 	@Override
 	public int hashCode() {
@@ -72,21 +70,8 @@ public class Computer implements ModelClass {
 
 	@Override
 	public String toString() {
-		String res = "Computer " + this.name + "(" + this.id + ") : \n";
-
-		Field [] attributes =  Computer.class.getDeclaredFields();
-		for(Field attribute : attributes) {
-
-			try {
-				res += attribute.getName() + " : " + attribute.get(this) + "\n";
-			} catch (IllegalArgumentException | IllegalAccessException e) {
-				final StackTraceElement[] ste = Thread.currentThread().getStackTrace();
-				String methodName = ste[1].getMethodName(); 
-				logger.log(Level.ERROR, "Error in method " + methodName + " : " + e.getMessage());
-			}
-		}
-
-		return res;
+		return "Computer [id=" + id + ", name=" + name + ", introduced=" + introduced + ", discontinued=" + discontinued
+				+ ", companyId=" + companyId + "]\n";
 	}
 
 	public long getId() {
