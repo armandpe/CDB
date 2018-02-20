@@ -73,9 +73,7 @@ public abstract class DAO<T extends ModelClass> {
 			return f.apply(append(objects, connection));
 
 		} catch (SQLException e) {
-			final StackTraceElement[] ste = Thread.currentThread().getStackTrace();
-			String methodName = ste[1].getMethodName(); 
-			logger.log(Level.ERROR, "Error in method " + methodName + " : " + e.getMessage());
+			logger.log(Level.ERROR, "Error in method " + Main.getMethodName() + " : " + e.getMessage());
 		}
 		return null;
 	}
@@ -280,10 +278,8 @@ public abstract class DAO<T extends ModelClass> {
 
 		Field field = fieldClassValue.getValue().getKey();
 		Class<?> type = field.getType();
-		boolean Optional = false;
 		
 		if(type == Optional.class) {
-			Optional = true;
 			type = (Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
 			if(((Optional<?>) value).isPresent())
 				value = ((Optional<?>) value).get();
