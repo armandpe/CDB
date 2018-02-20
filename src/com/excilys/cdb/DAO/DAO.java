@@ -1,6 +1,7 @@
 package com.excilys.cdb.DAO;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -99,11 +100,8 @@ public abstract class DAO<T extends ModelClass> {
 
 		try {
 			Statement stmt = connection.createStatement();
-			System.out.println(query);
 			sqlResults = stmt.executeQuery(query);
 		}catch(Exception e) { 
-			final StackTraceElement[] ste = Thread.currentThread().getStackTrace();
-			String methodName = ste[1].getMethodName(); 
 			logger.log(Level.ERROR, "Error in method " + Main.getMethodName() + " : " + e.getMessage());
 		}
 
@@ -111,16 +109,12 @@ public abstract class DAO<T extends ModelClass> {
 			if(sqlResults.next())
 				result = buildItem(sqlResults);
 		}catch(SQLException e) {
-			final StackTraceElement[] ste = Thread.currentThread().getStackTrace();
-			String methodName = ste[1].getMethodName(); 
-			logger.log(Level.ERROR, "Error in method " + methodName + " : " + e.getMessage());
+			logger.log(Level.ERROR, "Error in method " + Main.getMethodName() + " : " + e.getMessage());
 		}
 		try {
 			sqlResults.close();
 		} catch (SQLException e) {
-			final StackTraceElement[] ste = Thread.currentThread().getStackTrace();
-			String methodName = ste[1].getMethodName(); 
-			logger.log(Level.ERROR, "Error in method " + methodName + " : " + e.getMessage());
+			logger.log(Level.ERROR, "Error in method " + Main.getMethodName() + " : " + e.getMessage());
 		}
 
 		return result;
@@ -198,7 +192,7 @@ public abstract class DAO<T extends ModelClass> {
 	protected long getCount(Object...objects) {
 		Connection connection = (Connection) objects[0];
 
-		String query = "SELECT count(" + getPrimaryKeyName() + ") as nbComputer FROM " + getTable();
+		String query = "SELECT count(" + getPrimaryKey().getKey() + ") as nbComputer FROM " + getTable();
 
 		ResultSet sqlResults = null;
 
@@ -228,7 +222,7 @@ public abstract class DAO<T extends ModelClass> {
 		return result;
 	}
 
-	protected String getPrimaryKeyName() {
+	protected SimpleEntry<String,Field> getPrimaryKey() {
 		Class<?> objectClass;
 		try {
 			objectClass = Class.forName(getModelClassFullName());
@@ -236,7 +230,7 @@ public abstract class DAO<T extends ModelClass> {
 
 			for(Field field : fields) {
 				if(field.isAnnotationPresent(SQLInfo.class) && field.getAnnotation(SQLInfo.class).primaryKey())
-					return field.getAnnotation(SQLInfo.class).name();
+					return new SimpleEntry<String,Field>(field.getAnnotation(SQLInfo.class).name(), field);
 			}
 		} catch (ClassNotFoundException e) {
 			logger.log(Level.ERROR, "Error in method " + Main.getMethodName() + " : " + e.getMessage());
@@ -245,20 +239,20 @@ public abstract class DAO<T extends ModelClass> {
 	}
 
 	protected int deleteByPrimaryKey(Object primaryKeyValue) {
-		String primaryKey = getPrimaryKeyName();
+		SimpleEntry<String,Field> primaryKey = getPrimaryKey();
 
 		String query = "DELETE FROM " + getTable() + " WHERE " + primaryKey + " = ?";
 
-		LinkedHashMap<String, SimpleEntry<Class<?>, Object>> fieldsClassValues = new LinkedHashMap<>();
-		fieldsClassValues.put(primaryKey, new SimpleEntry<Class<?>, Object>(primaryKeyValue.getClass(), primaryKeyValue));
+		LinkedHashMap<String, SimpleEntry<Field, Object>> fieldsClassValues = new LinkedHashMap<>();
+		fieldsClassValues.put(primaryKey.getKey(), new SimpleEntry<Field, Object>(primaryKey.getValue(), primaryKeyValue));
 
 		HashMap<String, Integer> keyOrder = new HashMap<>();
-		keyOrder.put(primaryKey, 1);
+		keyOrder.put(primaryKey.getKey(), 1);
 
 		return executeStatement(query, fieldsClassValues, keyOrder);
 	}
 
-	protected int executeStatement(String query, LinkedHashMap<String, SimpleEntry<Class<?>, Object>> fieldsClassValues, HashMap<String, Integer> keyOrder) {
+	protected int executeStatement(String query, LinkedHashMap<String, SimpleEntry<Field, Object>> fieldsClassValues, HashMap<String, Integer> keyOrder) {
 		PreparedStatement ps;
 		ConnectionManager cManager = ConnectionManager.getInstance();
 		int result = -1;
@@ -266,7 +260,7 @@ public abstract class DAO<T extends ModelClass> {
 		try(Connection connection = cManager.getConnection()){			
 			ps = connection.prepareStatement(query);
 
-			for(Entry<String, SimpleEntry<Class<?>, Object>> fieldClassValue : fieldsClassValues.entrySet())
+			for(Entry<String, SimpleEntry<Field, Object>> fieldClassValue : fieldsClassValues.entrySet())
 			{
 				addValueToStatement(ps, fieldClassValue, keyOrder);
 			}
@@ -280,39 +274,49 @@ public abstract class DAO<T extends ModelClass> {
 		return result;
 	}
 
-	protected void addValueToStatement(PreparedStatement ps, Entry<String, SimpleEntry<Class<?>, Object>> fieldClassValue, Map<String, Integer> keyOrder) throws SQLException {
+	protected void addValueToStatement(PreparedStatement ps, Entry<String, SimpleEntry<Field, Object>> fieldClassValue, Map<String, Integer> keyOrder) throws SQLException {
 
 		Object value = fieldClassValue.getValue().getValue();
 
-		Class<?> c = fieldClassValue.getValue().getKey();
+		Field field = fieldClassValue.getValue().getKey();
+		Class<?> type = field.getType();
+		boolean Optional = false;
+		
+		if(type == Optional.class) {
+			Optional = true;
+			type = (Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
+			if(((Optional<?>) value).isPresent())
+				value = ((Optional<?>) value).get();
+		}
+		
 
 		System.out.println(keyOrder);
 
 		int order = keyOrder.get(fieldClassValue.getKey());
 
-		if(c == String.class) {
+		if(type == String.class) {
 			ps.setString(order, (String) value);
 		}
-		else if(c == LocalDateTime.class) {
+		else if(type == LocalDateTime.class) {
 			if(!isNull(value))
 				ps.setDate(order, Date.valueOf(((LocalDateTime) value).toLocalDate()));
 			else
 				ps.setDate(order, null);
 		}
-		else if(c == LocalDate.class) {
+		else if(type == LocalDate.class) {
 			if(!isNull(value))
 				ps.setDate(order, Date.valueOf((LocalDate) value));
 			else
 				ps.setDate(order, null);
 		}
-		else if(c == Integer.class || c == int.class) {
+		else if(type == Integer.class || type == int.class) {
 			if(!isNull(value)) {
 				ps.setInt(order, (Integer) value);
 			}else {
 				ps.setNull(order, Types.INTEGER);
 			}
 		}
-		else if(c == Long.class || c == long.class) {
+		else if(type == Long.class || type == long.class) {
 			if(!isNull(value)) {
 				ps.setLong(order, (Long) value);
 			} else {
@@ -320,7 +324,7 @@ public abstract class DAO<T extends ModelClass> {
 			}
 		}
 		else {
-			logger.log(Level.ERROR, "Error in method " + Main.getMethodName() + " : no implementation for type " + c.getName());
+			logger.log(Level.ERROR, "Error in method " + Main.getMethodName() + " : no implementation for type " + type.getName());
 		}
 
 	}

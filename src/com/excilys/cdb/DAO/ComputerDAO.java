@@ -14,6 +14,7 @@ import java.util.Set;
 
 import org.apache.log4j.Level;
 
+import com.excilys.cdb.Main;
 import com.excilys.cdb.Model.Computer;
 
 public class ComputerDAO extends DAO<Computer> {
@@ -53,7 +54,7 @@ public class ComputerDAO extends DAO<Computer> {
 		Map<String, String> mapperSQLFields = getMapperSQLFields();
 		Set<String> keys = mapperSQLFields.keySet();
 
-		LinkedHashMap<String, SimpleEntry<Class<?>, Object>> fieldsClassValues = generateFieldsClassValues(mapperSQLFields, computer);
+		LinkedHashMap<String, SimpleEntry<Field, Object>> fieldsClassValues = generateFieldsClassValues(mapperSQLFields, computer);
 
 		HashMap<String, Integer> keyOrder = getKeyOrder(fieldsClassValues);
 
@@ -62,31 +63,29 @@ public class ComputerDAO extends DAO<Computer> {
 		return executeStatement(query, fieldsClassValues, keyOrder);
 	}
 
-	private LinkedHashMap<String, SimpleEntry<Class<?>, Object>> generateFieldsClassValues(Map<String, String> mapperSQLFields, Computer computer) {
-		LinkedHashMap<String, SimpleEntry<Class<?>, Object>> fieldsClassValues = new LinkedHashMap<>();
+	private LinkedHashMap<String, SimpleEntry<Field, Object>> generateFieldsClassValues(Map<String, String> mapperSQLFields, Computer computer) {
+		LinkedHashMap<String, SimpleEntry<Field, Object>> fieldsClassValues = new LinkedHashMap<>();
 
-		Class<?> fieldClass = null;
+		Field field = null;
 
 		for(Entry<String, String> entry : mapperSQLFields.entrySet())
 		{
 			Object value = null;
 			try {
-				Field field = Computer.class.getDeclaredField(entry.getValue());
+				field = Computer.class.getDeclaredField(entry.getValue());
 				field.setAccessible(true);
 				value = field.get(computer);
-				fieldClass = field.getType();
+				
 			} catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e) {
-				final StackTraceElement[] ste = Thread.currentThread().getStackTrace();
-				String methodName = ste[1].getMethodName(); 
-				logger.log(Level.ERROR, "Error in method " + methodName + " : " + e.getMessage());
+				logger.log(Level.ERROR, "Error in method " + Main.getMethodName() + " : " + e.getMessage());
 			}
-			fieldsClassValues.put(entry.getKey(), new SimpleEntry<Class<?>, Object>(fieldClass, value));
+			fieldsClassValues.put(entry.getKey(), new SimpleEntry<Field, Object>(field, value));
 		}
 
 		return fieldsClassValues;
 	}
 
-	private String generateCreateQuery(LinkedHashMap<String, SimpleEntry<Class<?>, Object>> paramValues, Set<String> keys) {
+	private String generateCreateQuery(LinkedHashMap<String, SimpleEntry<Field, Object>> paramValues, Set<String> keys) {
 
 		String[] template = {};
 		String query = "INSERT INTO " + getTable() + " ( " + arrayToString(paramValues.keySet().toArray(template)) + " ) VALUES ( ";
@@ -105,9 +104,9 @@ public class ComputerDAO extends DAO<Computer> {
 		Map<String, String> mapperSQLFields = getMapperSQLFields();
 		Set<String> keys = mapperSQLFields.keySet();
 
-		LinkedHashMap<String, SimpleEntry<Class<?>, Object>> fieldsClassValues = generateFieldsClassValues(mapperSQLFields, computer);
+		LinkedHashMap<String, SimpleEntry<Field, Object>> fieldsClassValues = generateFieldsClassValues(mapperSQLFields, computer);
 
-		String primaryKey = getPrimaryKeyName();
+		String primaryKey = getPrimaryKey().getKey();
 
 		HashMap<String, Integer> keyOrder = getKeyOrder(fieldsClassValues, primaryKey);
 
@@ -116,11 +115,11 @@ public class ComputerDAO extends DAO<Computer> {
 		return executeStatement(query, fieldsClassValues, keyOrder);
 	}
 
-	private HashMap<String, Integer> getKeyOrder(LinkedHashMap<String, SimpleEntry<Class<?>, Object>> fieldsClassValues){
+	private HashMap<String, Integer> getKeyOrder(LinkedHashMap<String, SimpleEntry<Field, Object>> fieldsClassValues){
 		HashMap<String, Integer> keyOrder = new HashMap<>(); 
 
 		int i = 0;
-		for( Entry<String, SimpleEntry<Class<?>, Object>> entry : fieldsClassValues.entrySet())
+		for( Entry<String, SimpleEntry<Field, Object>> entry : fieldsClassValues.entrySet())
 		{
 			keyOrder.put(entry.getKey(), ++i);
 		}
@@ -128,12 +127,12 @@ public class ComputerDAO extends DAO<Computer> {
 		return keyOrder;
 	}
 
-	private HashMap<String, Integer> getKeyOrder(LinkedHashMap<String, SimpleEntry<Class<?>, Object>> fieldsClassValues,
+	private HashMap<String, Integer> getKeyOrder(LinkedHashMap<String, SimpleEntry<Field, Object>> fieldsClassValues,
 			String primaryKey) {
 		HashMap<String, Integer> keyOrder = new HashMap<>(); 
 
 		int i = 0;
-		for( Entry<String, SimpleEntry<Class<?>, Object>> entry : fieldsClassValues.entrySet())
+		for( Entry<String, SimpleEntry<Field, Object>> entry : fieldsClassValues.entrySet())
 		{
 			if(!entry.getKey().equals(primaryKey))
 				keyOrder.put(entry.getKey(), ++i);
@@ -144,7 +143,7 @@ public class ComputerDAO extends DAO<Computer> {
 		return keyOrder;
 	}
 
-	private String generateUpdateQuery(LinkedHashMap<String, SimpleEntry<Class<?>, Object>> paramValues, Set<String> keys, String primaryKey) {
+	private String generateUpdateQuery(LinkedHashMap<String, SimpleEntry<Field, Object>> paramValues, Set<String> keys, String primaryKey) {
 
 		String query = "UPDATE " + getTable() + " SET ";
 

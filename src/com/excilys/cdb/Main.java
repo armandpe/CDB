@@ -30,6 +30,8 @@ import com.excilys.cdb.Service.Service;
 import com.excilys.cdb.Service.ServiceClass;
 import com.excilys.cdb.Service.ServiceMethod;
 
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+
 
 public class Main {
 
@@ -280,21 +282,23 @@ public class Main {
 	private static Object AskParameter(Parameter param, Scanner sc) throws InputMismatchException {
 		try {
 			
+			Object result = null;
+			
 			Class<?> paramClass = param.getType();
 			boolean isOptional = false;
 			
-			if(param.getType() == Optional.class) {
+			if(paramClass == Optional.class) {
 				paramClass = (Class<?>) ((ParameterizedType) param.getParameterizedType()).getActualTypeArguments()[0];
 				isOptional = true;
 			}
 			
-			if(param.getType() == long.class || param.getType() == Long.class) {
+			if(paramClass == long.class || paramClass == Long.class) {
 				long l = sc.nextLong();
 				sc.nextLine();
 
-				return l;
+				result = l;
 
-			} else if(param.getType() == LocalDate.class) {
+			} else if(paramClass == LocalDate.class) {
 				int year = 0;
 				Month month = Month.of(1);
 				int dayOfMonth = 0;
@@ -316,13 +320,17 @@ public class Main {
 					throw new InputMismatchException("The input is invalid for a date");
 				}
 
-				return LocalDate.of(year, month, dayOfMonth);
-			} else if(param.getType() == String.class) {
-				return sc.nextLine();
-			} 
+				result = LocalDate.of(year, month, dayOfMonth);
+			} else if(paramClass == String.class) {
+				result = sc.nextLine();
+			}else {
+				throw new NotImplementedException();
+			}
 			
-
-			return null;
+			if(isOptional)
+				result = Optional.ofNullable(result);
+			
+			return result;
 		}catch(InputMismatchException e) {
 			if(e.getMessage() == null) {
 				sc.nextLine();
