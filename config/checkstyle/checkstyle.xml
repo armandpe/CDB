@@ -58,16 +58,16 @@
 
   <!-- Checks for whitespace                               -->
   <!-- See http://checkstyle.sf.net/config_whitespace.html -->
-  <module name="FileTabCharacter"/>
+<!--   <module name="FileTabCharacter"/> -->
 
   <!-- Miscellaneous other checks.                   -->
   <!-- See http://checkstyle.sf.net/config_misc.html -->
-  <module name="RegexpSingleline">
+<!--   <module name="RegexpSingleline">
     <property name="format" value="\s+$"/>
     <property name="minimum" value="0"/>
     <property name="maximum" value="0"/>
     <property name="message" value="Line has trailing spaces."/>
-  </module>
+  </module> -->
 
   <!-- Checks for Headers                                -->
   <!-- See http://checkstyle.sf.net/config_header.html   -->
@@ -80,19 +80,19 @@
 
     <!-- Checks for Javadoc comments.                     -->
     <!-- See http://checkstyle.sf.net/config_javadoc.html -->
-    <module name="JavadocMethod">
+<!--     <module name="JavadocMethod">
       <property name="allowMissingPropertyJavadoc" value="true" />
       <property name="allowedAnnotations" value="Override" />
       <property name="allowedAnnotations" value="RequestMapping,PostConstruct" />
     </module>
-    <module name="JavadocStyle"/>
+    <module name="JavadocStyle"/> -->
     <!--
     <module name="JavadocType"/>
     <module name="JavadocVariable"/>
     -->
 
     <!-- To have SuppressionsCommentFilter available -->
-    <module name="FileContentsHolder"/>
+<!--     <module name="FileContentsHolder"/> -->
 
     <!-- Checks for Naming Conventions.                  -->
     <!-- See http://checkstyle.sf.net/config_naming.html -->
@@ -190,13 +190,13 @@
 
   </module>
   <!-- Ignore filter-->
-  <module name="SuppressionCommentFilter">
+<!--   <module name="SuppressionCommentFilter">
     <property name="offCommentFormat" value="CHECKSTYLE_OFF: JAVADOC"/>
     <property name="onCommentFormat" value="CHECKSTYLE_ON: JAVADOC"/>
     <property name="checkFormat" value="JavadocMethod"/>
-  </module>
+  </module> -->
   <module name="SuppressionFilter">
-    <property name="file" value="suppressions.xml"/>
+    <property name="file" value="/home/excilys/eclipse-workspace/CDB/config/checkstyle/suppressions.xml"/>
   </module>
 
 

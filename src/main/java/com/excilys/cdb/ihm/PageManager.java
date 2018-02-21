@@ -6,16 +6,16 @@ import java.util.function.Function;
 
 import main.java.com.excilys.cdb.model.ModelClass;
 
-public class PageManager{
+public class PageManager {
 	
-	final private long limit;
+	private final long limit;
 	private Function<Object[], Object> getList;
 	private long max;
 	private long maxPage;
 	private long offset;
 	private ArrayList<ModelClass> pageData;
 	
-	public PageManager(long limit, long max, Function<Object[],Object> getList) {
+	public PageManager(long limit, long max, Function<Object[], Object> getList) {
 		this.offset = 0;
 		this.limit = limit;
 		setMax(max);
@@ -56,22 +56,24 @@ public class PageManager{
 
 	@UserChoice(name = "Get last page")
 	public boolean last() {
-		offset = (maxPage-1) * limit;
+		offset = (maxPage - 1) * limit;
 		return getItems();
 	}
 
 	@UserChoice(name = "Get next page")
 	public boolean next() {
-		if(offset + limit > max - 1)
+		if (offset + limit > max - 1) {
 			return false;
+		}
 		offset += limit;
 		return getItems();
 	}
 
 	@UserChoice(name = "Get previous page")
 	public boolean previous() {
-		if(offset - limit < 0)
+		if (offset - limit < 0) {
 			return false;
+		}
 		
 		offset -= limit;
 		return getItems();
@@ -87,7 +89,7 @@ public class PageManager{
 	}
 
 	private boolean getItems() {
-		Object[] parameters = { offset, limit };
+		Object[] parameters = {offset, limit};
 
 		pageData.clear();
 		((List<?>) getList.apply(parameters)).forEach(x -> pageData.add((ModelClass) x));

@@ -15,10 +15,10 @@ import java.util.InputMismatchException;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Scanner;
 import java.util.Set;
-import java.util.Map.Entry;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -30,11 +30,10 @@ import main.java.com.excilys.cdb.service.ComputerService;
 import main.java.com.excilys.cdb.service.Service;
 import main.java.com.excilys.cdb.service.ServiceClass;
 import main.java.com.excilys.cdb.service.ServiceMethod;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public class CLI {
 
-	final static Logger logger = Logger.getLogger(CLI.class);
+	static final Logger LOGGER = Logger.getLogger(CLI.class);
 
 	public static void start() {
 		ArrayList<Class<? extends Service<?, ?>>> services = new ArrayList<>();
@@ -46,7 +45,7 @@ public class CLI {
 		LinkedHashMap<Class<? extends Service<?, ?>>, Method[]> servicesMethods = getSQLMethods(services);
 
 		while (continuer) {
-			int maxChoice = PrintChoices(services, servicesMethods);
+			int maxChoice = printChoices(services, servicesMethods);
 			int choice = -1;
 			try {
 				choice = sc.nextInt();
@@ -55,8 +54,9 @@ public class CLI {
 				sc.nextLine();
 				continue;
 			}
-			if (choice == 0)
+			if (choice == 0) {
 				break;
+			}
 
 			if (choice > maxChoice || choice < 0) {
 				print("Invalid input - Please try again ...");
@@ -65,8 +65,9 @@ public class CLI {
 			print(applyChoice(choice, servicesMethods, sc).toString());
 			print("\n Press ENTER");
 			sc.nextLine();
-			for (int i = 0; i < 10; ++i)
+			for (int i = 0; i < 10; ++i) {
 				print("");
+			}
 		}
 		print("Goodbye ! :) ");
 		sc.close();
@@ -97,7 +98,7 @@ public class CLI {
 			case "com.excilys.cdb.Service.getAll":
 				return serviceGetAll(usedClass, chosenMethod, sc);
 			default:
-				logger.log(Level.ERROR,
+				LOGGER.log(Level.ERROR,
 						"The method " + chosenMethod.getName() + " is undefined in " + Main.getMethodName());
 				return "The method " + chosenMethod.getName() + " is undefined in " + Main.getMethodName()
 				+ ". We couldn't execute your request.";
@@ -108,7 +109,7 @@ public class CLI {
 
 			Object[] parameters = new Object[0];
 
-			parameters = AskParameters(params, sc).toArray();
+			parameters = askParameters(params, sc).toArray();
 
 			return applyServiceMethod(usedClass, chosenMethod, parameters);
 		}
@@ -119,10 +120,10 @@ public class CLI {
 		try {
 			return chosenMethod.invoke(getServiceInstance(usedClass), parameters);
 		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-			logger.log(Level.ERROR, "Error in method " + Main.getMethodName() + " : " + e.getMessage());
+			LOGGER.log(Level.ERROR, "Error in method " + Main.getMethodName() + " : " + e.getMessage());
 		}
 
-		logger.log(Level.ERROR,
+		LOGGER.log(Level.ERROR,
 				"An error occured in " + Main.getMethodName() + " using method " + chosenMethod.getName());
 		return "An error occured in " + Main.getMethodName() + " using method " + chosenMethod.getName()
 		+ ". We couldn't execute your request.";
@@ -144,13 +145,15 @@ public class CLI {
 			int choice = -1;
 			ArrayList<Method> methods = new ArrayList<>();
 			for (Method method : PageManager.class.getMethods()) {
-				if (method.isAnnotationPresent(UserChoice.class))
+				if (method.isAnnotationPresent(UserChoice.class)) {
 					methods.add(method);
+				}
 			}
 
 			while (invalidInput && offset < max) {
-				if (!first)
+				if (!first) {
 					print("Invalid input. Please enter a correct value");
+				}
 				first = false;
 				print("\nWhat do you want to do ?");
 				print("\t0 - Exit");
@@ -161,12 +164,13 @@ public class CLI {
 
 				try {
 					choice = sc.nextInt();
-					if (choice < 5 && choice >= 0)
+					if (choice < 5 && choice >= 0) {
 						invalidInput = false;
-					else
-						logger.log(Level.INFO, "Invalid input");
+					} else {
+						LOGGER.log(Level.INFO, "Invalid input");
+					}
 				} catch (InputMismatchException e) {
-					logger.log(Level.INFO, "Invalid input : " + e.getMessage());
+					LOGGER.log(Level.INFO, "Invalid input : " + e.getMessage());
 				}
 				sc.nextLine();
 			}
@@ -175,12 +179,13 @@ public class CLI {
 				break;
 			} else {
 				try {
-					if (!(boolean) methods.get(choice - 1).invoke(pageManager, new Object[0]))
+					if (!(boolean) methods.get(choice - 1).invoke(pageManager, new Object[0])) {
 						print("Request failure");
-					else
+					} else {
 						print(pageManager.getPageData().toString());
+					}
 				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-					logger.log(Level.ERROR, "Error in method " + Main.getMethodName() + " : " + e.getMessage());
+					LOGGER.log(Level.ERROR, "Error in method " + Main.getMethodName() + " : " + e.getMessage());
 					print("Request failure");
 				}
 			}
@@ -196,20 +201,20 @@ public class CLI {
 		try {
 			method = serviceClass.getMethod("getInstance");
 		} catch (NoSuchMethodException | SecurityException e) {
-			logger.log(Level.ERROR, "Error in method " + Main.getMethodName() + " : " + e.getMessage());
+			LOGGER.log(Level.ERROR, "Error in method " + Main.getMethodName() + " : " + e.getMessage());
 		}
 
 		try {
 			service = (Service<?, ?>) method.invoke(null);
 		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-			logger.log(Level.ERROR, "Error in method " + Main.getMethodName() + " : " + e.getMessage());
+			LOGGER.log(Level.ERROR, "Error in method " + Main.getMethodName() + " : " + e.getMessage());
 		}
 
 		return service;
 	}
 
-	private static List<?> AskParameters(Parameter[] params, Scanner sc) {
-		Class<?>[] acceptedTypes = { long.class, Long.class, LocalDate.class, String.class, Optional.class };
+	private static List<?> askParameters(Parameter[] params, Scanner sc) {
+		Class<?>[] acceptedTypes = {long.class, Long.class, LocalDate.class, String.class, Optional.class};
 		ArrayList<Class<?>> acceptedTypesList = new ArrayList<>(Arrays.asList(acceptedTypes));
 
 		LinkedList<Object> parameters = new LinkedList<>();
@@ -230,8 +235,9 @@ public class CLI {
 
 			while (result == defaultReturn) {
 				try {
-					if (!firstTime)
+					if (!firstTime) {
 						print("Entry error - please try again...");
+					}
 					firstTime = false;
 					if (optional) {
 						print("The " + name + " is optional, do you wan't to set Mapit ? (0 - yes, 1 - no)");
@@ -248,9 +254,9 @@ public class CLI {
 					if (!optional) {
 						print("Enter the " + name + " :");
 						if (acceptedTypesList.contains(param.getType())) {
-							result = AskParameter(param, sc);
+							result = askParameter(param, sc);
 						} else {
-							result = AskOtherParameter(parameters, param, sc);
+							result = askOtherParameter(parameters, param, sc);
 						}
 					} else {
 						result = Optional.empty();
@@ -258,7 +264,7 @@ public class CLI {
 
 				} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
 						| InvocationTargetException | InputMismatchException e) {
-					logger.log(Level.ERROR, "Error in method " + Main.getMethodName() + e.getMessage() == null ? ""
+					LOGGER.log(Level.ERROR, "Error in method " + Main.getMethodName() + e.getMessage() == null ? ""
 							: " : " + e.getMessage());
 					result = defaultReturn;
 				}
@@ -268,20 +274,21 @@ public class CLI {
 		return parameters;
 	}
 
-	private static Object AskOtherParameter(LinkedList<Object> parameters, Parameter param, Scanner sc)
+	private static Object askOtherParameter(LinkedList<Object> parameters, Parameter param, Scanner sc)
 			throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		Class<?> type = param.getType();
 		Constructor<?>[] cs = type.getConstructors();
 		Constructor<?> maxArgs = cs[0];
 
 		for (Constructor<?> c : cs) {
-			if (c.getParameterCount() > maxArgs.getParameterCount())
+			if (c.getParameterCount() > maxArgs.getParameterCount()) {
 				maxArgs = c;
+			}
 		}
-		return maxArgs.newInstance(AskParameters(maxArgs.getParameters(), sc).toArray());
+		return maxArgs.newInstance(askParameters(maxArgs.getParameters(), sc).toArray());
 	}
 
-	private static Object AskParameter(Parameter param, Scanner sc) throws InputMismatchException {
+	private static Object askParameter(Parameter param, Scanner sc) throws InputMismatchException {
 		try {
 
 			Object result = null;
@@ -329,8 +336,9 @@ public class CLI {
 				throw new IllegalArgumentException("Class not implemented in " + Main.getMethodName());
 			}
 
-			if (isOptional)
+			if (isOptional) {
 				result = Optional.ofNullable(result);
+			}
 
 			return result;
 		} catch (InputMismatchException e) {
@@ -347,7 +355,7 @@ public class CLI {
 		System.out.println(s);
 	}
 
-	private static int PrintChoices(ArrayList<Class<? extends Service<?, ?>>> services,
+	private static int printChoices(ArrayList<Class<? extends Service<?, ?>>> services,
 			LinkedHashMap<Class<? extends Service<?, ?>>, Method[]> servicesMethods) {
 		print("Here is the command list :");
 		print("\t0 - Exit the program");
@@ -375,8 +383,9 @@ public class CLI {
 			Set<Method> toAdd = new HashSet<>();
 
 			for (Method method : currentClass.getMethods()) {
-				if (method.isAnnotationPresent(ServiceMethod.class))
+				if (method.isAnnotationPresent(ServiceMethod.class)) {
 					toAdd.add(method);
+				}
 			}
 
 			result.put(currentClass, toAdd.toArray(new Method[toAdd.size()]));

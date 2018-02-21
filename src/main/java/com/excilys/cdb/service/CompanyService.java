@@ -4,14 +4,14 @@ import main.java.com.excilys.cdb.dao.CompanyDAO;
 import main.java.com.excilys.cdb.model.Company;
 
 @ServiceClass(name = "companies")
-public class CompanyService extends Service<Company, CompanyDAO>{
+public class CompanyService extends Service<Company, CompanyDAO> {
 	
 	private static CompanyService service;
 	
-	private CompanyService() {}
+	private CompanyService() { }
 	
 	public static CompanyService getInstance() {
-		if(service == null) {
+		if (service == null) {
 			service = new CompanyService();
 		}
 		return service;

@@ -21,8 +21,7 @@ public abstract class Service<T extends ModelClass, U extends DAO<T>> {
 	public abstract String getDaoClassFullName();
 	
 	@SuppressWarnings("unchecked")
-	public DAO<T> getDAO()
-	{
+	public DAO<T> getDAO() {
 		Class<?> c = null;
 		DAO<T> dao = null;
 		Method method = null;
@@ -55,7 +54,7 @@ public abstract class Service<T extends ModelClass, U extends DAO<T>> {
 	}
 	
 	@ServiceMethod(name = "Get the list of all elements", forUser = false, fullName = "com.excilys.cdb.Service.getAll")
-	public List<T> getAll(long offset, long limit){
+	public List<T> getAll(long offset, long limit) {
 		DAO<T> dao = getDAO();
 		return dao.getAll(offset, limit);
 	}

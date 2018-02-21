@@ -18,11 +18,12 @@ public class ConnectionManager {
 	private static String password = "qwerty1234";
 	private Connection connection;
 
-	private ConnectionManager() {}
+	private ConnectionManager() { }
 
 	public static ConnectionManager getInstance() {
-		if(connectionManager == null)
+		if (connectionManager == null) {
 			connectionManager = new ConnectionManager();
+		}
 
 		return connectionManager;
 	}

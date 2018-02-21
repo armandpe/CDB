@@ -9,7 +9,7 @@ import main.java.com.excilys.cdb.ParamDescription;
 
 public class Computer implements ModelClass {
 	
-	static final Logger logger = Logger.getLogger(Computer.class);
+	static final Logger LOGGER = Logger.getLogger(Computer.class);
 	
 	@Override
 	public int hashCode() {
@@ -21,15 +21,19 @@ public class Computer implements ModelClass {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		Computer other = (Computer) obj;
-		if (id != other.id)
+		if (id != other.id) {
 			return false;
+		}
 		return true;
 	}
 
@@ -48,7 +52,7 @@ public class Computer implements ModelClass {
 	@SQLInfo(name = "company_id")
 	private Optional<Long> companyId;
 
-	public Computer() {}
+	public Computer() { }
 
 	public Computer(@ParamDescription(name = "computer id") long id, 
 					@ParamDescription(name = "computer name") String name, 
@@ -61,9 +65,10 @@ public class Computer implements ModelClass {
 		this.discontinued = discontinued;
 		this.companyId = companyId;
 		
-		if(this.introduced.isPresent() && this.discontinued.isPresent() && introduced.get().compareTo(discontinued.get()) > 0)
+		if (this.introduced.isPresent() && this.discontinued.isPresent() && introduced.get().compareTo(discontinued.get()) > 0) {
 			throw new IllegalArgumentException("Introduced date superior to discontinued date");
-		if((introduced.isPresent() && introduced.get().getYear() < 1970) || (discontinued.isPresent() && discontinued.get().getYear() < 1970)) {
+		}
+		if ((introduced.isPresent() && introduced.get().getYear() < 1970) || (discontinued.isPresent() && discontinued.get().getYear() < 1970)) {
 			throw new IllegalArgumentException("A date was inferior to 1970 - not managed by the database");
 		}
 	}

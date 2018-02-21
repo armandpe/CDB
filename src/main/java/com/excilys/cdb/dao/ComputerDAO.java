@@ -17,14 +17,18 @@ import org.apache.log4j.Level;
 import main.java.com.excilys.cdb.Main;
 import main.java.com.excilys.cdb.model.Computer;
 
+/**
+ * @author excilys
+ *
+ */
 public class ComputerDAO extends DAO<Computer> {
 
 	private static ComputerDAO computerDAO;
 
-	private ComputerDAO() {}
+	private ComputerDAO() { }
 
 	public static ComputerDAO getInstance() {
-		if(computerDAO == null) {
+		if (computerDAO == null) {
 			computerDAO = new ComputerDAO();
 		}
 
@@ -43,12 +47,16 @@ public class ComputerDAO extends DAO<Computer> {
 			c.setDiscontinued(Optional.ofNullable(temp == null ? null : temp.toLocalDateTime().toLocalDate()));
 			c.setCompanyId(Optional.ofNullable(rs.getLong("company_id")));
 			return Optional.of(c);
-		}catch(SQLException e) {
+		} catch (SQLException e) {
 			logger.log(Level.ERROR, "Error in method " + Main.getMethodName() + " : " + e.getMessage());
 			return Optional.ofNullable(null);
 		}
 	}
 
+	/**
+	 * @param computer Computer to create
+	 * @return see {@link executeStatement}
+	 */
 	public int createComputer(Computer computer) {
 		Map<String, String> mapperSQLFields = getMapperSQLFields();
 		Set<String> keys = mapperSQLFields.keySet();
@@ -67,8 +75,7 @@ public class ComputerDAO extends DAO<Computer> {
 
 		Field field = null;
 
-		for(Entry<String, String> entry : mapperSQLFields.entrySet())
-		{
+		for (Entry<String, String> entry : mapperSQLFields.entrySet()) {
 			Object value = null;
 			try {
 				field = Computer.class.getDeclaredField(entry.getValue());
@@ -89,10 +96,11 @@ public class ComputerDAO extends DAO<Computer> {
 		String[] template = {};
 		String query = "INSERT INTO " + getTable() + " ( " + arrayToString(paramValues.keySet().toArray(template)) + " ) VALUES ( ";
 
-		for(int i = 0; i < keys.size(); ++i)
+		for (int i = 0; i < keys.size(); ++i) {
 			query += "?,";
+			}
 
-		query = query.substring(0, query.length()-1);
+		query = query.substring(0, query.length() - 1);
 
 		query += " )";
 
@@ -114,12 +122,11 @@ public class ComputerDAO extends DAO<Computer> {
 		return executeStatement(query, fieldsClassValues, keyOrder);
 	}
 
-	private HashMap<String, Integer> getKeyOrder(LinkedHashMap<String, SimpleEntry<Field, Object>> fieldsClassValues){
-		HashMap<String, Integer> keyOrder = new HashMap<>(); 
+	private HashMap<String, Integer> getKeyOrder(LinkedHashMap<String, SimpleEntry<Field, Object>> fieldsClassValues) {
+		HashMap<String, Integer> keyOrder = new HashMap<>();
 
 		int i = 0;
-		for( Entry<String, SimpleEntry<Field, Object>> entry : fieldsClassValues.entrySet())
-		{
+		for (Entry<String, SimpleEntry<Field, Object>> entry : fieldsClassValues.entrySet()) {
 			keyOrder.put(entry.getKey(), ++i);
 		}
 
@@ -128,13 +135,13 @@ public class ComputerDAO extends DAO<Computer> {
 
 	private HashMap<String, Integer> getKeyOrder(LinkedHashMap<String, SimpleEntry<Field, Object>> fieldsClassValues,
 			String primaryKey) {
-		HashMap<String, Integer> keyOrder = new HashMap<>(); 
+		HashMap<String, Integer> keyOrder = new HashMap<>();
 
 		int i = 0;
-		for( Entry<String, SimpleEntry<Field, Object>> entry : fieldsClassValues.entrySet())
-		{
-			if(!entry.getKey().equals(primaryKey))
+		for (Entry<String, SimpleEntry<Field, Object>> entry : fieldsClassValues.entrySet()) {
+			if (entry.getKey().equals(primaryKey)) {
 				keyOrder.put(entry.getKey(), ++i);
+			}
 		}
 
 		keyOrder.put(primaryKey, ++i);
@@ -146,12 +153,13 @@ public class ComputerDAO extends DAO<Computer> {
 
 		String query = "UPDATE " + getTable() + " SET ";
 
-		for(String name : paramValues.keySet()) {
-			if(!name.equals(primaryKey))
+		for (String name : paramValues.keySet()) {
+			if (!name.equals(primaryKey)) {
 				query += name + " = ?,";
+			}
 		}
 
-		query = query.substring(0, query.length()-1);
+		query = query.substring(0, query.length() - 1);
 
 		query += " WHERE " + primaryKey + " = ?";
 

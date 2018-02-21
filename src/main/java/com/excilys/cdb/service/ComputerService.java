@@ -5,14 +5,14 @@ import main.java.com.excilys.cdb.dao.ComputerDAO;
 import main.java.com.excilys.cdb.model.Computer;
 
 @ServiceClass(name = "computers")
-public class ComputerService extends Service<Computer, ComputerDAO>{
+public class ComputerService extends Service<Computer, ComputerDAO> {
 	
 	private static ComputerService service;
 	
-	private ComputerService() {}
+	private ComputerService() { }
 	
 	public static ComputerService getInstance() {
-		if(service == null) {
+		if (service == null) {
 			service = new ComputerService();
 		}
 		return service;

@@ -12,10 +12,10 @@ public class CompanyDAO extends DAO<Company> {
 	
 	private static CompanyDAO companyDAO;
 	
-	private CompanyDAO() {}
+	private CompanyDAO() { }
 	
 	public static CompanyDAO getInstance() {
-		if(companyDAO == null) {
+		if (companyDAO == null) {
 			companyDAO = new CompanyDAO();
 		}
 		
@@ -28,7 +28,7 @@ public class CompanyDAO extends DAO<Company> {
 			c.setId(rs.getLong("id"));
 			c.setName(rs.getString("name"));
 			return Optional.of(c);
-		}catch(SQLException e) {
+		} catch (SQLException e) {
 			final StackTraceElement[] ste = Thread.currentThread().getStackTrace();
 			String methodName = ste[1].getMethodName(); 
 			logger.log(Level.ERROR, "Error in method " + methodName + " : " + e.getMessage());

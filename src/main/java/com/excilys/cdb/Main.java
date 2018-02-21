@@ -7,7 +7,7 @@ import main.java.com.excilys.cdb.ihm.CLI;
 
 public class Main {
 
-	final static Logger logger = Logger.getLogger(Main.class);
+	static final Logger LOGGER = Logger.getLogger(Main.class);
 
 	public static void main(String[] args) {
 		CLI.start();
