@@ -1,4 +1,4 @@
-package com.excilys.cdb.ihm;
+package main.java.com.excilys.cdb.ihm;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -23,14 +23,13 @@ import java.util.Map.Entry;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
-import com.excilys.cdb.Main;
-import com.excilys.cdb.ParamDescription;
-import com.excilys.cdb.Service.CompanyService;
-import com.excilys.cdb.Service.ComputerService;
-import com.excilys.cdb.Service.Service;
-import com.excilys.cdb.Service.ServiceClass;
-import com.excilys.cdb.Service.ServiceMethod;
-
+import main.java.com.excilys.cdb.Main;
+import main.java.com.excilys.cdb.ParamDescription;
+import main.java.com.excilys.cdb.service.CompanyService;
+import main.java.com.excilys.cdb.service.ComputerService;
+import main.java.com.excilys.cdb.service.Service;
+import main.java.com.excilys.cdb.service.ServiceClass;
+import main.java.com.excilys.cdb.service.ServiceMethod;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public class CLI {
@@ -48,7 +47,6 @@ public class CLI {
 
 		while (continuer) {
 			int maxChoice = PrintChoices(services, servicesMethods);
-
 			int choice = -1;
 			try {
 				choice = sc.nextInt();
@@ -57,7 +55,6 @@ public class CLI {
 				sc.nextLine();
 				continue;
 			}
-
 			if (choice == 0)
 				break;
 
@@ -65,14 +62,12 @@ public class CLI {
 				print("Invalid input - Please try again ...");
 				continue;
 			}
-
 			print(applyChoice(choice, servicesMethods, sc).toString());
 			print("\n Press ENTER");
 			sc.nextLine();
 			for (int i = 0; i < 10; ++i)
 				print("");
 		}
-
 		print("Goodbye ! :) ");
 		sc.close();
 	}
@@ -105,7 +100,7 @@ public class CLI {
 				logger.log(Level.ERROR,
 						"The method " + chosenMethod.getName() + " is undefined in " + Main.getMethodName());
 				return "The method " + chosenMethod.getName() + " is undefined in " + Main.getMethodName()
-						+ ". We couldn't execute your request.";
+				+ ". We couldn't execute your request.";
 			}
 		} else {
 
@@ -130,7 +125,7 @@ public class CLI {
 		logger.log(Level.ERROR,
 				"An error occured in " + Main.getMethodName() + " using method " + chosenMethod.getName());
 		return "An error occured in " + Main.getMethodName() + " using method " + chosenMethod.getName()
-				+ ". We couldn't execute your request.";
+		+ ". We couldn't execute your request.";
 	}
 
 	private static Object serviceGetAll(Class<? extends Service<?, ?>> usedClass, Method chosenMethod, Scanner sc) {

@@ -1,4 +1,4 @@
-package com.excilys.cdb.DAO;
+package main.java.com.excilys.cdb.dao;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -6,7 +6,7 @@ import java.util.Optional;
 
 import org.apache.log4j.Level;
 
-import com.excilys.cdb.Model.Company;
+import main.java.com.excilys.cdb.model.Company;
 
 public class CompanyDAO extends DAO<Company> {
 	

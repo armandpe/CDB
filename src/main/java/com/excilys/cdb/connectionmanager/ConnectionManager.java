@@ -1,4 +1,4 @@
-package com.excilys.cdb.ConnectionManager;
+package main.java.com.excilys.cdb.connectionmanager;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

@@ -1,4 +1,4 @@
-package com.excilys.cdb.Service;
+package main.java.com.excilys.cdb.service;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -8,9 +8,9 @@ import java.util.Optional;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
-import com.excilys.cdb.ParamDescription;
-import com.excilys.cdb.DAO.DAO;
-import com.excilys.cdb.Model.ModelClass;
+import main.java.com.excilys.cdb.ParamDescription;
+import main.java.com.excilys.cdb.dao.DAO;
+import main.java.com.excilys.cdb.model.ModelClass;
 
 public abstract class Service<T extends ModelClass, U extends DAO<T>> {
 

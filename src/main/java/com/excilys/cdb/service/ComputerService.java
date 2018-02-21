@@ -1,8 +1,8 @@
-package com.excilys.cdb.Service;
+package main.java.com.excilys.cdb.service;
 
-import com.excilys.cdb.ParamDescription;
-import com.excilys.cdb.DAO.ComputerDAO;
-import com.excilys.cdb.Model.Computer;
+import main.java.com.excilys.cdb.ParamDescription;
+import main.java.com.excilys.cdb.dao.ComputerDAO;
+import main.java.com.excilys.cdb.model.Computer;
 
 @ServiceClass(name = "computers")
 public class ComputerService extends Service<Computer, ComputerDAO>{

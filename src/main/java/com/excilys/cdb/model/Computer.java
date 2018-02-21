@@ -1,11 +1,11 @@
-package com.excilys.cdb.Model;
+package main.java.com.excilys.cdb.model;
 
 import java.time.LocalDate;
 import java.util.Optional;
 
 import org.apache.log4j.Logger;
 
-import com.excilys.cdb.ParamDescription;
+import main.java.com.excilys.cdb.ParamDescription;
 
 public class Computer implements ModelClass {
 	

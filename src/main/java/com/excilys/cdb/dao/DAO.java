@@ -1,4 +1,4 @@
-package com.excilys.cdb.DAO;
+package main.java.com.excilys.cdb.dao;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
@@ -25,10 +25,10 @@ import java.util.function.Function;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
-import com.excilys.cdb.Main;
-import com.excilys.cdb.ConnectionManager.ConnectionManager;
-import com.excilys.cdb.Model.ModelClass;
-import com.excilys.cdb.Model.SQLInfo;
+import main.java.com.excilys.cdb.Main;
+import main.java.com.excilys.cdb.connectionmanager.ConnectionManager;
+import main.java.com.excilys.cdb.model.ModelClass;
+import main.java.com.excilys.cdb.model.SQLInfo;
 
 public abstract class DAO<T extends ModelClass> {
 

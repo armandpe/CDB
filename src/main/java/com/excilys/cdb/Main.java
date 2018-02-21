@@ -1,8 +1,8 @@
-package com.excilys.cdb;
+package main.java.com.excilys.cdb;
 
 import org.apache.log4j.Logger;
 
-import com.excilys.cdb.ihm.CLI;
+import main.java.com.excilys.cdb.ihm.CLI;
 
 
 public class Main {

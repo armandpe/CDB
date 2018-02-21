@@ -1,4 +1,4 @@
-package com.excilys.cdb.DAO;
+package main.java.com.excilys.cdb.dao;
 
 import java.lang.reflect.Field;
 import java.sql.ResultSet;
@@ -14,8 +14,8 @@ import java.util.Set;
 
 import org.apache.log4j.Level;
 
-import com.excilys.cdb.Main;
-import com.excilys.cdb.Model.Computer;
+import main.java.com.excilys.cdb.Main;
+import main.java.com.excilys.cdb.model.Computer;
 
 public class ComputerDAO extends DAO<Computer> {
 

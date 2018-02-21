@@ -1,10 +1,10 @@
-package com.excilys.cdb.ihm;
+package main.java.com.excilys.cdb.ihm;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
-import com.excilys.cdb.Model.ModelClass;
+import main.java.com.excilys.cdb.model.ModelClass;
 
 public class PageManager{
 	

@@ -1,4 +1,4 @@
-package com.excilys.cdb.Service;
+package main.java.com.excilys.cdb.ihm;
 
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
@@ -6,10 +6,14 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
+
+/**
+ * @author Armand Pette
+ * Use this interface to expose methods to user
+ * Annotated methods must return a boolean and musn't have arguments.
+ */
 @Retention(RUNTIME)
 @Target(METHOD)
-public @interface ServiceMethod {
+public @interface UserChoice {
 	String name();
-	boolean forUser() default true; //If false, you must manually specify the behavior of the function
-	String fullName() default ""; //Specify if forUser is false, must be unique
 }

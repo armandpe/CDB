@@ -1,7 +1,7 @@
-package com.excilys.cdb.Service;
+package main.java.com.excilys.cdb.service;
 
-import com.excilys.cdb.DAO.CompanyDAO;
-import com.excilys.cdb.Model.Company;
+import main.java.com.excilys.cdb.dao.CompanyDAO;
+import main.java.com.excilys.cdb.model.Company;
 
 @ServiceClass(name = "companies")
 public class CompanyService extends Service<Company, CompanyDAO>{
