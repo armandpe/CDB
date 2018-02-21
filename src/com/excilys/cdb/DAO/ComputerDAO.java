@@ -44,8 +44,7 @@ public class ComputerDAO extends DAO<Computer> {
 			c.setCompanyId(Optional.ofNullable(rs.getLong("company_id")));
 			return Optional.of(c);
 		}catch(SQLException e) {
-			e.printStackTrace();
-			System.out.println(e.getMessage());
+			logger.log(Level.ERROR, "Error in method " + Main.getMethodName() + " : " + e.getMessage());
 			return Optional.ofNullable(null);
 		}
 	}

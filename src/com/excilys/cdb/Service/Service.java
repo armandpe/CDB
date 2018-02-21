@@ -20,6 +20,7 @@ public abstract class Service<T extends ModelClass, U extends DAO<T>> {
 	
 	public abstract String getDaoClassFullName();
 	
+	@SuppressWarnings("unchecked")
 	public DAO<T> getDAO()
 	{
 		Class<?> c = null;

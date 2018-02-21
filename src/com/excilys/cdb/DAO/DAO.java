@@ -157,7 +157,6 @@ public abstract class DAO<T extends ModelClass> {
 
 		try {
 			Statement stmt = connection.createStatement();
-			System.out.println(query);
 			sqlResults = stmt.executeQuery(query);
 		}catch(Exception e) { 
 			final StackTraceElement[] ste = Thread.currentThread().getStackTrace();
@@ -262,7 +261,6 @@ public abstract class DAO<T extends ModelClass> {
 			{
 				addValueToStatement(ps, fieldClassValue, keyOrder);
 			}
-			System.out.println(query);
 			result = ps.executeUpdate();
 			ps.close();
 
@@ -284,9 +282,6 @@ public abstract class DAO<T extends ModelClass> {
 			if(((Optional<?>) value).isPresent())
 				value = ((Optional<?>) value).get();
 		}
-		
-
-		System.out.println(keyOrder);
 
 		int order = keyOrder.get(fieldClassValue.getKey());
 

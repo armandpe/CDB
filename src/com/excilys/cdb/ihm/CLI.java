@@ -46,23 +46,22 @@ public class CLI {
 		Scanner sc = new Scanner(System.in);
 		LinkedHashMap<Class<? extends Service<?, ?>>, Method[]> servicesMethods = getSQLMethods(services);
 
-		while (continuer) {			
+		while (continuer) {
 			int maxChoice = PrintChoices(services, servicesMethods);
 
-			int choice = -1; 
+			int choice = -1;
 			try {
 				choice = sc.nextInt();
 				sc.nextLine();
-			}catch(InputMismatchException e) {
+			} catch (InputMismatchException e) {
 				sc.nextLine();
 				continue;
 			}
 
-			if(choice == 0)
+			if (choice == 0)
 				break;
 
-			if(choice > maxChoice || choice < 0)
-			{
+			if (choice > maxChoice || choice < 0) {
 				print("Invalid input - Please try again ...");
 				continue;
 			}
@@ -70,11 +69,11 @@ public class CLI {
 			print(applyChoice(choice, servicesMethods, sc).toString());
 			print("\n Press ENTER");
 			sc.nextLine();
-			for(int i = 0; i < 10; ++i)
+			for (int i = 0; i < 10; ++i)
 				print("");
 		}
 
-		print("Goodbye ! :) "); 
+		print("Goodbye ! :) ");
 		sc.close();
 	}
 
@@ -139,9 +138,9 @@ public class CLI {
 		long offset = 0;
 		long limit = 10;
 		long max = getServiceInstance(usedClass).getCount();
-		PageManager pageManager = new PageManager(limit, max, x-> applyServiceMethod(usedClass, chosenMethod, x));
+		PageManager pageManager = new PageManager(limit, max, x -> applyServiceMethod(usedClass, chosenMethod, x));
 		while (keepGoing) {
-			
+
 			print("Page " + pageManager.getPage() + "/" + pageManager.getMaxPage() + " :");
 			print(pageManager.getPageData().toString());
 
@@ -149,11 +148,11 @@ public class CLI {
 			boolean invalidInput = true;
 			int choice = -1;
 			ArrayList<Method> methods = new ArrayList<>();
-			for(Method method : PageManager.class.getMethods()) {
-				if(method.isAnnotationPresent(UserChoice.class))
+			for (Method method : PageManager.class.getMethods()) {
+				if (method.isAnnotationPresent(UserChoice.class))
 					methods.add(method);
 			}
-			
+
 			while (invalidInput && offset < max) {
 				if (!first)
 					print("Invalid input. Please enter a correct value");
@@ -161,10 +160,10 @@ public class CLI {
 				print("\nWhat do you want to do ?");
 				print("\t0 - Exit");
 				int i = 1;
-				for(Method method : methods) {
+				for (Method method : methods) {
 					print("\t" + i++ + " - " + method.getAnnotation(UserChoice.class).name());
 				}
-				
+
 				try {
 					choice = sc.nextInt();
 					if (choice < 5 && choice >= 0)
@@ -176,12 +175,12 @@ public class CLI {
 				}
 				sc.nextLine();
 			}
-			if(choice == 0) {
+			if (choice == 0) {
 				keepGoing = false;
 				break;
 			} else {
 				try {
-					if(!(boolean) methods.get(choice-1).invoke(pageManager, new Object[0]))
+					if (!(boolean) methods.get(choice - 1).invoke(pageManager, new Object[0]))
 						print("Request failure");
 					else
 						print(pageManager.getPageData().toString());
@@ -258,7 +257,7 @@ public class CLI {
 						} else {
 							result = AskOtherParameter(parameters, param, sc);
 						}
-					} else { 
+					} else {
 						result = Optional.empty();
 					}
 
@@ -332,7 +331,7 @@ public class CLI {
 			} else if (paramClass == String.class) {
 				result = sc.nextLine();
 			} else {
-				throw new NotImplementedException();
+				throw new IllegalArgumentException("Class not implemented in " + Main.getMethodName());
 			}
 
 			if (isOptional)
