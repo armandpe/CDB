@@ -38,15 +38,18 @@ public class ComputerDAO extends DAO<Computer> {
 	@Override
 	protected Optional<Computer> buildItem(ResultSet rs) {
 		try {
-			Computer c = new Computer();
-			c.setId(rs.getLong("id"));
-			c.setName(rs.getString("name"));
+			Computer.ComputerBuilder builder = new Computer.ComputerBuilder();
+			builder.withId(rs.getLong("id"));
+			builder.withName(rs.getString("name"));
 			Timestamp temp = rs.getTimestamp("introduced");
-			c.setIntroduced(Optional.ofNullable(temp == null ? null : temp.toLocalDateTime().toLocalDate()));
+			builder.withIntroduced(temp == null ? null : temp.toLocalDateTime().toLocalDate());
 			temp = rs.getTimestamp("discontinued");
-			c.setDiscontinued(Optional.ofNullable(temp == null ? null : temp.toLocalDateTime().toLocalDate()));
-			c.setCompanyId(Optional.ofNullable(rs.getLong("company_id")));
-			return Optional.of(c);
+			builder.withDiscontinued(temp == null ? null : temp.toLocalDateTime().toLocalDate());
+			Optional<Long> companyId = Optional.ofNullable(rs.getLong("company_id"));
+			if (companyId.isPresent()) {
+				builder.withCompanyId(companyId.get());
+			}
+			return Optional.of(builder.build());
 		} catch (SQLException e) {
 			logger.log(Level.ERROR, "Error in method " + Main.getMethodName() + " : " + e.getMessage());
 			return Optional.ofNullable(null);

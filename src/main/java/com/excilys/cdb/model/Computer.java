@@ -9,33 +9,49 @@ import main.java.com.excilys.cdb.ParamDescription;
 
 public class Computer implements ModelClass {
 	
-	static final Logger LOGGER = Logger.getLogger(Computer.class);
-	
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + (int) (id ^ (id >>> 32));
-		return result;
+	public static class ComputerBuilder {
+		
+		private long id = 0;
+
+		private String name = "Unnamed";
+
+		private Optional<LocalDate> introduced = Optional.empty();
+
+		private Optional<LocalDate> discontinued = Optional.empty();
+
+		private Optional<Long> companyId = Optional.empty();
+		
+		public Computer build() {
+			return new Computer(id, name, introduced, discontinued, companyId);
+		}
+		
+		public ComputerBuilder withId(long id) {
+			this.id = id;
+			return this;
+		}
+		
+		public ComputerBuilder withName(String name) {
+			this.name = name;
+			return this;
+		}
+		
+		public ComputerBuilder withIntroduced(LocalDate introduced) {
+			this.introduced = Optional.ofNullable(introduced);
+			return this;
+		}
+		
+		public ComputerBuilder withDiscontinued(LocalDate discontinued) {
+			this.introduced = Optional.ofNullable(discontinued);
+			return this;
+		}
+		
+		public ComputerBuilder withCompanyId(long companyId) {
+			this.companyId = Optional.of(companyId);
+			return this;
+		}
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
-		Computer other = (Computer) obj;
-		if (id != other.id) {
-			return false;
-		}
-		return true;
-	}
+	static final Logger LOGGER = Logger.getLogger(Computer.class);
 
 	@SQLInfo(name = "id", primaryKey = true)
 	private long id;
@@ -52,7 +68,7 @@ public class Computer implements ModelClass {
 	@SQLInfo(name = "company_id")
 	private Optional<Long> companyId;
 
-	public Computer() { }
+	private Computer() { }
 
 	public Computer(@ParamDescription(name = "computer id") long id, 
 					@ParamDescription(name = "computer name") String name, 
@@ -127,5 +143,29 @@ public class Computer implements ModelClass {
 		this.companyId = companyId;
 	}
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (int) (id ^ (id >>> 32));
+		return result;
+	}
 
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		Computer other = (Computer) obj;
+		if (id != other.id) {
+			return false;
+		}
+		return true;
+	}
 }
