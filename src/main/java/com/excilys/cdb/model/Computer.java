@@ -68,8 +68,6 @@ public class Computer implements ModelClass {
 	@SQLInfo(name = "company_id")
 	private Optional<Long> companyId;
 
-	private Computer() { }
-
 	public Computer(@ParamDescription(name = "computer id") long id, 
 					@ParamDescription(name = "computer name") String name, 
 					@ParamDescription(name = "date of introdution", optional = true) Optional<LocalDate> introduced, 

@@ -142,7 +142,7 @@ public class ComputerDAO extends DAO<Computer> {
 
 		int i = 0;
 		for (Entry<String, SimpleEntry<Field, Object>> entry : fieldsClassValues.entrySet()) {
-			if (entry.getKey().equals(primaryKey)) {
+			if (!entry.getKey().equals(primaryKey)) {
 				keyOrder.put(entry.getKey(), ++i);
 			}
 		}

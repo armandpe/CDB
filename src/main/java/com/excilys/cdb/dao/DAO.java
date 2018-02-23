@@ -58,14 +58,15 @@ public abstract class DAO<T extends ModelClass> {
 	}
 
 	public String arrayToString(String[] array) {
-		String res = "";
-		for (String s : array) {
-			res += s + ',';
-		}
-
-		res = res.substring(0, res.length() - 1);
-
-		return res;
+//		String res = "";
+//		for (String s : array) {
+//			res += s + ',';
+//		}
+//
+//		res = res.substring(0, res.length() - 1);
+//
+//		return res;
+		return String.join(",", array);
 	}
 
 	public <V> V executeWithConnection(Function<Object[], V> f, Object[] objects) {
@@ -238,7 +239,7 @@ public abstract class DAO<T extends ModelClass> {
 	protected int deleteByPrimaryKey(Object primaryKeyValue) {
 		SimpleEntry<String, Field> primaryKey = getPrimaryKey();
 
-		String query = "DELETE FROM " + getTable() + " WHERE " + primaryKey + " = ?";
+		String query = "DELETE FROM " + getTable() + " WHERE " + primaryKey.getKey() + " = ?";
 
 		LinkedHashMap<String, SimpleEntry<Field, Object>> fieldsClassValues = new LinkedHashMap<>();
 		fieldsClassValues.put(primaryKey.getKey(), new SimpleEntry<Field, Object>(primaryKey.getValue(), primaryKeyValue));
@@ -282,7 +283,7 @@ public abstract class DAO<T extends ModelClass> {
 				value = ((Optional<?>) value).get();
 			}
 		}
-
+		
 		int order = keyOrder.get(fieldClassValue.getKey());
 
 		if (type == String.class) {
