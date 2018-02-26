@@ -5,33 +5,40 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import main.java.com.excilys.cdb.Main;
 
 
 public class ConnectionManager {
 
-	final Logger logger = Logger.getLogger(this.getClass());
 	private static ConnectionManager connectionManager;
-	private static String url;
 	private static String login;
 	private static String password;
-	private Connection connection;
-	
-	private ConnectionManager() { 
-		ResourceBundle bundle = ResourceBundle.getBundle("connection");
-        login = bundle.getString("login");
-        password = bundle.getString("password");
-        url = bundle.getString("url");
-	}
-
+	private static String url;
 	public static ConnectionManager getInstance() {
 		if (connectionManager == null) {
 			connectionManager = new ConnectionManager();
 		}
 		return connectionManager;
+	}
+	private Connection connection;
+	
+	final Logger logger = LogManager.getLogger(this.getClass());
+
+	private ConnectionManager() { 
+		ResourceBundle bundle = ResourceBundle.getBundle("connection");
+        login = bundle.getString("login");
+        password = bundle.getString("password");
+        url = bundle.getString("url");
+        try {
+			Class.forName(bundle.getString("driver"));
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public Connection getConnection() {

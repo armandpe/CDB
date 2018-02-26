@@ -8,14 +8,14 @@ public class CompanyService extends Service<Company, CompanyDAO> {
 	
 	private static CompanyService service;
 	
-	private CompanyService() { }
-	
 	public static CompanyService getInstance() {
 		if (service == null) {
 			service = new CompanyService();
 		}
 		return service;
 	}
+	
+	private CompanyService() { }
 	
 	@Override
 	public String getDaoClassFullName() {

@@ -12,7 +12,7 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 
-import org.apache.log4j.Level;
+import org.apache.logging.log4j.Level;
 
 import main.java.com.excilys.cdb.Main;
 import main.java.com.excilys.cdb.model.Computer;
@@ -25,8 +25,6 @@ public class ComputerDAO extends DAO<Computer> {
 
 	private static ComputerDAO computerDAO;
 
-	private ComputerDAO() { }
-
 	public static ComputerDAO getInstance() {
 		if (computerDAO == null) {
 			computerDAO = new ComputerDAO();
@@ -35,26 +33,7 @@ public class ComputerDAO extends DAO<Computer> {
 		return computerDAO;
 	}
 
-	@Override
-	protected Optional<Computer> buildItem(ResultSet rs) {
-		try {
-			Computer.ComputerBuilder builder = new Computer.ComputerBuilder();
-			builder.withId(rs.getLong("id"));
-			builder.withName(rs.getString("name"));
-			Timestamp temp = rs.getTimestamp("introduced");
-			builder.withIntroduced(temp == null ? null : temp.toLocalDateTime().toLocalDate());
-			temp = rs.getTimestamp("discontinued");
-			builder.withDiscontinued(temp == null ? null : temp.toLocalDateTime().toLocalDate());
-			Optional<Long> companyId = Optional.ofNullable(rs.getLong("company_id"));
-			if (companyId.isPresent()) {
-				builder.withCompanyId(companyId.get());
-			}
-			return Optional.of(builder.build());
-		} catch (SQLException e) {
-			logger.log(Level.ERROR, "Error in method " + Main.getMethodName() + " : " + e.getMessage());
-			return Optional.ofNullable(null);
-		}
-	}
+	private ComputerDAO() { }
 
 	/**
 	 * @param computer Computer to create
@@ -71,6 +50,46 @@ public class ComputerDAO extends DAO<Computer> {
 		String query = generateCreateQuery(fieldsClassValues, keys);
 
 		return executeStatement(query, fieldsClassValues, keyOrder);
+	}
+
+	public int deleteComputer(long id) {
+		return deleteByPrimaryKey(id);
+	}
+
+	@Override
+	public String getModelClassFullName() {
+		return Computer.class.getName();
+	}
+
+	public int updateComputer(Computer computer) {
+		Map<String, String> mapperSQLFields = getMapperSQLFields();
+		Set<String> keys = mapperSQLFields.keySet();
+
+		LinkedHashMap<String, SimpleEntry<Field, Object>> fieldsClassValues = generateFieldsClassValues(mapperSQLFields, computer);
+
+		String primaryKey = getPrimaryKey().getKey();
+
+		HashMap<String, Integer> keyOrder = getKeyOrder(fieldsClassValues, primaryKey);
+
+		String query = generateUpdateQuery(fieldsClassValues, keys, primaryKey);
+
+		return executeStatement(query, fieldsClassValues, keyOrder);
+	}
+
+	private String generateCreateQuery(LinkedHashMap<String, SimpleEntry<Field, Object>> paramValues, Set<String> keys) {
+
+		String[] template = {};
+		String query = "INSERT INTO " + getTable() + " ( " + arrayToString(paramValues.keySet().toArray(template)) + " ) VALUES ( ";
+
+		for (int i = 0; i < keys.size(); ++i) {
+			query += "?,";
+			}
+
+		query = query.substring(0, query.length() - 1);
+
+		query += " )";
+
+		return query;
 	}
 
 	private LinkedHashMap<String, SimpleEntry<Field, Object>> generateFieldsClassValues(Map<String, String> mapperSQLFields, Computer computer) {
@@ -94,35 +113,21 @@ public class ComputerDAO extends DAO<Computer> {
 		return fieldsClassValues;
 	}
 
-	private String generateCreateQuery(LinkedHashMap<String, SimpleEntry<Field, Object>> paramValues, Set<String> keys) {
+	private String generateUpdateQuery(LinkedHashMap<String, SimpleEntry<Field, Object>> paramValues, Set<String> keys, String primaryKey) {
 
-		String[] template = {};
-		String query = "INSERT INTO " + getTable() + " ( " + arrayToString(paramValues.keySet().toArray(template)) + " ) VALUES ( ";
+		String query = "UPDATE " + getTable() + " SET ";
 
-		for (int i = 0; i < keys.size(); ++i) {
-			query += "?,";
+		for (String name : paramValues.keySet()) {
+			if (!name.equals(primaryKey)) {
+				query += name + " = ?,";
 			}
+		}
 
 		query = query.substring(0, query.length() - 1);
 
-		query += " )";
+		query += " WHERE " + primaryKey + " = ?";
 
 		return query;
-	}
-
-	public int updateComputer(Computer computer) {
-		Map<String, String> mapperSQLFields = getMapperSQLFields();
-		Set<String> keys = mapperSQLFields.keySet();
-
-		LinkedHashMap<String, SimpleEntry<Field, Object>> fieldsClassValues = generateFieldsClassValues(mapperSQLFields, computer);
-
-		String primaryKey = getPrimaryKey().getKey();
-
-		HashMap<String, Integer> keyOrder = getKeyOrder(fieldsClassValues, primaryKey);
-
-		String query = generateUpdateQuery(fieldsClassValues, keys, primaryKey);
-
-		return executeStatement(query, fieldsClassValues, keyOrder);
 	}
 
 	private HashMap<String, Integer> getKeyOrder(LinkedHashMap<String, SimpleEntry<Field, Object>> fieldsClassValues) {
@@ -152,35 +157,30 @@ public class ComputerDAO extends DAO<Computer> {
 		return keyOrder;
 	}
 
-	private String generateUpdateQuery(LinkedHashMap<String, SimpleEntry<Field, Object>> paramValues, Set<String> keys, String primaryKey) {
-
-		String query = "UPDATE " + getTable() + " SET ";
-
-		for (String name : paramValues.keySet()) {
-			if (!name.equals(primaryKey)) {
-				query += name + " = ?,";
+	@Override
+	protected Optional<Computer> buildItem(ResultSet rs) {
+		try {
+			Computer.ComputerBuilder builder = new Computer.ComputerBuilder();
+			builder.withId(rs.getLong("id"));
+			builder.withName(rs.getString("name"));
+			Timestamp temp = rs.getTimestamp("introduced");
+			builder.withIntroduced(temp == null ? null : temp.toLocalDateTime().toLocalDate());
+			temp = rs.getTimestamp("discontinued");
+			builder.withDiscontinued(temp == null ? null : temp.toLocalDateTime().toLocalDate());
+			Optional<Long> companyId = Optional.ofNullable(rs.getLong("company_id"));
+			if (companyId.isPresent()) {
+				builder.withCompanyId(companyId.get());
 			}
+			return Optional.of(builder.build());
+		} catch (SQLException e) {
+			logger.log(Level.ERROR, "Error in method " + Main.getMethodName() + " : " + e.getMessage());
+			return Optional.ofNullable(null);
 		}
-
-		query = query.substring(0, query.length() - 1);
-
-		query += " WHERE " + primaryKey + " = ?";
-
-		return query;
-	}
-
-	public int deleteComputer(long id) {
-		return deleteByPrimaryKey(id);
 	}
 
 	@Override
 	protected String getTable() {
 		return "computer";
-	}
-
-	@Override
-	public String getModelClassFullName() {
-		return Computer.class.getName();
 	}
 
 }

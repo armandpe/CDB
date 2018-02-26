@@ -4,7 +4,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Optional;
 
-import org.apache.log4j.Level;
+import org.apache.logging.log4j.Level;
 
 import main.java.com.excilys.cdb.model.Company;
 
@@ -12,14 +12,19 @@ public class CompanyDAO extends DAO<Company> {
 	
 	private static CompanyDAO companyDAO;
 	
-	private CompanyDAO() { }
-	
 	public static CompanyDAO getInstance() {
 		if (companyDAO == null) {
 			companyDAO = new CompanyDAO();
 		}
 		
 		return companyDAO;
+	}
+	
+	private CompanyDAO() { }
+	
+	@Override
+	public String getModelClassFullName() {
+		return Company.class.getName();
 	}
 	
 	protected Optional<Company> buildItem(ResultSet rs) {
@@ -35,15 +40,10 @@ public class CompanyDAO extends DAO<Company> {
 			return Optional.empty();
 		}
 	}
-	
+
 	@Override
 	protected String getTable() {
 		return "company";
-	}
-
-	@Override
-	public String getModelClassFullName() {
-		return Company.class.getName();
 	}
 
 }

@@ -3,7 +3,8 @@ package main.java.com.excilys.cdb.model;
 import java.time.LocalDate;
 import java.util.Optional;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import main.java.com.excilys.cdb.ParamDescription;
 
@@ -11,32 +12,22 @@ public class Computer implements ModelClass {
 	
 	public static class ComputerBuilder {
 		
-		private long id = 0;
-
-		private String name = "Unnamed";
-
-		private Optional<LocalDate> introduced = Optional.empty();
+		private Optional<Long> companyId = Optional.empty();
 
 		private Optional<LocalDate> discontinued = Optional.empty();
 
-		private Optional<Long> companyId = Optional.empty();
+		private long id = 0;
+
+		private Optional<LocalDate> introduced = Optional.empty();
+
+		private String name = "Unnamed";
 		
 		public Computer build() {
 			return new Computer(id, name, introduced, discontinued, companyId);
 		}
 		
-		public ComputerBuilder withId(long id) {
-			this.id = id;
-			return this;
-		}
-		
-		public ComputerBuilder withName(String name) {
-			this.name = name;
-			return this;
-		}
-		
-		public ComputerBuilder withIntroduced(LocalDate introduced) {
-			this.introduced = Optional.ofNullable(introduced);
+		public ComputerBuilder withCompanyId(long companyId) {
+			this.companyId = Optional.of(companyId);
 			return this;
 		}
 		
@@ -45,28 +36,38 @@ public class Computer implements ModelClass {
 			return this;
 		}
 		
-		public ComputerBuilder withCompanyId(long companyId) {
-			this.companyId = Optional.of(companyId);
+		public ComputerBuilder withId(long id) {
+			this.id = id;
+			return this;
+		}
+		
+		public ComputerBuilder withIntroduced(LocalDate introduced) {
+			this.introduced = Optional.ofNullable(introduced);
+			return this;
+		}
+		
+		public ComputerBuilder withName(String name) {
+			this.name = name;
 			return this;
 		}
 	}
 
-	static final Logger LOGGER = Logger.getLogger(Computer.class);
+	static final Logger LOGGER = LogManager.getLogger(Computer.class);
 
-	@SQLInfo(name = "id", primaryKey = true)
-	private long id;
-
-	@SQLInfo(name = "name")
-	private String name;
-
-	@SQLInfo(name = "introduced")
-	private Optional<LocalDate> introduced;
+	@SQLInfo(name = "company_id")
+	private Optional<Long> companyId;
 
 	@SQLInfo(name = "discontinued")
 	private Optional<LocalDate> discontinued;
 
-	@SQLInfo(name = "company_id")
-	private Optional<Long> companyId;
+	@SQLInfo(name = "id", primaryKey = true)
+	private long id;
+
+	@SQLInfo(name = "introduced")
+	private Optional<LocalDate> introduced;
+
+	@SQLInfo(name = "name")
+	private String name;
 
 	public Computer(@ParamDescription(name = "computer id") long id, 
 					@ParamDescription(name = "computer name") String name, 
@@ -92,64 +93,6 @@ public class Computer implements ModelClass {
 	}
 
 	@Override
-	public String toString() {
-		return "Computer [id=" + id + 
-				", name=" + name + 
-				(introduced.isPresent() ? ", introduced=" + introduced.get() : "") + 
-				(discontinued.isPresent() ? ", discontinued=" + discontinued.get() : "") + 
-				(companyId.isPresent() ? ", companyId=" + companyId.get() : "") + 
-				"]\n";
-	}
-	
-	public long getId() {
-		return id;
-	}
-
-	public void setId(long id) {
-		this.id = id;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public Optional<LocalDate> getIntroduced() {
-		return introduced;
-	}
-
-	public void setIntroduced(Optional<LocalDate> localDate) {
-		this.introduced = localDate;
-	}
-
-	public Optional<LocalDate> getDiscontinued() {
-		return discontinued;
-	}
-
-	public void setDiscontinued(Optional<LocalDate> discontinued) {
-		this.discontinued = discontinued;
-	}
-
-	public Optional<Long> getCompanyId() {
-		return companyId;
-	}
-
-	public void setCompanyId(Optional<Long> companyId) {
-		this.companyId = companyId;
-	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + (int) (id ^ (id >>> 32));
-		return result;
-	}
-
-	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
 			return true;
@@ -165,5 +108,63 @@ public class Computer implements ModelClass {
 			return false;
 		}
 		return true;
+	}
+	
+	public Optional<Long> getCompanyId() {
+		return companyId;
+	}
+
+	public Optional<LocalDate> getDiscontinued() {
+		return discontinued;
+	}
+
+	public long getId() {
+		return id;
+	}
+
+	public Optional<LocalDate> getIntroduced() {
+		return introduced;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (int) (id ^ (id >>> 32));
+		return result;
+	}
+
+	public void setCompanyId(Optional<Long> companyId) {
+		this.companyId = companyId;
+	}
+
+	public void setDiscontinued(Optional<LocalDate> discontinued) {
+		this.discontinued = discontinued;
+	}
+
+	public void setId(long id) {
+		this.id = id;
+	}
+
+	public void setIntroduced(Optional<LocalDate> localDate) {
+		this.introduced = localDate;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	@Override
+	public String toString() {
+		return "Computer [id=" + id + 
+				", name=" + name + 
+				(introduced.isPresent() ? ", introduced=" + introduced.get() : "") + 
+				(discontinued.isPresent() ? ", discontinued=" + discontinued.get() : "") + 
+				(companyId.isPresent() ? ", companyId=" + companyId.get() : "") + 
+				"]\n";
 	}
 }

@@ -7,8 +7,9 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -22,10 +23,24 @@ import main.java.com.excilys.cdb.model.Computer;
 
 public class ComputerDAOTest {
 
-	static final Logger LOGGER = Logger.getLogger(ComputerDAOTest.class);
-	
 	private static boolean first = true;
 	
+	static final Logger LOGGER = LogManager.getLogger(ComputerDAOTest.class);
+	
+	@BeforeClass
+	public static void setUpBeforeClass() throws Exception {
+		
+	}
+	
+	@AfterClass
+	public static void tearDownAfterClass() throws Exception {
+		
+	}
+	
+	private static void dropDatabase() {
+
+	}
+
 	private static void initDatabase() {
 		try (Connection connection = ConnectionManager.getInstance().getConnection(); Statement statement = connection.createStatement();) {
 			statement.executeUpdate("DROP TABLE computer;\n"
@@ -68,20 +83,6 @@ public class ComputerDAOTest {
 			LOGGER.log(Level.ERROR, "Error in method " + Main.getMethodName() + " : " + e.getMessage());
 		}
 	}
-	
-	private static void dropDatabase() {
-
-	}
-	
-	@BeforeClass
-	public static void setUpBeforeClass() throws Exception {
-		
-	}
-
-	@AfterClass
-	public static void tearDownAfterClass() throws Exception {
-		
-	}
 
 	@Before
 	public void setUp() throws Exception {
@@ -94,13 +95,10 @@ public class ComputerDAOTest {
 	}
 
 	@Test
-	public void testUpdateComputer() {
-		
-		Computer computer = new Computer.ComputerBuilder().withId(3).withName("CM-200").withCompanyId(2).build();
-		computer.setName("j");
-		ComputerDAO.getInstance().updateComputer(computer);
-		Computer computer2 = ComputerDAO.getInstance().getById(3).get();
-		assertEquals(computer, computer2);
+	public void testCreateComputerComputer() {
+		Computer toAdd = new Computer.ComputerBuilder().withId(2).withName("Mb").withCompanyId(1).build();
+		int result = ComputerDAO.getInstance().createComputer(toAdd);
+		assertTrue(ComputerDAO.getInstance().getCount() == 4 && result >= 0 && ComputerDAO.getInstance().getById(2).get().equals(toAdd));
 	}
 
 	@Test
@@ -111,15 +109,15 @@ public class ComputerDAOTest {
 	}
 
 	@Test
+	public void testGetAllLongLong() {
+		assertEquals(3, ComputerDAO.getInstance().getAll(0, 10).size());
+	}
+
+	@Test
 	public void testGetByIdLong() {
 		Computer c = ComputerDAO.getInstance().getById(1).get();
 		
 		assertEquals(c, new Computer.ComputerBuilder().withId(1).withName("MacBook Pro 15.4 inch").withCompanyId(1).build());
-	}
-
-	@Test
-	public void testGetAllLongLong() {
-		assertEquals(3, ComputerDAO.getInstance().getAll(0, 10).size());
 	}
 
 	@Test
@@ -132,10 +130,13 @@ public class ComputerDAOTest {
 	}
 	
 	@Test
-	public void testCreateComputerComputer() {
-		Computer toAdd = new Computer.ComputerBuilder().withId(2).withName("Mb").withCompanyId(1).build();
-		int result = ComputerDAO.getInstance().createComputer(toAdd);
-		assertTrue(ComputerDAO.getInstance().getCount() == 4 && result >= 0 && ComputerDAO.getInstance().getById(2).get().equals(toAdd));
+	public void testUpdateComputer() {
+		
+		Computer computer = new Computer.ComputerBuilder().withId(3).withName("CM-200").withCompanyId(2).build();
+		computer.setName("j");
+		ComputerDAO.getInstance().updateComputer(computer);
+		Computer computer2 = ComputerDAO.getInstance().getById(3).get();
+		assertEquals(computer, computer2);
 	}
 
 }

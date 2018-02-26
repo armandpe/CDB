@@ -8,8 +8,8 @@ import main.java.com.excilys.cdb.model.ModelClass;
 
 public class PageManager {
 	
-	private final long limit;
 	private Function<Object[], Object> getList;
+	private final long limit;
 	private long max;
 	private long maxPage;
 	private long offset;

@@ -20,8 +20,9 @@ import java.util.Optional;
 import java.util.Scanner;
 import java.util.Set;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import main.java.com.excilys.cdb.Main;
 import main.java.com.excilys.cdb.ParamDescription;
@@ -33,7 +34,7 @@ import main.java.com.excilys.cdb.service.ServiceMethod;
 
 public class CLI {
 
-	static final Logger LOGGER = Logger.getLogger(CLI.class);
+	static final Logger LOGGER = LogManager.getLogger(CLI.class);
 
 	public static void start() {
 		ArrayList<Class<? extends Service<?, ?>>> services = new ArrayList<>();
@@ -129,151 +130,6 @@ public class CLI {
 		+ ". We couldn't execute your request.";
 	}
 
-	private static Object serviceGetAll(Class<? extends Service<?, ?>> usedClass, Method chosenMethod, Scanner sc) {
-		boolean keepGoing = true;
-		long offset = 0;
-		long limit = 10;
-		long max = getServiceInstance(usedClass).getCount();
-		PageManager pageManager = new PageManager(limit, max, x -> applyServiceMethod(usedClass, chosenMethod, x));
-		while (keepGoing) {
-
-			print("Page " + pageManager.getPage() + "/" + pageManager.getMaxPage() + " :");
-			print(pageManager.getPageData().toString());
-
-			boolean first = true;
-			boolean invalidInput = true;
-			int choice = -1;
-			ArrayList<Method> methods = new ArrayList<>();
-			for (Method method : PageManager.class.getMethods()) {
-				if (method.isAnnotationPresent(UserChoice.class)) {
-					methods.add(method);
-				}
-			}
-
-			while (invalidInput && offset < max) {
-				if (!first) {
-					print("Invalid input. Please enter a correct value");
-				}
-				first = false;
-				print("\nWhat do you want to do ?");
-				print("\t0 - Exit");
-				int i = 1;
-				for (Method method : methods) {
-					print("\t" + i++ + " - " + method.getAnnotation(UserChoice.class).name());
-				}
-
-				try {
-					choice = sc.nextInt();
-					if (choice < 5 && choice >= 0) {
-						invalidInput = false;
-					} else {
-						LOGGER.log(Level.INFO, "Invalid input");
-					}
-				} catch (InputMismatchException e) {
-					LOGGER.log(Level.INFO, "Invalid input : " + e.getMessage());
-				}
-				sc.nextLine();
-			}
-			if (choice == 0) {
-				keepGoing = false;
-				break;
-			} else {
-				try {
-					if (!(boolean) methods.get(choice - 1).invoke(pageManager, new Object[0])) {
-						print("Request failure");
-					} else {
-						print(pageManager.getPageData().toString());
-					}
-				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-					LOGGER.log(Level.ERROR, "Error in method " + Main.getMethodName() + " : " + e.getMessage());
-					print("Request failure");
-				}
-			}
-		}
-		return "\n Ended.";
-	}
-
-	private static Service<?, ?> getServiceInstance(Class<? extends Service<?, ?>> serviceClass) {
-
-		Service<?, ?> service = null;
-
-		Method method = null;
-		try {
-			method = serviceClass.getMethod("getInstance");
-		} catch (NoSuchMethodException | SecurityException e) {
-			LOGGER.log(Level.ERROR, "Error in method " + Main.getMethodName() + " : " + e.getMessage());
-		}
-
-		try {
-			service = (Service<?, ?>) method.invoke(null);
-		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-			LOGGER.log(Level.ERROR, "Error in method " + Main.getMethodName() + " : " + e.getMessage());
-		}
-
-		return service;
-	}
-
-	private static List<?> askParameters(Parameter[] params, Scanner sc) {
-		Class<?>[] acceptedTypes = {long.class, Long.class, LocalDate.class, String.class, Optional.class};
-		ArrayList<Class<?>> acceptedTypesList = new ArrayList<>(Arrays.asList(acceptedTypes));
-
-		LinkedList<Object> parameters = new LinkedList<>();
-
-		for (Parameter param : params) {
-
-			String name = param.getName();
-			boolean optional = false;
-
-			if (param.isAnnotationPresent(ParamDescription.class)) {
-				name = param.getAnnotation(ParamDescription.class).name();
-				optional = param.getAnnotation(ParamDescription.class).optional();
-			}
-
-			Object defaultReturn = new Object();
-			Object result = defaultReturn;
-			boolean firstTime = true;
-
-			while (result == defaultReturn) {
-				try {
-					if (!firstTime) {
-						print("Entry error - please try again...");
-					}
-					firstTime = false;
-					if (optional) {
-						print("The " + name + " is optional, do you wan't to set Mapit ? (0 - yes, 1 - no)");
-						long l = sc.nextLong();
-						sc.nextLine();
-						if (l == 0) {
-							optional = false;
-						} else if (l == 1) {
-							optional = true;
-						} else {
-							continue;
-						}
-					}
-					if (!optional) {
-						print("Enter the " + name + " :");
-						if (acceptedTypesList.contains(param.getType())) {
-							result = askParameter(param, sc);
-						} else {
-							result = askOtherParameter(parameters, param, sc);
-						}
-					} else {
-						result = Optional.empty();
-					}
-
-				} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
-						| InvocationTargetException | InputMismatchException e) {
-					LOGGER.log(Level.ERROR, "Error in method " + Main.getMethodName() + e.getMessage() == null ? ""
-							: " : " + e.getMessage());
-					result = defaultReturn;
-				}
-			}
-			parameters.add(result);
-		}
-		return parameters;
-	}
-
 	private static Object askOtherParameter(LinkedList<Object> parameters, Parameter param, Scanner sc)
 			throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		Class<?> type = param.getType();
@@ -351,6 +207,107 @@ public class CLI {
 		}
 	}
 
+	private static List<?> askParameters(Parameter[] params, Scanner sc) {
+		Class<?>[] acceptedTypes = {long.class, Long.class, LocalDate.class, String.class, Optional.class};
+		ArrayList<Class<?>> acceptedTypesList = new ArrayList<>(Arrays.asList(acceptedTypes));
+
+		LinkedList<Object> parameters = new LinkedList<>();
+
+		for (Parameter param : params) {
+
+			String name = param.getName();
+			boolean optional = false;
+
+			if (param.isAnnotationPresent(ParamDescription.class)) {
+				name = param.getAnnotation(ParamDescription.class).name();
+				optional = param.getAnnotation(ParamDescription.class).optional();
+			}
+
+			Object defaultReturn = new Object();
+			Object result = defaultReturn;
+			boolean firstTime = true;
+
+			while (result == defaultReturn) {
+				try {
+					if (!firstTime) {
+						print("Entry error - please try again...");
+					}
+					firstTime = false;
+					if (optional) {
+						print("The " + name + " is optional, do you wan't to set it ? (0 - yes, 1 - no)");
+						long l = sc.nextLong();
+						sc.nextLine();
+						if (l == 0) {
+							optional = false;
+						} else if (l == 1) {
+							optional = true;
+						} else {
+							continue;
+						}
+					}
+					if (!optional) {
+						print("Enter the " + name + " :");
+						if (acceptedTypesList.contains(param.getType())) {
+							result = askParameter(param, sc);
+						} else {
+							result = askOtherParameter(parameters, param, sc);
+						}
+					} else {
+						result = Optional.empty();
+					}
+
+				} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+						| InvocationTargetException | InputMismatchException e) {
+					LOGGER.log(Level.ERROR, "Error in method " + Main.getMethodName() + e.getMessage() == null ? ""
+							: " : " + e.getMessage());
+					result = defaultReturn;
+				}
+			}
+			parameters.add(result);
+		}
+		return parameters;
+	}
+
+	private static Service<?, ?> getServiceInstance(Class<? extends Service<?, ?>> serviceClass) {
+
+		Service<?, ?> service = null;
+
+		Method method = null;
+		try {
+			method = serviceClass.getMethod("getInstance");
+		} catch (NoSuchMethodException | SecurityException e) {
+			LOGGER.log(Level.ERROR, "Error in method " + Main.getMethodName() + " : " + e.getMessage());
+		}
+
+		try {
+			service = (Service<?, ?>) method.invoke(null);
+		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+			LOGGER.log(Level.ERROR, "Error in method " + Main.getMethodName() + " : " + e.getMessage());
+		}
+
+		return service;
+	}
+
+	private static LinkedHashMap<Class<? extends Service<?, ?>>, Method[]> getSQLMethods(
+			ArrayList<Class<? extends Service<?, ?>>> services) {
+
+		LinkedHashMap<Class<? extends Service<?, ?>>, Method[]> result = new LinkedHashMap<>();
+
+		for (Class<? extends Service<?, ?>> currentClass : services) {
+			Set<Method> toAdd = new HashSet<>();
+
+			for (Method method : currentClass.getMethods()) {
+				if (method.isAnnotationPresent(ServiceMethod.class)) {
+					toAdd.add(method);
+				}
+			}
+
+			result.put(currentClass, toAdd.toArray(new Method[toAdd.size()]));
+		}
+
+		return result;
+	}
+
 	private static void print(String s) {
 		System.out.println(s);
 	}
@@ -374,24 +331,68 @@ public class CLI {
 		return i;
 	}
 
-	private static LinkedHashMap<Class<? extends Service<?, ?>>, Method[]> getSQLMethods(
-			ArrayList<Class<? extends Service<?, ?>>> services) {
+	private static Object serviceGetAll(Class<? extends Service<?, ?>> usedClass, Method chosenMethod, Scanner sc) {
+		boolean keepGoing = true;
+		long offset = 0;
+		long limit = 10;
+		long max = getServiceInstance(usedClass).getCount();
+		PageManager pageManager = new PageManager(limit, max, x -> applyServiceMethod(usedClass, chosenMethod, x));
+		while (keepGoing) {
 
-		LinkedHashMap<Class<? extends Service<?, ?>>, Method[]> result = new LinkedHashMap<>();
+			print("Page " + pageManager.getPage() + "/" + pageManager.getMaxPage() + " :");
+			print(pageManager.getPageData().toString());
 
-		for (Class<? extends Service<?, ?>> currentClass : services) {
-			Set<Method> toAdd = new HashSet<>();
-
-			for (Method method : currentClass.getMethods()) {
-				if (method.isAnnotationPresent(ServiceMethod.class)) {
-					toAdd.add(method);
+			boolean first = true;
+			boolean invalidInput = true;
+			int choice = -1;
+			ArrayList<Method> methods = new ArrayList<>();
+			for (Method method : PageManager.class.getMethods()) {
+				if (method.isAnnotationPresent(UserChoice.class)) {
+					methods.add(method);
 				}
 			}
 
-			result.put(currentClass, toAdd.toArray(new Method[toAdd.size()]));
-		}
+			while (invalidInput && offset < max) {
+				if (!first) {
+					print("Invalid input. Please enter a correct value");
+				}
+				first = false;
+				print("\nWhat do you want to do ?");
+				print("\t0 - Exit");
+				int i = 1;
+				for (Method method : methods) {
+					print("\t" + i++ + " - " + method.getAnnotation(UserChoice.class).name());
+				}
 
-		return result;
+				try {
+					choice = sc.nextInt();
+					if (choice < 5 && choice >= 0) {
+						invalidInput = false;
+					} else {
+						LOGGER.log(Level.INFO, "Invalid input");
+					}
+				} catch (InputMismatchException e) {
+					LOGGER.log(Level.INFO, "Invalid input : " + e.getMessage());
+				}
+				sc.nextLine();
+			}
+			if (choice == 0) {
+				keepGoing = false;
+				break;
+			} else {
+				try {
+					if (!(boolean) methods.get(choice - 1).invoke(pageManager, new Object[0])) {
+						print("Request failure");
+					} else {
+						print(pageManager.getPageData().toString());
+					}
+				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+					LOGGER.log(Level.ERROR, "Error in method " + Main.getMethodName() + " : " + e.getMessage());
+					print("Request failure");
+				}
+			}
+		}
+		return "\n Ended.";
 	}
 
 }
