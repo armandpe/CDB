@@ -14,6 +14,7 @@
 		<hsqldb>2.4.0</hsqldb>
 		<powermock>1.7.1</powermock>
 		<taglibs>1.1.2</taglibs>
+		<jstl>1.2</jstl>
 	</properties>
 	<build>
 		<sourceDirectory>src</sourceDirectory>
@@ -110,6 +111,18 @@
 			<artifactId>standard</artifactId>
 			<version>${taglibs}</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/javax.servlet.jsp.jstl/jstl -->
+		<dependency>
+			<groupId>javax.servlet.jsp.jstl</groupId>
+			<artifactId>jstl-api</artifactId>
+			<version>${jstl}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish.web</groupId>
+			<artifactId>jstl-impl</artifactId>
+			<version>${jstl}</version>
+		</dependency>
+
 	</dependencies>
 	<packaging>war</packaging>
 </project>

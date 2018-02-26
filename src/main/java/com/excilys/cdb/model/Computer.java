@@ -32,7 +32,7 @@ public class Computer implements ModelClass {
 		}
 		
 		public ComputerBuilder withDiscontinued(LocalDate discontinued) {
-			this.introduced = Optional.ofNullable(discontinued);
+			this.discontinued = Optional.ofNullable(discontinued);
 			return this;
 		}
 		

@@ -4,12 +4,12 @@ import main.java.com.excilys.cdb.model.Company;
 
 public class CompanyMapper {
 	
-	public static Company getCompany(CompanyDTO dto) {
+	public static Company toCompany(CompanyDTO dto) {
 		
 		return new Company(dto.getId(), dto.getName());
 	}
 	
-	public static CompanyDTO getCompanyDTO(Company company) {
+	public static CompanyDTO toDTO(Company company) {
 		
 		CompanyDTO result = new CompanyDTO();
 		result.setId(company.getId());

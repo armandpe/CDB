@@ -8,7 +8,7 @@ import main.java.com.excilys.cdb.model.Computer;
 
 public class ComputerMapper {
 	
-	public static Computer getComputer(ComputerDTO dto) {
+	public static Computer toComputer(ComputerDTO dto) {
 				
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 		formatter = formatter.withLocale(Locale.FRANCE); 
@@ -20,7 +20,7 @@ public class ComputerMapper {
 		return builder.build();
 	}
 	
-	public static ComputerDTO getComputerDTO(Computer computer) {
+	public static ComputerDTO toDTO(Computer computer) {
 		
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 		formatter = formatter.withLocale(Locale.FRANCE); 
@@ -30,8 +30,8 @@ public class ComputerMapper {
 		dto.setDiscontinued(computer.getDiscontinued().isPresent() ? computer.getDiscontinued().get().format(formatter) : null);
 		dto.setIntroduced(computer.getIntroduced().isPresent() ? computer.getIntroduced().get().format(formatter) : null);
 		dto.setCompanyId(computer.getCompanyId().isPresent() ? computer.getCompanyId().get() : 0);
-		dto.setId(dto.getId());
-		dto.setName(dto.getName());
+		dto.setId(computer.getId());
+		dto.setName(computer.getName());
 		
 		return dto;
 	}
