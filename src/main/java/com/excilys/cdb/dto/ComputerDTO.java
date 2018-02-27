@@ -3,6 +3,8 @@ package main.java.com.excilys.cdb.dto;
 public class ComputerDTO {
 	
 	private long companyId;
+	
+	private String companyName;
 
 	private String discontinued;
 
@@ -11,11 +13,15 @@ public class ComputerDTO {
 	private String introduced;
 
 	private String name;
-	
+
 	public long getCompanyId() {
 		return companyId;
 	}
 
+	public String getCompanyName() {
+		return companyName;
+	}
+	
 	public String getDiscontinued() {
 		return discontinued;
 	}
@@ -34,6 +40,10 @@ public class ComputerDTO {
 
 	public void setCompanyId(long companyId) {
 		this.companyId = companyId;
+	}
+
+	public void setCompanyName(String companyName) {
+		this.companyName = companyName;
 	}
 
 	public void setDiscontinued(String discontinued) {

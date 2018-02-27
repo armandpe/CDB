@@ -22,7 +22,6 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.function.Function;
 
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -53,14 +52,6 @@ public abstract class DAO<T extends ModelClass> {
 	protected final Logger logger = LogManager.getLogger(this.getClass());
 
 	public String arrayToString(String[] array) {
-//		String res = "";
-//		for (String s : array) {
-//			res += s + ',';
-//		}
-//
-//		res = res.substring(0, res.length() - 1);
-//
-//		return res;
 		return String.join(",", array);
 	}
 
@@ -71,8 +62,9 @@ public abstract class DAO<T extends ModelClass> {
 			return f.apply(append(objects, connection));
 
 		} catch (SQLException e) {
-			logger.log(Level.ERROR, "Error in method " + Main.getMethodName() + " : " + e.getMessage());
+			logger.error(Main.getErrorMessage(null, e.getMessage()));
 		}
+
 		return null;
 	}
 
@@ -102,7 +94,7 @@ public abstract class DAO<T extends ModelClass> {
 			Statement stmt = connection.createStatement();
 			sqlResults = stmt.executeQuery(query);
 		} catch (Exception e) {
-			logger.log(Level.ERROR, "Error in method " + Main.getMethodName() + " : " + e.getMessage());
+			logger.error(Main.getErrorMessage(null, e.getMessage()));
 		}
 
 		try {
@@ -110,12 +102,12 @@ public abstract class DAO<T extends ModelClass> {
 				result = buildItem(sqlResults);
 			}
 		} catch (SQLException e) {
-			logger.log(Level.ERROR, "Error in method " + Main.getMethodName() + " : " + e.getMessage());
+			logger.error(Main.getErrorMessage(null, e.getMessage()));
 		}
 		try {
 			sqlResults.close();
 		} catch (SQLException e) {
-			logger.log(Level.ERROR, "Error in method " + Main.getMethodName() + " : " + e.getMessage());
+			logger.error(Main.getErrorMessage(null, e.getMessage()));
 		}
 
 		return result;
@@ -132,9 +124,7 @@ public abstract class DAO<T extends ModelClass> {
 		try {
 			fields = Class.forName(getModelClassFullName()).getDeclaredFields();
 		} catch (SecurityException | ClassNotFoundException e) {
-			final StackTraceElement[] ste = Thread.currentThread().getStackTrace();
-			String methodName = ste[1].getMethodName();
-			logger.log(Level.ERROR, "Error in method " + methodName + " : " + e.getMessage());
+			logger.error(Main.getErrorMessage(null, e.getMessage()));
 		}
 
 		for (Field field : fields) {
@@ -161,7 +151,7 @@ public abstract class DAO<T extends ModelClass> {
 				value = ((Optional<?>) value).get();
 			}
 		}
-		
+
 		int order = keyOrder.get(fieldClassValue.getKey());
 
 		if (type == String.class) {
@@ -194,7 +184,7 @@ public abstract class DAO<T extends ModelClass> {
 							ps.setNull(order, Types.LONGNVARCHAR);
 						}
 					} else {
-						logger.log(Level.ERROR, "Error in method " + Main.getMethodName() + " : no implementation for type " + type.getName());
+						logger.error(Main.getErrorMessage("maybe theres no implementation for type " + type.getName(), null));
 					}
 				}
 			}
@@ -233,7 +223,7 @@ public abstract class DAO<T extends ModelClass> {
 			ps.close();
 
 		} catch (SQLException e) {
-			logger.log(Level.ERROR, "Error in method " + Main.getMethodName() + " : " + e.getMessage());
+			logger.error(Main.getErrorMessage(null, e.getMessage()));
 		}
 		return result;
 	}
@@ -255,7 +245,7 @@ public abstract class DAO<T extends ModelClass> {
 			Statement stmt = connection.createStatement();
 			sqlResults = stmt.executeQuery(query);
 		} catch (Exception e) {
-			logger.log(Level.ERROR, "Error in method " + Main.getMethodName() + " : " + e.getMessage());
+			logger.error(Main.getErrorMessage(null, e.getMessage()));
 		}
 
 		try {
@@ -266,12 +256,12 @@ public abstract class DAO<T extends ModelClass> {
 				}
 			}
 		} catch (SQLException e) {
-			logger.log(Level.ERROR, "Error in method " + Main.getMethodName() + " : " + e.getMessage());
+			logger.error(Main.getErrorMessage(null, e.getMessage()));
 		}
 		try {
 			sqlResults.close();
 		} catch (SQLException e) {
-			logger.log(Level.ERROR, "Error in method " + Main.getMethodName() + " : " + e.getMessage());
+			logger.error(Main.getErrorMessage(null, e.getMessage()));
 		}
 
 		return result;
@@ -290,22 +280,22 @@ public abstract class DAO<T extends ModelClass> {
 			Statement stmt = connection.createStatement();
 			sqlResults = stmt.executeQuery(query);
 		} catch (Exception e) {
-			logger.log(Level.ERROR, "Error in method " + Main.getMethodName() + " : " + e.getMessage());
+			logger.error(Main.getErrorMessage(null, e.getMessage()));
 		}
 
 		try {
 			if (sqlResults.next()) {
 				result = sqlResults.getInt("nbComputer");
 			} else {
-				logger.log(Level.ERROR, "Error in method " + Main.getMethodName() + " : This isn't supposed to happen");
+				logger.error(Main.getErrorMessage("This isn't supposed to happend", null));
 			}
 		} catch (SQLException e) {
-			logger.log(Level.ERROR, "Error in method " + Main.getMethodName() + " : " + e.getMessage());
+			logger.error(Main.getErrorMessage("Error getting nbComputer", e.getMessage()));
 		}
 		try {
 			sqlResults.close();
 		} catch (SQLException e) {
-			logger.log(Level.ERROR, "Error in method " + Main.getMethodName() + " : " + e.getMessage());
+			logger.error(Main.getErrorMessage("Error closing sqlResult", e.getMessage()));
 		}
 
 		return result;
@@ -323,7 +313,7 @@ public abstract class DAO<T extends ModelClass> {
 				}
 			}
 		} catch (ClassNotFoundException e) {
-			logger.log(Level.ERROR, "Error in method " + Main.getMethodName() + " : " + e.getMessage());
+			logger.error(Main.getErrorMessage(null, e.getMessage()));
 		}
 		return null;
 	}

@@ -7,7 +7,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.After;
@@ -47,7 +46,7 @@ public class ComputerDAOTest {
 					+ "DROP TABLE company;");
 			connection.commit();
 		} catch (SQLException e) {
-			LOGGER.log(Level.ERROR, "Error in method " + Main.getMethodName() + " : " + e.getMessage());
+			LOGGER.error(Main.getErrorMessage(null, e.getMessage()));
 		}
 		
 		try (Connection connection = ConnectionManager.getInstance().getConnection(); 
@@ -80,7 +79,7 @@ public class ComputerDAOTest {
 			statement.executeUpdate("insert into computer (id,name,introduced,discontinued,company_id) values (  4,'Lalala','2010-10-10','2012-12-12',2);");
 			connection.commit();
 		} catch (SQLException e) {
-			LOGGER.log(Level.ERROR, "Error in method " + Main.getMethodName() + " : " + e.getMessage());
+			LOGGER.error(Main.getErrorMessage(null, e.getMessage()));
 		}
 	}
 

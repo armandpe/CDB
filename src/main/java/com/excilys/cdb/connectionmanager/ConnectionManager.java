@@ -5,7 +5,6 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
 
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -36,8 +35,7 @@ public class ConnectionManager {
         try {
 			Class.forName(bundle.getString("driver"));
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error(Main.getErrorMessage(null, e.getMessage()));
 		}
 	}
 
@@ -45,7 +43,7 @@ public class ConnectionManager {
 		try {
 			connection = DriverManager.getConnection(url, login, password);
 		} catch (SQLException e) {
-			logger.log(Level.ERROR, "Error in method " + Main.getMethodName() + " : " + e.getMessage());
+			logger.error(Main.getErrorMessage("connection to database failed", e.getMessage()));
 		}
 		return connection;
 	}

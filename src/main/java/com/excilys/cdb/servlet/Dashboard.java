@@ -16,7 +16,7 @@ import main.java.com.excilys.cdb.dto.ComputerDTO;
 import main.java.com.excilys.cdb.dto.ComputerMapper;
 import main.java.com.excilys.cdb.service.ComputerService;
 
-@WebServlet("/dashboard")
+@WebServlet("/dashboard.html")
 public class Dashboard extends HttpServlet {
 
 	Logger logger = LogManager.getLogger(this.getClass());
@@ -27,13 +27,9 @@ public class Dashboard extends HttpServlet {
 
 		request.setAttribute("count", count);
 
-		ArrayList<ComputerDTO> dtoList = new ArrayList<ComputerDTO>();
+		ArrayList<ComputerDTO> dtoList = new ArrayList<>();
 		
 		ComputerService.getInstance().getAll(0, 600).forEach(x -> dtoList.add(ComputerMapper.toDTO(x)));
-		
-		ComputerService.getInstance().getAll(0, 600).forEach(x -> System.out.println(x.getDiscontinued().isPresent() ? x.getDiscontinued().get() : "null"));
-		System.out.println("dto :");
-		dtoList.forEach(x -> System.out.println(x.getDiscontinued()));
 		
 		request.setAttribute("computerList", dtoList);
 

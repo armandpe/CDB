@@ -20,7 +20,6 @@ import java.util.Optional;
 import java.util.Scanner;
 import java.util.Set;
 
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -99,10 +98,8 @@ public class CLI {
 			case "com.excilys.cdb.Service.getAll":
 				return serviceGetAll(usedClass, chosenMethod, sc);
 			default:
-				LOGGER.log(Level.ERROR,
-						"The method " + chosenMethod.getName() + " is undefined in " + Main.getMethodName());
-				return "The method " + chosenMethod.getName() + " is undefined in " + Main.getMethodName()
-				+ ". We couldn't execute your request.";
+				LOGGER.error(Main.getErrorMessage("the method " + chosenMethod.getName() + "is undefined", null));
+				return "The method " + chosenMethod.getName() + " is undefined. We couldn't execute your request.";
 			}
 		} else {
 
@@ -121,12 +118,11 @@ public class CLI {
 		try {
 			return chosenMethod.invoke(getServiceInstance(usedClass), parameters);
 		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-			LOGGER.log(Level.ERROR, "Error in method " + Main.getMethodName() + " : " + e.getMessage());
+			LOGGER.error(Main.getErrorMessage(null, e.getMessage()));
 		}
 
-		LOGGER.log(Level.ERROR,
-				"An error occured in " + Main.getMethodName() + " using method " + chosenMethod.getName());
-		return "An error occured in " + Main.getMethodName() + " using method " + chosenMethod.getName()
+		LOGGER.error(Main.getErrorMessage("error using method " + chosenMethod.getName(), null));
+		return "An error occured in using method " + chosenMethod.getName()
 		+ ". We couldn't execute your request.";
 	}
 
@@ -189,7 +185,8 @@ public class CLI {
 			} else if (paramClass == String.class) {
 				result = sc.nextLine();
 			} else {
-				throw new IllegalArgumentException("Class not implemented in " + Main.getMethodName());
+				LOGGER.error(Main.getErrorMessage("class not implemented : " + paramClass.getName(), null));
+				throw new IllegalArgumentException("Class not implemented : " + paramClass.getName());
 			}
 
 			if (isOptional) {
@@ -258,8 +255,7 @@ public class CLI {
 
 				} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
 						| InvocationTargetException | InputMismatchException e) {
-					LOGGER.log(Level.ERROR, "Error in method " + Main.getMethodName() + e.getMessage() == null ? ""
-							: " : " + e.getMessage());
+					LOGGER.error(Main.getErrorMessage(null, e.getMessage()));
 					result = defaultReturn;
 				}
 			}
@@ -276,13 +272,13 @@ public class CLI {
 		try {
 			method = serviceClass.getMethod("getInstance");
 		} catch (NoSuchMethodException | SecurityException e) {
-			LOGGER.log(Level.ERROR, "Error in method " + Main.getMethodName() + " : " + e.getMessage());
+			LOGGER.error(Main.getErrorMessage("reflexion error getting getInstance", e.getMessage()));
 		}
 
 		try {
 			service = (Service<?, ?>) method.invoke(null);
 		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-			LOGGER.log(Level.ERROR, "Error in method " + Main.getMethodName() + " : " + e.getMessage());
+			LOGGER.error(Main.getErrorMessage("reflexion error invoking getInstance", e.getMessage()));
 		}
 
 		return service;
@@ -369,10 +365,10 @@ public class CLI {
 					if (choice < 5 && choice >= 0) {
 						invalidInput = false;
 					} else {
-						LOGGER.log(Level.INFO, "Invalid input");
+						LOGGER.info(Main.getErrorMessage("Invalid input", null));
 					}
 				} catch (InputMismatchException e) {
-					LOGGER.log(Level.INFO, "Invalid input : " + e.getMessage());
+					LOGGER.info(Main.getErrorMessage("Invalid input", e.getMessage()));
 				}
 				sc.nextLine();
 			}
@@ -387,7 +383,7 @@ public class CLI {
 						print(pageManager.getPageData().toString());
 					}
 				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-					LOGGER.log(Level.ERROR, "Error in method " + Main.getMethodName() + " : " + e.getMessage());
+					LOGGER.error(Main.getErrorMessage(null, e.getMessage()));
 					print("Request failure");
 				}
 			}

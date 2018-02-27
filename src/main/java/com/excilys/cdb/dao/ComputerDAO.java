@@ -12,8 +12,6 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 
-import org.apache.logging.log4j.Level;
-
 import main.java.com.excilys.cdb.Main;
 import main.java.com.excilys.cdb.model.Computer;
 
@@ -105,7 +103,7 @@ public class ComputerDAO extends DAO<Computer> {
 				value = field.get(computer);
 				
 			} catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e) {
-				logger.log(Level.ERROR, "Error in method " + Main.getMethodName() + " : " + e.getMessage());
+				logger.error(Main.getErrorMessage("Reflexion error", e.getMessage()));
 			}
 			fieldsClassValues.put(entry.getKey(), new SimpleEntry<Field, Object>(field, value));
 		}
@@ -116,7 +114,6 @@ public class ComputerDAO extends DAO<Computer> {
 	private String generateUpdateQuery(LinkedHashMap<String, SimpleEntry<Field, Object>> paramValues, Set<String> keys, String primaryKey) {
 
 		String query = "UPDATE " + getTable() + " SET ";
-
 		for (String name : paramValues.keySet()) {
 			if (!name.equals(primaryKey)) {
 				query += name + " = ?,";
@@ -124,9 +121,7 @@ public class ComputerDAO extends DAO<Computer> {
 		}
 
 		query = query.substring(0, query.length() - 1);
-
 		query += " WHERE " + primaryKey + " = ?";
-
 		return query;
 	}
 
@@ -173,7 +168,7 @@ public class ComputerDAO extends DAO<Computer> {
 			}
 			return Optional.of(builder.build());
 		} catch (SQLException e) {
-			logger.log(Level.ERROR, "Error in method " + Main.getMethodName() + " : " + e.getMessage());
+			logger.error(Main.getErrorMessage(null, e.getMessage()));
 			return Optional.ofNullable(null);
 		}
 	}

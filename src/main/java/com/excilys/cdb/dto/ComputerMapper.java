@@ -3,7 +3,10 @@ package main.java.com.excilys.cdb.dto;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
+import java.util.Optional;
 
+import main.java.com.excilys.cdb.dao.CompanyDAO;
+import main.java.com.excilys.cdb.model.Company;
 import main.java.com.excilys.cdb.model.Computer;
 
 public class ComputerMapper {
@@ -16,7 +19,6 @@ public class ComputerMapper {
 		Computer.ComputerBuilder builder = new Computer.ComputerBuilder().withId(dto.getId()).withCompanyId(dto.getCompanyId()).withName(dto.getName());
 		builder.withDiscontinued(dto.getDiscontinued() == null ? null : LocalDate.parse(dto.getDiscontinued(), formatter));
 		builder.withIntroduced(dto.getIntroduced() == null ? null : LocalDate.parse(dto.getIntroduced(), formatter));
-		
 		return builder.build();
 	}
 	
@@ -26,13 +28,14 @@ public class ComputerMapper {
 		formatter = formatter.withLocale(Locale.FRANCE); 
 		
 		ComputerDTO dto = new ComputerDTO();
-		
 		dto.setDiscontinued(computer.getDiscontinued().isPresent() ? computer.getDiscontinued().get().format(formatter) : null);
 		dto.setIntroduced(computer.getIntroduced().isPresent() ? computer.getIntroduced().get().format(formatter) : null);
 		dto.setCompanyId(computer.getCompanyId().isPresent() ? computer.getCompanyId().get() : 0);
 		dto.setId(computer.getId());
 		dto.setName(computer.getName());
 		
+		Optional<Company> company = CompanyDAO.getInstance().getById(computer.getId());
+		company.ifPresent(x -> dto.setCompanyName(x.getName()));
 		return dto;
 	}
 

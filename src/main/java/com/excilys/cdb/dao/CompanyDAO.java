@@ -4,8 +4,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Optional;
 
-import org.apache.logging.log4j.Level;
-
+import main.java.com.excilys.cdb.Main;
 import main.java.com.excilys.cdb.model.Company;
 
 public class CompanyDAO extends DAO<Company> {
@@ -16,7 +15,6 @@ public class CompanyDAO extends DAO<Company> {
 		if (companyDAO == null) {
 			companyDAO = new CompanyDAO();
 		}
-		
 		return companyDAO;
 	}
 	
@@ -34,9 +32,7 @@ public class CompanyDAO extends DAO<Company> {
 			c.setName(rs.getString("name"));
 			return Optional.of(c);
 		} catch (SQLException e) {
-			final StackTraceElement[] ste = Thread.currentThread().getStackTrace();
-			String methodName = ste[1].getMethodName(); 
-			logger.log(Level.ERROR, "Error in method " + methodName + " : " + e.getMessage());
+			logger.error(Main.getErrorMessage(null, e.getMessage()));
 			return Optional.empty();
 		}
 	}
