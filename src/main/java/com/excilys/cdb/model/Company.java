@@ -1,5 +1,8 @@
 package main.java.com.excilys.cdb.model;
 
+import main.java.com.excilys.cdb.ParamDescription;
+
+@SQLTable(name = "company")
 public class Company implements ModelClass {
 	
 	@SQLInfo(name = "id", primaryKey = true)
@@ -10,7 +13,8 @@ public class Company implements ModelClass {
 
 	public Company() { }
 	
-	public Company(long id, String name) {
+	public Company(@ParamDescription(name = "company id") long id, 
+			@ParamDescription(name = "company name") String name) {
 		this.id = id;
 		this.name = name;
 	}

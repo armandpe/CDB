@@ -16,9 +16,10 @@ public class ComputerMapper {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 		formatter = formatter.withLocale(Locale.FRANCE); 
 		
-		Computer.ComputerBuilder builder = new Computer.ComputerBuilder().withId(dto.getId()).withCompanyId(dto.getCompanyId()).withName(dto.getName());
+		Computer.ComputerBuilder builder = new Computer.ComputerBuilder().withId(dto.getId()).withName(dto.getName());
 		builder.withDiscontinued(dto.getDiscontinued() == null ? null : LocalDate.parse(dto.getDiscontinued(), formatter));
 		builder.withIntroduced(dto.getIntroduced() == null ? null : LocalDate.parse(dto.getIntroduced(), formatter));
+		builder.withCompany(dto.getName() == null ? null : new Company(dto.getCompanyId(), dto.getCompanyName()));
 		return builder.build();
 	}
 	
@@ -30,7 +31,8 @@ public class ComputerMapper {
 		ComputerDTO dto = new ComputerDTO();
 		dto.setDiscontinued(computer.getDiscontinued().isPresent() ? computer.getDiscontinued().get().format(formatter) : null);
 		dto.setIntroduced(computer.getIntroduced().isPresent() ? computer.getIntroduced().get().format(formatter) : null);
-		dto.setCompanyId(computer.getCompanyId().isPresent() ? computer.getCompanyId().get() : 0);
+		dto.setCompanyId(computer.getCompany().isPresent() ? computer.getCompany().get().getId() : 0);
+		dto.setCompanyName(computer.getCompany().isPresent() ? computer.getCompany().get().getName() : null);
 		dto.setId(computer.getId());
 		dto.setName(computer.getName());
 		

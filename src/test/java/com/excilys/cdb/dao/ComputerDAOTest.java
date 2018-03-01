@@ -95,7 +95,7 @@ public class ComputerDAOTest {
 
 	@Test
 	public void testCreateComputerComputer() {
-		Computer toAdd = new Computer.ComputerBuilder().withId(2).withName("Mb").withCompanyId(1).build();
+		Computer toAdd = new Computer.ComputerBuilder().withId(2).withName("Mb").withCompany(1).build();
 		int result = ComputerDAO.getInstance().createComputer(toAdd);
 		assertTrue(ComputerDAO.getInstance().getCount() == 4 && result >= 0 && ComputerDAO.getInstance().getById(2).get().equals(toAdd));
 	}
@@ -116,7 +116,7 @@ public class ComputerDAOTest {
 	public void testGetByIdLong() {
 		Computer c = ComputerDAO.getInstance().getById(1).get();
 		
-		assertEquals(c, new Computer.ComputerBuilder().withId(1).withName("MacBook Pro 15.4 inch").withCompanyId(1).build());
+		assertEquals(c, new Computer.ComputerBuilder().withId(1).withName("MacBook Pro 15.4 inch").withCompany(1).build());
 	}
 
 	@Test
@@ -131,7 +131,7 @@ public class ComputerDAOTest {
 	@Test
 	public void testUpdateComputer() {
 		
-		Computer computer = new Computer.ComputerBuilder().withId(3).withName("CM-200").withCompanyId(2).build();
+		Computer computer = new Computer.ComputerBuilder().withId(3).withName("CM-200").withCompany(2).build();
 		computer.setName("j");
 		ComputerDAO.getInstance().updateComputer(computer);
 		Computer computer2 = ComputerDAO.getInstance().getById(3).get();

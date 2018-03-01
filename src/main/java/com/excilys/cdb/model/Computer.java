@@ -8,11 +8,12 @@ import org.apache.logging.log4j.Logger;
 
 import main.java.com.excilys.cdb.ParamDescription;
 
+@SQLTable(name = "computer")
 public class Computer implements ModelClass {
 	
 	public static class ComputerBuilder {
 		
-		private Optional<Long> companyId = Optional.empty();
+		private Optional<Company> company = Optional.empty();
 
 		private Optional<LocalDate> discontinued = Optional.empty();
 
@@ -23,11 +24,11 @@ public class Computer implements ModelClass {
 		private String name = "Unnamed";
 		
 		public Computer build() {
-			return new Computer(id, name, introduced, discontinued, companyId);
+			return new Computer(id, name, introduced, discontinued, company);
 		}
 		
-		public ComputerBuilder withCompanyId(long companyId) {
-			this.companyId = Optional.of(companyId);
+		public ComputerBuilder withCompany(Company company) {
+			this.company = Optional.ofNullable(company);
 			return this;
 		}
 		
@@ -54,8 +55,8 @@ public class Computer implements ModelClass {
 
 	static final Logger LOGGER = LogManager.getLogger(Computer.class);
 
-	@SQLInfo(name = "company_id")
-	private Optional<Long> companyId;
+	@SQLInfo(name = "company_id", foreignKey = true)
+	private Optional<Company> company;
 
 	@SQLInfo(name = "discontinued")
 	private Optional<LocalDate> discontinued;
@@ -73,12 +74,12 @@ public class Computer implements ModelClass {
 					@ParamDescription(name = "computer name") String name, 
 					@ParamDescription(name = "date of introdution", optional = true) Optional<LocalDate> introduced, 
 					@ParamDescription(name = "date of discontinuation", optional = true) Optional<LocalDate> discontinued, 
-					@ParamDescription(name = "company id", optional = true) Optional<Long> companyId) {
+					@ParamDescription(name = "company", optional = true) Optional<Company> company) {
 		this.id = id;
 		this.name = name;
 		this.introduced = introduced;
 		this.discontinued = discontinued;
-		this.companyId = companyId;
+		this.company = company;
 		
 		if (this.introduced.isPresent() && this.discontinued.isPresent() && introduced.get().compareTo(discontinued.get()) > 0) {
 			throw new IllegalArgumentException("Introduced date superior to discontinued date");
@@ -88,9 +89,7 @@ public class Computer implements ModelClass {
 		}
 	}
 
-	public Computer(String name,  Optional<LocalDate> introduced, Optional<LocalDate> discontinued,  Optional<Long> companyId) {
-		this(0, name, introduced, discontinued, companyId);
-	}
+	private Computer() { }
 
 	@Override
 	public boolean equals(Object obj) {
@@ -110,8 +109,8 @@ public class Computer implements ModelClass {
 		return true;
 	}
 	
-	public Optional<Long> getCompanyId() {
-		return companyId;
+	public Optional<Company> getCompany() {
+		return company;
 	}
 
 	public Optional<LocalDate> getDiscontinued() {
@@ -138,8 +137,8 @@ public class Computer implements ModelClass {
 		return result;
 	}
 
-	public void setCompanyId(Optional<Long> companyId) {
-		this.companyId = companyId;
+	public void setCompany(Optional<Company> company) {
+		this.company = company;
 	}
 
 	public void setDiscontinued(Optional<LocalDate> discontinued) {
@@ -164,7 +163,7 @@ public class Computer implements ModelClass {
 				", name=" + name + 
 				(introduced.isPresent() ? ", introduced=" + introduced.get() : "") + 
 				(discontinued.isPresent() ? ", discontinued=" + discontinued.get() : "") + 
-				(companyId.isPresent() ? ", companyId=" + companyId.get() : "") + 
+				(company.isPresent() ? ", company=" + company.get() : "") + 
 				"]\n";
 	}
 }

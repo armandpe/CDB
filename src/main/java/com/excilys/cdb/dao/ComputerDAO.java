@@ -13,6 +13,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import main.java.com.excilys.cdb.Main;
+import main.java.com.excilys.cdb.model.Company;
 import main.java.com.excilys.cdb.model.Computer;
 
 /**
@@ -60,12 +61,12 @@ public class ComputerDAO extends DAO<Computer> {
 	}
 
 	public int updateComputer(Computer computer) {
-		Map<String, String> mapperSQLFields = getMapperSQLFields();
+		Map<String, Field> mapperSQLFields = getMapperSQLFields(getModelClassFullName());
 		Set<String> keys = mapperSQLFields.keySet();
 
 		LinkedHashMap<String, SimpleEntry<Field, Object>> fieldsClassValues = generateFieldsClassValues(mapperSQLFields, computer);
 
-		String primaryKey = getPrimaryKey().getKey();
+		String primaryKey = getKey(getModelClassFullName(), x -> x.primaryKey()).getKey();
 
 		HashMap<String, Integer> keyOrder = getKeyOrder(fieldsClassValues, primaryKey);
 
@@ -150,32 +151,6 @@ public class ComputerDAO extends DAO<Computer> {
 		keyOrder.put(primaryKey, ++i);
 
 		return keyOrder;
-	}
-
-	@Override
-	protected Optional<Computer> buildItem(ResultSet rs) {
-		try {
-			Computer.ComputerBuilder builder = new Computer.ComputerBuilder();
-			builder.withId(rs.getLong("id"));
-			builder.withName(rs.getString("name"));
-			Timestamp temp = rs.getTimestamp("introduced");
-			builder.withIntroduced(temp == null ? null : temp.toLocalDateTime().toLocalDate());
-			temp = rs.getTimestamp("discontinued");
-			builder.withDiscontinued(temp == null ? null : temp.toLocalDateTime().toLocalDate());
-			Optional<Long> companyId = Optional.ofNullable(rs.getLong("company_id"));
-			if (companyId.isPresent()) {
-				builder.withCompanyId(companyId.get());
-			}
-			return Optional.of(builder.build());
-		} catch (SQLException e) {
-			logger.error(Main.getErrorMessage(null, e.getMessage()));
-			return Optional.ofNullable(null);
-		}
-	}
-
-	@Override
-	protected String getTable() {
-		return "computer";
 	}
 
 }

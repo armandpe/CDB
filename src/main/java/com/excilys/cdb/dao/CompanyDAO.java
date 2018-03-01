@@ -18,11 +18,17 @@ public class CompanyDAO extends DAO<Company> {
 		return companyDAO;
 	}
 	
+	private String modelClassFullName = null;
+	
 	private CompanyDAO() { }
 	
 	@Override
 	public String getModelClassFullName() {
-		return Company.class.getName();
+		if (modelClassFullName == null) {
+			modelClassFullName = Company.class.getName();
+		}
+		
+		return modelClassFullName;
 	}
 	
 	protected Optional<Company> buildItem(ResultSet rs) {
@@ -35,11 +41,6 @@ public class CompanyDAO extends DAO<Company> {
 			logger.error(Main.getErrorMessage(null, e.getMessage()));
 			return Optional.empty();
 		}
-	}
-
-	@Override
-	protected String getTable() {
-		return "company";
 	}
 
 }

@@ -122,13 +122,19 @@ public class CLI {
 		}
 
 		LOGGER.error(Main.getErrorMessage("error using method " + chosenMethod.getName(), null));
-		return "An error occured in using method " + chosenMethod.getName()
-		+ ". We couldn't execute your request.";
+		return null;
 	}
 
 	private static Object askOtherParameter(LinkedList<Object> parameters, Parameter param, Scanner sc)
 			throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		Class<?> type = param.getType();
+		
+		boolean isOptional = false;
+		if (type == Optional.class) {
+			type = (Class<?>) ((ParameterizedType) param.getParameterizedType()).getActualTypeArguments()[0];
+			isOptional = true;
+		}
+		
 		Constructor<?>[] cs = type.getConstructors();
 		Constructor<?> maxArgs = cs[0];
 
@@ -137,7 +143,9 @@ public class CLI {
 				maxArgs = c;
 			}
 		}
-		return maxArgs.newInstance(askParameters(maxArgs.getParameters(), sc).toArray());
+		Object result = maxArgs.newInstance(askParameters(maxArgs.getParameters(), sc).toArray());
+		
+		return isOptional ? Optional.ofNullable(result) : result;
 	}
 
 	private static Object askParameter(Parameter param, Scanner sc) throws InputMismatchException {
@@ -205,7 +213,7 @@ public class CLI {
 	}
 
 	private static List<?> askParameters(Parameter[] params, Scanner sc) {
-		Class<?>[] acceptedTypes = {long.class, Long.class, LocalDate.class, String.class, Optional.class};
+		Class<?>[] acceptedTypes = {long.class, Long.class, LocalDate.class, String.class};
 		ArrayList<Class<?>> acceptedTypesList = new ArrayList<>(Arrays.asList(acceptedTypes));
 
 		LinkedList<Object> parameters = new LinkedList<>();
@@ -214,10 +222,13 @@ public class CLI {
 
 			String name = param.getName();
 			boolean optional = false;
+			
+			Class<?> paramClass = param.getType();			
 
 			if (param.isAnnotationPresent(ParamDescription.class)) {
 				name = param.getAnnotation(ParamDescription.class).name();
 				optional = param.getAnnotation(ParamDescription.class).optional();
+				paramClass = (Class<?>) ((ParameterizedType) param.getParameterizedType()).getActualTypeArguments()[0];
 			}
 
 			Object defaultReturn = new Object();
@@ -244,7 +255,7 @@ public class CLI {
 					}
 					if (!optional) {
 						print("Enter the " + name + " :");
-						if (acceptedTypesList.contains(param.getType())) {
+						if (acceptedTypesList.contains(paramClass)) {
 							result = askParameter(param, sc);
 						} else {
 							result = askOtherParameter(parameters, param, sc);

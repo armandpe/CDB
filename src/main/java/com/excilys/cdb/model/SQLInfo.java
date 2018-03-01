@@ -10,4 +10,5 @@ import java.lang.annotation.Target;
 public @interface SQLInfo {
 	String name();
 	boolean primaryKey() default false;
+	boolean foreignKey() default false;
 }
