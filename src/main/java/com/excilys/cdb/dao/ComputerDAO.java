@@ -1,9 +1,7 @@
 package main.java.com.excilys.cdb.dao;
 
 import java.lang.reflect.Field;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
+import java.lang.reflect.ParameterizedType;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -13,8 +11,8 @@ import java.util.Optional;
 import java.util.Set;
 
 import main.java.com.excilys.cdb.Main;
-import main.java.com.excilys.cdb.model.Company;
 import main.java.com.excilys.cdb.model.Computer;
+import main.java.com.excilys.cdb.model.SQLInfo;
 
 /**
  * @author excilys
@@ -39,7 +37,7 @@ public class ComputerDAO extends DAO<Computer> {
 	 * @return see {@link executeStatement}
 	 */
 	public int createComputer(Computer computer) {
-		Map<String, String> mapperSQLFields = getMapperSQLFields();
+		Map<String, Field> mapperSQLFields = getMapperSQLFields(getModelClassFullName());
 		Set<String> keys = mapperSQLFields.keySet();
 
 		LinkedHashMap<String, SimpleEntry<Field, Object>> fieldsClassValues = generateFieldsClassValues(mapperSQLFields, computer);
@@ -78,7 +76,7 @@ public class ComputerDAO extends DAO<Computer> {
 	private String generateCreateQuery(LinkedHashMap<String, SimpleEntry<Field, Object>> paramValues, Set<String> keys) {
 
 		String[] template = {};
-		String query = "INSERT INTO " + getTable() + " ( " + arrayToString(paramValues.keySet().toArray(template)) + " ) VALUES ( ";
+		String query = "INSERT INTO " + getTable(getModelClassFullName()) + " ( " + arrayToString(paramValues.keySet().toArray(template)) + " ) VALUES ( ";
 
 		for (int i = 0; i < keys.size(); ++i) {
 			query += "?,";
@@ -91,19 +89,41 @@ public class ComputerDAO extends DAO<Computer> {
 		return query;
 	}
 
-	private LinkedHashMap<String, SimpleEntry<Field, Object>> generateFieldsClassValues(Map<String, String> mapperSQLFields, Computer computer) {
+	private LinkedHashMap<String, SimpleEntry<Field, Object>> generateFieldsClassValues(Map<String, Field> mapperSQLFields, Computer computer) {
 		LinkedHashMap<String, SimpleEntry<Field, Object>> fieldsClassValues = new LinkedHashMap<>();
 
 		Field field = null;
 
-		for (Entry<String, String> entry : mapperSQLFields.entrySet()) {
+		for (Entry<String, Field> entry : mapperSQLFields.entrySet()) {
 			Object value = null;
 			try {
-				field = Computer.class.getDeclaredField(entry.getValue());
+				field = entry.getValue();
 				field.setAccessible(true);
 				value = field.get(computer);
 				
-			} catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e) {
+				if (field.getAnnotation(SQLInfo.class).foreignKey() && value != null) {
+					Class<?> fieldType = field.getType();
+					boolean isOptional = false;
+					if (fieldType == Optional.class) {
+						fieldType = (Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
+						isOptional = true;
+					}
+					
+					if (isOptional) {
+						Optional<?> value2 = ((Optional<?>) value);
+						value = value2.isPresent() ? value2.get() : null;
+					}
+					
+					if (value != null) {
+						SimpleEntry<String, Field> primaryKey = getKey(fieldType.getName(), x -> x.primaryKey());
+						Field primaryField = primaryKey.getValue();
+						primaryField.setAccessible(true);
+						value = primaryField.get(value);
+						value = isOptional ? Optional.ofNullable(value) : value;
+					}
+				}
+				
+			} catch (IllegalArgumentException | IllegalAccessException | SecurityException e) {
 				logger.error(Main.getErrorMessage("Reflexion error", e.getMessage()));
 			}
 			fieldsClassValues.put(entry.getKey(), new SimpleEntry<Field, Object>(field, value));
@@ -114,7 +134,7 @@ public class ComputerDAO extends DAO<Computer> {
 
 	private String generateUpdateQuery(LinkedHashMap<String, SimpleEntry<Field, Object>> paramValues, Set<String> keys, String primaryKey) {
 
-		String query = "UPDATE " + getTable() + " SET ";
+		String query = "UPDATE " + getTable(getModelClassFullName()) + " SET ";
 		for (String name : paramValues.keySet()) {
 			if (!name.equals(primaryKey)) {
 				query += name + " = ?,";

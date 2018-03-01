@@ -16,6 +16,7 @@ import main.java.com.excilys.cdb.dto.ComputerDTO;
 import main.java.com.excilys.cdb.dto.ComputerMapper;
 import main.java.com.excilys.cdb.service.ComputerService;
 
+@SuppressWarnings("serial")
 @WebServlet("/dashboard.html")
 public class Dashboard extends HttpServlet {
 

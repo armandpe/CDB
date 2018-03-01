@@ -228,7 +228,9 @@ public class CLI {
 			if (param.isAnnotationPresent(ParamDescription.class)) {
 				name = param.getAnnotation(ParamDescription.class).name();
 				optional = param.getAnnotation(ParamDescription.class).optional();
-				paramClass = (Class<?>) ((ParameterizedType) param.getParameterizedType()).getActualTypeArguments()[0];
+				if (optional) {
+					paramClass = (Class<?>) ((ParameterizedType) param.getParameterizedType()).getActualTypeArguments()[0];
+				}
 			}
 
 			Object defaultReturn = new Object();
