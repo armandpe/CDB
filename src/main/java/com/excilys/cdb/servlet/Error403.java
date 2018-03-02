@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @SuppressWarnings("serial")
-@WebServlet("/403.html")
+@WebServlet("/403")
 public class Error403 extends HttpServlet {
 
 	

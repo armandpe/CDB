@@ -45,7 +45,7 @@ public class Computer implements ModelClass {
 		public ComputerBuilder withIntroduced(LocalDate introduced) {
 			this.introduced = Optional.ofNullable(introduced);
 			return this;
-		}
+		} 
 		
 		public ComputerBuilder withName(String name) {
 			this.name = name;

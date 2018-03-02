@@ -1,6 +1,7 @@
 package main.java.com.excilys.cdb.dao;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.HashMap;
@@ -80,7 +81,7 @@ public class ComputerDAO extends DAO<Computer> {
 
 		for (int i = 0; i < keys.size(); ++i) {
 			query += "?,";
-			}
+		}
 
 		query = query.substring(0, query.length() - 1);
 
@@ -100,29 +101,41 @@ public class ComputerDAO extends DAO<Computer> {
 				field = entry.getValue();
 				field.setAccessible(true);
 				value = field.get(computer);
-				
-				if (field.getAnnotation(SQLInfo.class).foreignKey() && value != null) {
+
+				if (field.getAnnotation(SQLInfo.class).foreignKey()) {
 					Class<?> fieldType = field.getType();
 					boolean isOptional = false;
 					if (fieldType == Optional.class) {
 						fieldType = (Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
 						isOptional = true;
 					}
-					
+
 					if (isOptional) {
-						Optional<?> value2 = ((Optional<?>) value);
-						value = value2.isPresent() ? value2.get() : null;
+						value = ((Optional<?>) value).isPresent() ? ((Optional<?>) value).get() : null;
 					}
-					
-					if (value != null) {
-						SimpleEntry<String, Field> primaryKey = getKey(fieldType.getName(), x -> x.primaryKey());
-						Field primaryField = primaryKey.getValue();
+
+					SimpleEntry<String, Field> primaryKey = getKey(fieldType.getName(), x -> x.primaryKey());
+					Field primaryField = primaryKey.getValue();
+					field = primaryKey.getValue();
+					if (value == null) {
+						try {
+							if (primaryField.getType() == Long.class) {
+								Optional<Long> l = Optional.empty();
+								value = l;
+							} else {
+								value = primaryField.getType().getDeclaredConstructor(new Class<?>[0]).newInstance(new Object[0]);
+							}
+						} catch (InstantiationException | InvocationTargetException | NoSuchMethodException e) {
+							logger.error(Main.getErrorMessage("error invoking parameterless constructor of " + primaryField.getType(), e.getMessage()));
+						}
+					} else {
 						primaryField.setAccessible(true);
 						value = primaryField.get(value);
 						value = isOptional ? Optional.ofNullable(value) : value;
 					}
+
 				}
-				
+
 			} catch (IllegalArgumentException | IllegalAccessException | SecurityException e) {
 				logger.error(Main.getErrorMessage("Reflexion error", e.getMessage()));
 			}

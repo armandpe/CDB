@@ -131,8 +131,7 @@ public class ComputerDAOTest {
 	
 	@Test
 	public void testUpdateComputer() {
-		
-		Computer computer = new Computer.ComputerBuilder().withId(3).withName("CM-200").withCompany(new Company(2, "test")).build();
+		Computer computer = new Computer.ComputerBuilder().withId(3).withName("CM-200").withCompany(new Company(1, "Apple Inc.")).build();
 		computer.setName("j");
 		ComputerDAO.getInstance().updateComputer(computer);
 		Computer computer2 = ComputerDAO.getInstance().getById(3).get();

@@ -6,7 +6,7 @@ import main.java.com.excilys.cdb.ParamDescription;
 public class Company implements ModelClass {
 	
 	@SQLInfo(name = "id", primaryKey = true)
-	private long id;
+	private Long id;
 
 	@SQLInfo(name = "name")
 	private String name;

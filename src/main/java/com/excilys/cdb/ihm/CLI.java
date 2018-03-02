@@ -27,6 +27,7 @@ import main.java.com.excilys.cdb.Main;
 import main.java.com.excilys.cdb.ParamDescription;
 import main.java.com.excilys.cdb.service.CompanyService;
 import main.java.com.excilys.cdb.service.ComputerService;
+import main.java.com.excilys.cdb.service.PageManager;
 import main.java.com.excilys.cdb.service.Service;
 import main.java.com.excilys.cdb.service.ServiceClass;
 import main.java.com.excilys.cdb.service.ServiceMethod;
@@ -34,9 +35,10 @@ import main.java.com.excilys.cdb.service.ServiceMethod;
 public class CLI {
 
 	static final Logger LOGGER = LogManager.getLogger(CLI.class);
-
+	static ArrayList<Class<? extends Service<?, ?>>> services = new ArrayList<>();
+	
 	public static void start() {
-		ArrayList<Class<? extends Service<?, ?>>> services = new ArrayList<>();
+		
 		services.add(ComputerService.class);
 		services.add(CompanyService.class);
 
@@ -344,8 +346,12 @@ public class CLI {
 		boolean keepGoing = true;
 		long offset = 0;
 		long limit = 10;
-		long max = getServiceInstance(usedClass).getCount();
-		PageManager pageManager = new PageManager(limit, max, x -> applyServiceMethod(usedClass, chosenMethod, x));
+		Service<?, ?> myService = getServiceInstance(usedClass);
+		long max = myService.getCount();
+		PageManager pageManager;
+		
+		pageManager = new PageManager(limit, max,  (x, y) -> myService.getAll(x, y));
+		
 		while (keepGoing) {
 
 			print("Page " + pageManager.getPage() + "/" + pageManager.getMaxPage() + " :");

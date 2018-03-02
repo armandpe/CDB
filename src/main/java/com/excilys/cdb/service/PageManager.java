@@ -1,21 +1,22 @@
-package main.java.com.excilys.cdb.ihm;
+package main.java.com.excilys.cdb.service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 
+import main.java.com.excilys.cdb.ihm.UserChoice;
 import main.java.com.excilys.cdb.model.ModelClass;
 
 public class PageManager {
 	
-	private Function<Object[], Object> getList;
-	private final long limit;
+	private BiFunction<Long, Long, List<?>> getList;
+	private long limit;
 	private long max;
 	private long maxPage;
 	private long offset;
 	private ArrayList<ModelClass> pageData;
 	
-	public PageManager(long limit, long max, Function<Object[], Object> getList) {
+	public PageManager(long limit, long max, BiFunction<Long, Long, List<?>> getList) {
 		this.offset = 0;
 		this.limit = limit;
 		setMax(max);
@@ -45,7 +46,7 @@ public class PageManager {
 	public long getOffset() {
 		return offset;
 	}
-
+	
 	public long getPage() {
 		return (offset / limit) + 1;
 	}
@@ -79,6 +80,11 @@ public class PageManager {
 		return getItems();
 	}
 
+	public void setLimit(long limit) {
+		this.limit = limit;
+		setOffset(0);
+	}
+
 	public void setMax(long max) {
 		this.max = max;
 		this.maxPage = (long) Math.ceil(((double) max) / (double) limit);
@@ -89,10 +95,8 @@ public class PageManager {
 	}
 
 	private boolean getItems() {
-		Object[] parameters = {offset, limit};
-
 		pageData.clear();
-		((List<?>) getList.apply(parameters)).forEach(x -> pageData.add((ModelClass) x));
+		(getList.apply(offset, limit)).forEach(x -> pageData.add((ModelClass) x));
 		return true;
 	}
 	

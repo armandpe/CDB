@@ -192,6 +192,12 @@ public abstract class DAO<T extends ModelClass> {
 				value = ((Optional<?>) value).get();
 			}
 		}
+		
+		if (value.getClass() == Optional.class) {
+			if (((Optional<?>) value).isPresent()) {
+				value = ((Optional<?>) value).get();
+			}
+		}
 
 		int order = keyOrder.get(fieldClassValue.getKey());
 
@@ -287,8 +293,6 @@ public abstract class DAO<T extends ModelClass> {
 
 		try (Connection connection = cManager.getConnection()) {
 			preparedStatement = connection.prepareStatement(query);
-			
-			logger.error(fieldsClassValues.toString());
 			
 			for (Entry<String, SimpleEntry<Field, Object>> fieldClassValue : fieldsClassValues.entrySet()) {
 				addValueToStatement(preparedStatement, fieldClassValue, keyOrder);

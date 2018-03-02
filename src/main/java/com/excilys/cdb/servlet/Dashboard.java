@@ -14,24 +14,38 @@ import org.apache.logging.log4j.Logger;
 
 import main.java.com.excilys.cdb.dto.ComputerDTO;
 import main.java.com.excilys.cdb.dto.ComputerMapper;
+import main.java.com.excilys.cdb.model.Computer;
 import main.java.com.excilys.cdb.service.ComputerService;
+import main.java.com.excilys.cdb.service.PageManager;
 
 @SuppressWarnings("serial")
-@WebServlet("/dashboard.html")
+@WebServlet("/dashboard")
 public class Dashboard extends HttpServlet {
 
 	Logger logger = LogManager.getLogger(this.getClass());
+	PageManager pageManager = null;
+	ComputerService computerService;
+	ArrayList<ComputerDTO> dtoList;
+	long limit;
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
-		long count = ComputerService.getInstance().getCount();
-
+		long count;
+		
+		String limit = request.getParameter("limit");
+		
+		if (pageManager == null) {
+			computerService = ComputerService.getInstance();
+			count = computerService.getCount();
+			dtoList = new ArrayList<>();
+			pageManager = new PageManager(limit == null ? 10 : Long.valueOf(limit), count, (x, y) -> computerService.getAll(x, y));
+		} else {
+			dtoList.clear();
+			count = computerService.getCount();
+		}
+		
+		pageManager.getPageData().forEach(computer -> dtoList.add(ComputerMapper.toDTO((Computer) computer)));
+		
 		request.setAttribute("count", count);
-
-		ArrayList<ComputerDTO> dtoList = new ArrayList<>();
-		
-		ComputerService.getInstance().getAll(0, 600).forEach(x -> dtoList.add(ComputerMapper.toDTO(x)));
-		
 		request.setAttribute("computerList", dtoList);
 
 		this.getServletContext().getRequestDispatcher("/WEB-INF/views/dashboard.jsp").forward(request, response);

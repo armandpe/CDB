@@ -14,7 +14,7 @@
 <body>
 	<header class="navbar navbar-inverse navbar-fixed-top">
 		<div class="container">
-			<a class="navbar-brand" href="dashboard.html"> Application -
+			<a class="navbar-brand" href="dashboard"> Application -
 				Computer Database </a>
 		</div>
 	</header>
@@ -33,8 +33,8 @@
 					</form>
 				</div>
 				<div class="pull-right">
-					<a class="btn btn-success" id="addComputer" href="add/computer.html">Add
-						Computer</a> <a class="btn btn-default" id="edit/computer.html" href="#"
+					<a class="btn btn-success" id="addComputer" href="add/computer">Add
+						Computer</a> <a class="btn btn-default" id="edit/computer" href="#"
 						onclick="$.fn.toggleEditMode();">Edit</a>
 				</div>
 			</div>
@@ -70,7 +70,7 @@
 						<tr>
 							<td class="editMode"><input type="checkbox" name="cb"
 								class="cb" value="0"></td>
-							<td><a href="edit/computer.html" onclick="">${computer.name}</a></td>
+							<td><a href="edit/computer" onclick="">${computer.name}</a></td>
 							<td>${computer.introduced}</td>
 							<td>${computer.discontinued}</td>
 							<td>${computer.companyName}</td>
@@ -97,9 +97,9 @@
 			</ul>
 
 			<div class="btn-group btn-group-sm pull-right" role="group">
-				<button type="button" class="btn btn-default">10</button>
-				<button type="button" class="btn btn-default">50</button>
-				<button type="button" class="btn btn-default">100</button>
+				<button type="button" class="btn btn-default" href="dashboard?limit=10">10</button>
+				<button type="button" class="btn btn-default" href="dashboard?limit=50">50</button>
+				<button type="button" class="btn btn-default" href="dashboard?limit=100">100</button>
 			</div>
 		</div>
 	</footer>
