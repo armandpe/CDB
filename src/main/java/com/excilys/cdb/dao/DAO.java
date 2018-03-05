@@ -150,7 +150,9 @@ public abstract class DAO<T extends ModelClass> {
 
 	/**
 	 * Get the SQL fields and field names of a class
-	 * @param className : name of the class to get SQL fields
+	 * 
+	 * @param className
+	 *            : name of the class to get SQL fields
 	 * @return Key : SQL Name, Value : Field Name
 	 */
 	public Map<String, Field> getMapperSQLFields(String className) {
@@ -179,7 +181,8 @@ public abstract class DAO<T extends ModelClass> {
 		return query;
 	}
 
-	protected void addValueToStatement(PreparedStatement ps, Entry<String, SimpleEntry<Field, Object>> fieldClassValue, Map<String, Integer> keyOrder) throws SQLException {
+	protected void addValueToStatement(PreparedStatement ps, Entry<String, SimpleEntry<Field, Object>> fieldClassValue,
+			Map<String, Integer> keyOrder) throws SQLException {
 
 		Object value = fieldClassValue.getValue().getValue();
 
@@ -192,8 +195,8 @@ public abstract class DAO<T extends ModelClass> {
 				value = ((Optional<?>) value).get();
 			}
 		}
-		
-		if (value.getClass() == Optional.class) {
+
+		if (value != null && value.getClass() == Optional.class) {
 			if (((Optional<?>) value).isPresent()) {
 				value = ((Optional<?>) value).get();
 			}
@@ -261,7 +264,7 @@ public abstract class DAO<T extends ModelClass> {
 
 		for (Entry<String, Field> sqlEntry : sqlFieldsMap.entrySet()) {
 			Field field = sqlEntry.getValue();
-			field.setAccessible(true);		
+			field.setAccessible(true);
 			try {
 				field.set(result, getFieldValue(sqlEntry, resultSet));
 			} catch (IllegalArgumentException | IllegalAccessException e) {
@@ -278,7 +281,8 @@ public abstract class DAO<T extends ModelClass> {
 		String query = "DELETE FROM " + table + " WHERE " + primaryKey.getKey() + " = ?";
 
 		LinkedHashMap<String, SimpleEntry<Field, Object>> fieldsClassValues = new LinkedHashMap<>();
-		fieldsClassValues.put(primaryKey.getKey(), new SimpleEntry<Field, Object>(primaryKey.getValue(), primaryKeyValue));
+		fieldsClassValues.put(primaryKey.getKey(),
+				new SimpleEntry<Field, Object>(primaryKey.getValue(), primaryKeyValue));
 
 		HashMap<String, Integer> keyOrder = new HashMap<>();
 		keyOrder.put(primaryKey.getKey(), 1);
@@ -286,14 +290,15 @@ public abstract class DAO<T extends ModelClass> {
 		return executeStatement(query, fieldsClassValues, keyOrder);
 	}
 
-	protected int executeStatement(String query, LinkedHashMap<String, SimpleEntry<Field, Object>> fieldsClassValues, HashMap<String, Integer> keyOrder) {
+	protected int executeStatement(String query, LinkedHashMap<String, SimpleEntry<Field, Object>> fieldsClassValues,
+			HashMap<String, Integer> keyOrder) {
 		PreparedStatement preparedStatement;
 		ConnectionManager cManager = ConnectionManager.getInstance();
 		int result = -1;
 
 		try (Connection connection = cManager.getConnection()) {
 			preparedStatement = connection.prepareStatement(query);
-			
+
 			for (Entry<String, SimpleEntry<Field, Object>> fieldClassValue : fieldsClassValues.entrySet()) {
 				addValueToStatement(preparedStatement, fieldClassValue, keyOrder);
 			}
@@ -306,25 +311,25 @@ public abstract class DAO<T extends ModelClass> {
 		return result;
 	}
 
-	protected List<T> getAll(Object...params) {
+	protected List<T> getAll(Object... params) {
 		long offset = (long) params[0];
 		long limit = (long) params[1];
 		Connection connection = (Connection) params[2];
 
 		ArrayList<T> result = new ArrayList<>();
 
-		//final static String QUERY_GET_ALL ="SELECT computer.id, computer.name, introduced, discontinued, company_id, company.name, company.id 
-		//FROM computer LEFT JOIN company ON company_id = company.id ";
+		// final static String QUERY_GET_ALL ="SELECT computer.id, computer.name,
+		// introduced, discontinued, company_id, company.name, company.id
+		// FROM computer LEFT JOIN company ON company_id = company.id ";
 
 		String query = selectQuery();
 		if (hasKey(getModelClassFullName(), x -> x.foreignKey())) {
 			SimpleEntry<String, Field> foreign = getKey(getModelClassFullName(), x -> x.foreignKey());
 			Class<?> fieldType = foreign.getValue().getType();
 
-			boolean isOptional = false;
 			if (fieldType == Optional.class) {
-				fieldType = (Class<?>) ((ParameterizedType) foreign.getValue().getGenericType()).getActualTypeArguments()[0];
-				isOptional = true;
+				fieldType = (Class<?>) ((ParameterizedType) foreign.getValue().getGenericType())
+						.getActualTypeArguments()[0];
 			}
 			String fieldTypeName = fieldType.getName();
 
@@ -332,12 +337,14 @@ public abstract class DAO<T extends ModelClass> {
 			Map<String, String> constraints = new HashMap<>();
 			String tableName = getTable(fieldTypeName);
 
-			constraints.put(getKey(fieldTypeName, x -> x.primaryKey()).getKey(), getKey(getModelClassFullName(), x -> x.foreignKey()).getKey());
+			constraints.put(getKey(fieldTypeName, x -> x.primaryKey()).getKey(),
+					getKey(getModelClassFullName(), x -> x.foreignKey()).getKey());
 
-			query = addLeftJoin(query, sqlFieldsMap.keySet().toArray(new String[sqlFieldsMap.keySet().size()]), tableName, constraints);
+			query = addLeftJoin(query, sqlFieldsMap.keySet().toArray(new String[sqlFieldsMap.keySet().size()]),
+					tableName, constraints);
 		}
 
-		query += " LIMIT " + offset  + ", " + limit;
+		query += " LIMIT " + offset + ", " + limit;
 
 		ResultSet sqlResults = null;
 
@@ -367,7 +374,7 @@ public abstract class DAO<T extends ModelClass> {
 		return result;
 	}
 
-	protected Optional<T> getById(Object...objects) {
+	protected Optional<T> getById(Object... objects) {
 		long id = (long) objects[0];
 		Connection connection = (Connection) objects[1];
 
@@ -384,10 +391,9 @@ public abstract class DAO<T extends ModelClass> {
 			SimpleEntry<String, Field> foreign = getKey(getModelClassFullName(), x -> x.foreignKey());
 			Class<?> fieldType = foreign.getValue().getType();
 
-			boolean isOptional = false;
 			if (fieldType == Optional.class) {
-				fieldType = (Class<?>) ((ParameterizedType) foreign.getValue().getGenericType()).getActualTypeArguments()[0];
-				isOptional = true;
+				fieldType = (Class<?>) ((ParameterizedType) foreign.getValue().getGenericType())
+						.getActualTypeArguments()[0];
 			}
 			String fieldTypeName = fieldType.getName();
 
@@ -395,11 +401,13 @@ public abstract class DAO<T extends ModelClass> {
 			Map<String, String> constraints = new HashMap<>();
 			String tableName = getTable(fieldTypeName);
 
-			constraints.put(getKey(fieldTypeName, x -> x.primaryKey()).getKey(), getKey(getModelClassFullName(), x -> x.foreignKey()).getKey());
+			constraints.put(getKey(fieldTypeName, x -> x.primaryKey()).getKey(),
+					getKey(getModelClassFullName(), x -> x.foreignKey()).getKey());
 
-			query = addLeftJoin(query, sqlFieldsMap.keySet().toArray(new String[sqlFieldsMap.keySet().size()]), tableName, constraints);
+			query = addLeftJoin(query, sqlFieldsMap.keySet().toArray(new String[sqlFieldsMap.keySet().size()]),
+					tableName, constraints);
 		}
-		
+
 		query = addConditions(query, conditions);
 
 		ResultSet sqlResults = null;
@@ -427,10 +435,11 @@ public abstract class DAO<T extends ModelClass> {
 		return result;
 	}
 
-	protected long getCount(Object...objects) {
+	protected long getCount(Object... objects) {
 		Connection connection = (Connection) objects[0];
 
-		String query = "SELECT count(" + getKey(getModelClassFullName(), x -> x.primaryKey()).getKey() + ") as nbComputer FROM " + getTable(getModelClassFullName());
+		String query = "SELECT count(" + getKey(getModelClassFullName(), x -> x.primaryKey()).getKey()
+				+ ") as nbComputer FROM " + getTable(getModelClassFullName());
 
 		ResultSet sqlResults = null;
 
@@ -468,7 +477,8 @@ public abstract class DAO<T extends ModelClass> {
 		boolean optional = false;
 
 		if (valueType == Optional.class) {
-			valueType = (Class<?>) ((ParameterizedType) sqlEntry.getValue().getGenericType()).getActualTypeArguments()[0];
+			valueType = (Class<?>) ((ParameterizedType) sqlEntry.getValue().getGenericType())
+					.getActualTypeArguments()[0];
 			optional = true;
 		}
 
@@ -495,7 +505,8 @@ public abstract class DAO<T extends ModelClass> {
 
 			for (Field field : fields) {
 				if (field.isAnnotationPresent(SQLInfo.class) && getKey.apply(field.getAnnotation(SQLInfo.class))) {
-					return new SimpleEntry<String, Field>(getTable(className) + "." + field.getAnnotation(SQLInfo.class).name(), field);
+					return new SimpleEntry<String, Field>(
+							getTable(className) + "." + field.getAnnotation(SQLInfo.class).name(), field);
 				}
 			}
 		} catch (ClassNotFoundException e) {

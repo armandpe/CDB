@@ -31,17 +31,20 @@ public class ComputerDAO extends DAO<Computer> {
 		return computerDAO;
 	}
 
-	private ComputerDAO() { }
+	private ComputerDAO() {
+	}
 
 	/**
-	 * @param computer Computer to create
+	 * @param computer
+	 *            Computer to create
 	 * @return see {@link executeStatement}
 	 */
 	public int createComputer(Computer computer) {
 		Map<String, Field> mapperSQLFields = getMapperSQLFields(getModelClassFullName());
 		Set<String> keys = mapperSQLFields.keySet();
 
-		LinkedHashMap<String, SimpleEntry<Field, Object>> fieldsClassValues = generateFieldsClassValues(mapperSQLFields, computer);
+		LinkedHashMap<String, SimpleEntry<Field, Object>> fieldsClassValues = generateFieldsClassValues(mapperSQLFields,
+				computer);
 
 		HashMap<String, Integer> keyOrder = getKeyOrder(fieldsClassValues);
 
@@ -63,7 +66,8 @@ public class ComputerDAO extends DAO<Computer> {
 		Map<String, Field> mapperSQLFields = getMapperSQLFields(getModelClassFullName());
 		Set<String> keys = mapperSQLFields.keySet();
 
-		LinkedHashMap<String, SimpleEntry<Field, Object>> fieldsClassValues = generateFieldsClassValues(mapperSQLFields, computer);
+		LinkedHashMap<String, SimpleEntry<Field, Object>> fieldsClassValues = generateFieldsClassValues(mapperSQLFields,
+				computer);
 
 		String primaryKey = getKey(getModelClassFullName(), x -> x.primaryKey()).getKey();
 
@@ -74,10 +78,12 @@ public class ComputerDAO extends DAO<Computer> {
 		return executeStatement(query, fieldsClassValues, keyOrder);
 	}
 
-	private String generateCreateQuery(LinkedHashMap<String, SimpleEntry<Field, Object>> paramValues, Set<String> keys) {
+	private String generateCreateQuery(LinkedHashMap<String, SimpleEntry<Field, Object>> paramValues,
+			Set<String> keys) {
 
 		String[] template = {};
-		String query = "INSERT INTO " + getTable(getModelClassFullName()) + " ( " + arrayToString(paramValues.keySet().toArray(template)) + " ) VALUES ( ";
+		String query = "INSERT INTO " + getTable(getModelClassFullName()) + " ( "
+				+ arrayToString(paramValues.keySet().toArray(template)) + " ) VALUES ( ";
 
 		for (int i = 0; i < keys.size(); ++i) {
 			query += "?,";
@@ -90,7 +96,8 @@ public class ComputerDAO extends DAO<Computer> {
 		return query;
 	}
 
-	private LinkedHashMap<String, SimpleEntry<Field, Object>> generateFieldsClassValues(Map<String, Field> mapperSQLFields, Computer computer) {
+	private LinkedHashMap<String, SimpleEntry<Field, Object>> generateFieldsClassValues(
+			Map<String, Field> mapperSQLFields, Computer computer) {
 		LinkedHashMap<String, SimpleEntry<Field, Object>> fieldsClassValues = new LinkedHashMap<>();
 
 		Field field = null;
@@ -123,10 +130,13 @@ public class ComputerDAO extends DAO<Computer> {
 								Optional<Long> l = Optional.empty();
 								value = l;
 							} else {
-								value = primaryField.getType().getDeclaredConstructor(new Class<?>[0]).newInstance(new Object[0]);
+								value = primaryField.getType().getDeclaredConstructor(new Class<?>[0])
+										.newInstance(new Object[0]);
 							}
 						} catch (InstantiationException | InvocationTargetException | NoSuchMethodException e) {
-							logger.error(Main.getErrorMessage("error invoking parameterless constructor of " + primaryField.getType(), e.getMessage()));
+							logger.error(Main.getErrorMessage(
+									"error invoking parameterless constructor of " + primaryField.getType(),
+									e.getMessage()));
 						}
 					} else {
 						primaryField.setAccessible(true);
@@ -145,7 +155,8 @@ public class ComputerDAO extends DAO<Computer> {
 		return fieldsClassValues;
 	}
 
-	private String generateUpdateQuery(LinkedHashMap<String, SimpleEntry<Field, Object>> paramValues, Set<String> keys, String primaryKey) {
+	private String generateUpdateQuery(LinkedHashMap<String, SimpleEntry<Field, Object>> paramValues, Set<String> keys,
+			String primaryKey) {
 
 		String query = "UPDATE " + getTable(getModelClassFullName()) + " SET ";
 		for (String name : paramValues.keySet()) {

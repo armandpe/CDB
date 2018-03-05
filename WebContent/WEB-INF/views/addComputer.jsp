@@ -26,29 +26,31 @@
 					<h1>Add Computer</h1>
 					<c:forEach items="${errors}" var="error">
 						<h3 style="color: red;">${error}</h3>
-						<br>
 					</c:forEach>
 					<form action="../add/computer" method="POST">
 						<fieldset>
 							<div class="form-group">
 								<label for="computerName">Computer name</label> <input
 									type="text" class="form-control" id="computerName"
-									placeholder="Computer name">
+									placeholder="Computer name" name="computerName"
+									required="required">
 							</div>
 							<div class="form-group">
 								<label for="introduced">Introduced date</label> <input
 									type="date" class="form-control" id="introduced"
-									placeholder="Introduced date">
+									placeholder="Introduced date" min="1970-01-01"
+									name="introduced">
 							</div>
 							<div class="form-group">
 								<label for="discontinued">Discontinued date</label> <input
 									type="date" class="form-control" id="discontinued"
-									placeholder="Discontinued date">
+									placeholder="Discontinued date" min="1970-01-01"
+									name="discontinued">
 							</div>
 							<div class="form-group">
 								<label for="companyId">Company</label> <select
-									class="form-control" id="companyId">
-									<option value=0>"None"</option>
+									class="form-control" id="companyId" name="companyId">
+									<option value=0>None</option>
 									<c:forEach items="${companyList}" var="company">
 										<option value="${company.id}">${company.name}</option>
 									</c:forEach>

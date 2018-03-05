@@ -22,18 +22,19 @@ import main.java.com.excilys.cdb.service.PageManager;
 @WebServlet("/dashboard")
 public class Dashboard extends HttpServlet {
 
-	Logger logger = LogManager.getLogger(this.getClass());
-	PageManager pageManager = null;
 	ComputerService computerService;
 	ArrayList<ComputerDTO> dtoList;
 	long limit = 10;
+	Logger logger = LogManager.getLogger(this.getClass());
+	PageManager pageManager = null;
 
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		long count;
-		
+
 		String limitString = request.getParameter("limit");
 		limit = limitString == null ? limit : Long.parseLong(limitString);
-		
+
 		if (pageManager == null) {
 			computerService = ComputerService.getInstance();
 			count = computerService.getCount();
@@ -44,9 +45,9 @@ public class Dashboard extends HttpServlet {
 			count = computerService.getCount();
 			pageManager.setLimit(limit);
 		}
-		
+
 		pageManager.getPageData().forEach(computer -> dtoList.add(ComputerMapper.toDTO((Computer) computer)));
-		
+
 		request.setAttribute("count", count);
 		request.setAttribute("computerList", dtoList);
 
