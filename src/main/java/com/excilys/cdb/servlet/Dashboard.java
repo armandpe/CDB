@@ -17,16 +17,18 @@ import main.java.com.excilys.cdb.dto.ComputerMapper;
 import main.java.com.excilys.cdb.model.Computer;
 import main.java.com.excilys.cdb.service.ComputerService;
 import main.java.com.excilys.cdb.service.PageManager;
+import main.java.com.excilys.cdb.servlet.tag.PaginationTag;
 
 @SuppressWarnings("serial")
 @WebServlet("/dashboard")
 public class Dashboard extends HttpServlet {
 
-	ComputerService computerService;
-	ArrayList<ComputerDTO> dtoList;
-	long limit = 10;
-	Logger logger = LogManager.getLogger(this.getClass());
-	PageManager pageManager = null;
+	protected ComputerService computerService;
+	protected ArrayList<ComputerDTO> dtoList;
+	protected long limit = 10;
+	protected Logger logger = LogManager.getLogger(this.getClass());
+	protected PageManager pageManager = null;
+	protected long currentPage = 1;
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
@@ -34,7 +36,10 @@ public class Dashboard extends HttpServlet {
 
 		String limitString = request.getParameter("limit");
 		limit = limitString == null ? limit : Long.parseLong(limitString);
-
+		
+		String pageString = request.getParameter("page");
+		currentPage = pageString == null ? limit : Long.parseLong(pageString);
+		
 		if (pageManager == null) {
 			computerService = ComputerService.getInstance();
 			count = computerService.getCount();
@@ -46,10 +51,14 @@ public class Dashboard extends HttpServlet {
 			pageManager.setLimit(limit);
 		}
 
+		pageManager.gotTo(currentPage);
 		pageManager.getPageData().forEach(computer -> dtoList.add(ComputerMapper.toDTO((Computer) computer)));
 
 		request.setAttribute("count", count);
 		request.setAttribute("computerList", dtoList);
+		
+		PaginationTag.setCurrentPage(pageManager.getPage());
+		PaginationTag.setNbPage(pageManager.getMaxPage());
 
 		this.getServletContext().getRequestDispatcher("/WEB-INF/views/dashboard.jsp").forward(request, response);
 	}

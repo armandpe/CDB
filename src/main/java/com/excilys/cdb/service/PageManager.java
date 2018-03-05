@@ -101,5 +101,13 @@ public class PageManager {
 		(getList.apply(offset, limit)).forEach(x -> pageData.add((ModelClass) x));
 		return true;
 	}
+
+	public boolean gotTo(long page) {
+		page = Math.min(page, maxPage);
+		page = Math.max(1, page);
+		
+		offset = (page - 1) * limit;
+		return getItems();
+	}
 	
 }
