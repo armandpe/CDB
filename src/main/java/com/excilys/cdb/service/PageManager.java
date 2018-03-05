@@ -83,6 +83,8 @@ public class PageManager {
 	public void setLimit(long limit) {
 		this.limit = limit;
 		setOffset(0);
+		setMax(max);
+		getItems();
 	}
 
 	public void setMax(long max) {

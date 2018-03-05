@@ -97,9 +97,9 @@
 			</ul>
 
 			<div class="btn-group btn-group-sm pull-right" role="group">
-				<button type="button" class="btn btn-default" href="dashboard?limit=10">10</button>
-				<button type="button" class="btn btn-default" href="dashboard?limit=50">50</button>
-				<button type="button" class="btn btn-default" href="dashboard?limit=100">100</button>
+				<input type="button" class="btn btn-default" onclick="location.href='dashboard?limit=10'" value="10"/>
+				<input type="button" class="btn btn-default" onclick="location.href='dashboard?limit=50'" value="50"/>
+				<input type="button" class="btn btn-default" onclick="location.href='dashboard?limit=100'" value="100"/>
 			</div>
 		</div>
 	</footer>

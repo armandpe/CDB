@@ -19,7 +19,7 @@ public class ComputerMapper {
 		Computer.ComputerBuilder builder = new Computer.ComputerBuilder().withId(dto.getId()).withName(dto.getName());
 		builder.withDiscontinued(dto.getDiscontinued() == null ? null : LocalDate.parse(dto.getDiscontinued(), formatter));
 		builder.withIntroduced(dto.getIntroduced() == null ? null : LocalDate.parse(dto.getIntroduced(), formatter));
-		builder.withCompany(dto.getName() == null ? null : new Company(dto.getCompanyId(), dto.getCompanyName()));
+		builder.withCompany(dto.getCompanyId() == 0 ? null : new Company(dto.getCompanyId(), dto.getCompanyName()));
 		return builder.build();
 	}
 	
@@ -38,6 +38,17 @@ public class ComputerMapper {
 		
 		Optional<Company> company = CompanyDAO.getInstance().getById(computer.getId());
 		company.ifPresent(x -> dto.setCompanyName(x.getName()));
+		return dto;
+	}
+	
+	public static ComputerDTO toDTO(String name, String introduced, String discontinued, String companyId) {
+		ComputerDTO dto = new ComputerDTO();
+		dto.setCompanyName(name);
+		dto.setIntroduced(introduced);
+		dto.setDiscontinued(discontinued);
+		dto.setCompanyId(Long.parseLong(companyId));
+		dto.setId(0);
+		
 		return dto;
 	}
 

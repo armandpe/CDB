@@ -26,21 +26,23 @@ public class Dashboard extends HttpServlet {
 	PageManager pageManager = null;
 	ComputerService computerService;
 	ArrayList<ComputerDTO> dtoList;
-	long limit;
+	long limit = 10;
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		long count;
 		
-		String limit = request.getParameter("limit");
+		String limitString = request.getParameter("limit");
+		limit = limitString == null ? limit : Long.parseLong(limitString);
 		
 		if (pageManager == null) {
 			computerService = ComputerService.getInstance();
 			count = computerService.getCount();
 			dtoList = new ArrayList<>();
-			pageManager = new PageManager(limit == null ? 10 : Long.valueOf(limit), count, (x, y) -> computerService.getAll(x, y));
+			pageManager = new PageManager(limit, count, (x, y) -> computerService.getAll(x, y));
 		} else {
 			dtoList.clear();
 			count = computerService.getCount();
+			pageManager.setLimit(limit);
 		}
 		
 		pageManager.getPageData().forEach(computer -> dtoList.add(ComputerMapper.toDTO((Computer) computer)));

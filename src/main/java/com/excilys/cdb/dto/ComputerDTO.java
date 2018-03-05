@@ -8,7 +8,7 @@ public class ComputerDTO {
 
 	private String discontinued;
 
-	private long id;
+	private long id = 0;
 
 	private String introduced;
 
