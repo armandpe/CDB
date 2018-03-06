@@ -1,6 +1,9 @@
 package main.java.com.excilys.cdb.servlet;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Function;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -17,6 +20,8 @@ import main.java.com.excilys.cdb.model.Computer;
 import main.java.com.excilys.cdb.service.ComputerService;
 import main.java.com.excilys.cdb.service.PageManager;
 import main.java.com.excilys.cdb.servlet.tag.PageData;
+import main.java.com.excilys.cdb.validator.InputValidator;
+import main.java.com.excilys.cdb.validator.InvalidInputException;
 
 @SuppressWarnings("serial")
 @WebServlet("/dashboard")
@@ -32,11 +37,30 @@ public class Dashboard extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		long count;
-
+		
 		String limitString = request.getParameter("limit");
+		List<Function<Long, Boolean>> limitTests = new ArrayList<>();
+		limitTests.add(limit -> (limit > 0));
+		try {
+			InputValidator.isCorrectString(limitString, toParse -> Long.parseLong(toParse), true, false, limitTests);
+		} catch (InvalidInputException | NumberFormatException e) {
+			logger.info(e.getClass().getName() + " : Incorrect limit value " + e.getMessage());
+			this.getServletContext().getRequestDispatcher("/WEB-INF/views/403.jsp").forward(request, response);	
+			return;
+		}
+		
 		limit = limitString == null ? limit : Long.parseLong(limitString);
 		
+		
 		String pageString = request.getParameter("page");
+		List<Function<Long, Boolean>> pageTests = new ArrayList<>();
+		try {
+			InputValidator.isCorrectString(pageString, toParse -> Long.parseLong(toParse), true, false, pageTests);
+		} catch (InvalidInputException | NumberFormatException e) {
+			logger.info(e.getClass().getName() + " : Incorrect page value " + e.getMessage());
+			this.getServletContext().getRequestDispatcher("/WEB-INF/views/403.jsp").forward(request, response);	
+			return;
+		}
 		currentPage = pageString == null ? limit : Long.parseLong(pageString);
 		
 		if (pageManager == null) {
