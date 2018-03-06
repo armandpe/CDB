@@ -14,14 +14,14 @@ public class PageManager {
 	private long max;
 	private long maxPage;
 	private long offset;
-	private ArrayList<ModelClass> pageData;
+	private ArrayList<ModelClass> pageData = new ArrayList<>();
 	
 	public PageManager(long limit, long max, BiFunction<Long, Long, List<?>> getList) {
 		this.offset = 0;
 		this.limit = limit;
-		setMax(max);
+		this.max = max;
+		refreshMaxPage();
 		this.getList = getList;
-		this.pageData = new ArrayList<>();
 		this.getItems();
 	}
 	
@@ -83,13 +83,17 @@ public class PageManager {
 	public void setLimit(long limit) {
 		this.limit = limit;
 		setOffset(0);
-		setMax(max);
+		refreshMaxPage();
 		getItems();
+	}
+	
+	private void refreshMaxPage() {
+		this.maxPage = (long) Math.ceil(((double) max) / (double) limit);
 	}
 
 	public void setMax(long max) {
 		this.max = max;
-		this.maxPage = (long) Math.ceil(((double) max) / (double) limit);
+		refreshMaxPage();
 	}
 
 	public void setOffset(long offset) {

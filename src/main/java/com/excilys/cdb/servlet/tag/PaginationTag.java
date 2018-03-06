@@ -8,26 +8,26 @@ import javax.servlet.jsp.tagext.SimpleTagSupport;
 
 public class PaginationTag extends SimpleTagSupport {
 
-	private static long currentPage;
+	private long currentPage;
 
-	private static long nbPage;
+	private long nbPage;
 
-	private static long span = 5; //Should be odd
+	private long span = 5; //Should be odd
 
-	public static long getCurrentPage() {
+	public long getCurrentPage() {
 		return currentPage;
 	}
 
-	public static long getNbPage() {
+	public long getNbPage() {
 		return nbPage;
 	}
 
-	public static void setCurrentPage(long currentPage) {
-		PaginationTag.currentPage = currentPage;
+	public void setCurrentPage(long currentPage) {
+		this.currentPage = currentPage;
 	}
 
-	public static void setNbPage(long nbPage) {
-		PaginationTag.nbPage = nbPage;
+	public void setNbPage(long nbPage) {
+		this.nbPage = nbPage;
 	}
 
 	public void doTag() throws JspException, IOException {
@@ -36,7 +36,7 @@ public class PaginationTag extends SimpleTagSupport {
 		StringBuilder pagination = new StringBuilder();
 
 		long normalStart = (long) (currentPage - Math.floor(span / 2));
-		long normalEnd = (long) (currentPage + Math.floor(span / 2) + 1);
+		long normalEnd = (long) (currentPage + Math.floor(span / 2));
 
 		long start = Math.max(1, normalStart);
 		long end = Math.min(nbPage, normalEnd);
@@ -54,7 +54,7 @@ public class PaginationTag extends SimpleTagSupport {
 			pagination.append(getCode((currentPage - 1), "<", false));
 		}		
 
-		for (long i = start; i < end; ++i) {
+		for (long i = start; i <= end; ++i) {
 			if (i == currentPage) {
 				pagination.append(getCode(i, "-", true));
 			} else {
@@ -62,7 +62,7 @@ public class PaginationTag extends SimpleTagSupport {
 			}
 		}
 
-		if (currentPage < (nbPage - 1)) {
+		if (currentPage < (nbPage)) {
 			pagination.append(getCode((long) (currentPage + 1), ">", false));
 			pagination.append(getCode(nbPage, ">>", false));
 		}

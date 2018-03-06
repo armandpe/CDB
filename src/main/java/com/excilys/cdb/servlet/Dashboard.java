@@ -1,7 +1,6 @@
 package main.java.com.excilys.cdb.servlet;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -17,19 +16,19 @@ import main.java.com.excilys.cdb.dto.ComputerMapper;
 import main.java.com.excilys.cdb.model.Computer;
 import main.java.com.excilys.cdb.service.ComputerService;
 import main.java.com.excilys.cdb.service.PageManager;
-import main.java.com.excilys.cdb.servlet.tag.PaginationTag;
+import main.java.com.excilys.cdb.servlet.tag.PageData;
 
 @SuppressWarnings("serial")
 @WebServlet("/dashboard")
 public class Dashboard extends HttpServlet {
 
 	protected ComputerService computerService;
-	protected ArrayList<ComputerDTO> dtoList;
 	protected long limit = 10;
 	protected Logger logger = LogManager.getLogger(this.getClass());
 	protected PageManager pageManager = null;
 	protected long currentPage = 1;
-
+	protected PageData<ComputerDTO> pageData = null;
+	
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		long count;
@@ -43,22 +42,21 @@ public class Dashboard extends HttpServlet {
 		if (pageManager == null) {
 			computerService = ComputerService.getInstance();
 			count = computerService.getCount();
-			dtoList = new ArrayList<>();
 			pageManager = new PageManager(limit, count, (x, y) -> computerService.getAll(x, y));
+			pageData = new PageData<>();
 		} else {
-			dtoList.clear();
+			pageData.getDataList().clear();
 			count = computerService.getCount();
 			pageManager.setLimit(limit);
 		}
 
 		pageManager.gotTo(currentPage);
-		pageManager.getPageData().forEach(computer -> dtoList.add(ComputerMapper.toDTO((Computer) computer)));
-
-		request.setAttribute("count", count);
-		request.setAttribute("computerList", dtoList);
+		pageManager.getPageData().forEach(computer -> pageData.getDataList().add(ComputerMapper.toDTO((Computer) computer)));
+		pageData.setCount(count);
+		pageData.setCurrentPage(pageManager.getPage());
+		pageData.setMaxPage(pageManager.getMaxPage());
 		
-		PaginationTag.setCurrentPage(pageManager.getPage());
-		PaginationTag.setNbPage(pageManager.getMaxPage());
+		request.setAttribute("pageData", pageData);
 
 		this.getServletContext().getRequestDispatcher("/WEB-INF/views/dashboard.jsp").forward(request, response);
 	}

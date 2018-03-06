@@ -10,13 +10,15 @@
       
       <attribute>
       	<name>currentPage</name>
-      	<required>false</required>
+      	<required>true</required>
       	<type>Integer</type>
+      	<rtexprvalue>true</rtexprvalue>
       </attribute>      
       <attribute>
       	<name>nbPage</name>
       	<required>false</required>
       	<type>Integer</type>
+      	<rtexprvalue>true</rtexprvalue>
       </attribute>
    </tag>
 </taglib>

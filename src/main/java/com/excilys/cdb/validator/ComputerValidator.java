@@ -9,7 +9,7 @@ import main.java.com.excilys.cdb.service.CompanyService;
 
 public class ComputerValidator {
 
-	private static List<Exception> exceptions = new ArrayList<>();
+	private static List<InvalidInputException> exceptions = new ArrayList<>();
 
 	public static void check(String computerName, String introduced, String discontinued, String companyId)
 			throws InvalidInputException {
@@ -104,7 +104,7 @@ public class ComputerValidator {
 		}
 	}
 
-	public static List<Exception> getExceptions() {
+	public static List<InvalidInputException> getExceptions() {
 		return exceptions;
 	}
 
