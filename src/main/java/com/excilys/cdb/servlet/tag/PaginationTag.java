@@ -50,24 +50,28 @@ public class PaginationTag extends SimpleTagSupport {
 		}
 
 		if (currentPage > 1) {
-			pagination.append(getCode(1, "<<"));
-			pagination.append(getCode((long) (currentPage - 1), "<"));
+			pagination.append(getCode(1, "<<", false));
+			pagination.append(getCode((currentPage - 1), "<", false));
 		}		
 
 		for (long i = start; i < end; ++i) {
-			pagination.append(getCode(i, "" + i));
+			if (i == currentPage) {
+				pagination.append(getCode(i, "-", true));
+			} else {
+				pagination.append(getCode(i, "" + i, false));
+			}
 		}
 
 		if (currentPage < (nbPage - 1)) {
-			pagination.append(getCode((long) (currentPage + 1), ">"));
-			pagination.append(getCode(nbPage, ">>"));
+			pagination.append(getCode((long) (currentPage + 1), ">", false));
+			pagination.append(getCode(nbPage, ">>", false));
 		}
 
 		out.print(pagination.toString());
 	}
 
-	private String getCode(long page, String toPrint) {
-		return "<li><a href=dashboard?page=" + page + "> " + toPrint + " </a><li>\n";
+	private String getCode(long page, String toPrint, boolean disabled) {
+		return "<li><a " + (disabled ? "" : "href=dashboard?page=" + page) + "> " + toPrint + " </a><li>\n";
 	}
 
 }
