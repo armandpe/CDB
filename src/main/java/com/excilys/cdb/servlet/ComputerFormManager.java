@@ -1,0 +1,61 @@
+package main.java.com.excilys.cdb.servlet;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import main.java.com.excilys.cdb.dto.CompanyDTO;
+import main.java.com.excilys.cdb.dto.CompanyMapper;
+import main.java.com.excilys.cdb.dto.ComputerDTO;
+import main.java.com.excilys.cdb.dto.ComputerMapper;
+import main.java.com.excilys.cdb.model.Computer;
+import main.java.com.excilys.cdb.service.CompanyService;
+import main.java.com.excilys.cdb.validator.ComputerValidator;
+import main.java.com.excilys.cdb.validator.InvalidInputException;
+
+public class ComputerFormManager {
+
+
+	protected Logger logger = LogManager.getLogger(this.getClass());
+	protected List<CompanyDTO> companyList = new ArrayList<>();	
+	protected CompanyService companyService = CompanyService.getInstance();
+
+
+	public List<String> setRequestCompanies(HttpServletRequest request) {
+		List<String> errors = new ArrayList<>();
+		companyList.clear();
+		errors.clear();
+		companyService.getAll(0, companyService.getCount()).forEach(company -> companyList.add(CompanyMapper.toDTO(company)));
+		request.setAttribute("companyList", companyList);
+		return errors;
+	}
+
+	public List<String> processInput(String id, String computerName, String introduced, String discontinued, 
+			String companyId, Consumer<Computer> processComputer) {
+
+		List<String> errors = new ArrayList<>();
+		
+		try {
+			ComputerValidator.check(id, computerName, introduced, discontinued, companyId);
+			ComputerDTO dto = ComputerMapper.toDTO(id, computerName, introduced, discontinued, companyId);
+			Computer computer = ComputerMapper.toComputer(dto);
+			processComputer.accept(computer);
+		} catch (InvalidInputException e) {
+			logger.info(e.getMessage());
+			ComputerValidator.getExceptions().forEach(exception -> errors.add(exception.getMessage()));
+		}
+
+		return errors;
+	}
+
+	public List<String> processInput(String computerName, String introduced, String discontinued, 
+			String companyId, Consumer<Computer> processComputer) {
+		return processInput("0", computerName, introduced, discontinued, companyId, processComputer);
+	}
+
+}

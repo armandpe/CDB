@@ -1,11 +1,15 @@
 package main.java.com.excilys.cdb.validator;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
+import main.java.com.excilys.cdb.constant.DateConstant;
 import main.java.com.excilys.cdb.service.CompanyService;
+import main.java.com.excilys.cdb.service.ComputerService;
 
 public class ComputerValidator {
 
@@ -52,26 +56,53 @@ public class ComputerValidator {
 			throw new InvalidInputException("Some input were invalid : " + exceptions.toString());
 		}
 	}
+	
+	public static void check(String id, String computerName, String introduced, String discontinued, String companyId)
+			throws InvalidInputException {
+		
+		checkId(id);
+		
+		check(computerName, introduced, discontinued, companyId);
+	}
+
+	private static void checkId(String idString) throws InvalidIdException {
+		if (idString == null) {
+			throw new InvalidIdException("Null id");
+		}
+
+		long id;
+		try {
+			id = Long.parseLong(idString);
+		} catch (NumberFormatException e) {
+			throw new InvalidIdException("Couldn't parse the id");
+		}
+
+		if (id < 0 || (id != 0 && !ComputerService.getInstance().getById(id).isPresent())) {
+			throw new InvalidIdException("Incorrect id value");
+		}
+		
+	}
 
 	public static void checkCompanyId(String companyId) throws InvalidIdException {
 
 		if (companyId == null) {
-			throw new InvalidIdException("Null id");
+			throw new InvalidIdException("Null company id");
 		}
 
 		long id;
 		try {
 			id = Long.parseLong(companyId);
 		} catch (NumberFormatException e) {
-			throw new InvalidIdException("Couldn't parse the id");
+			throw new InvalidIdException("Couldn't parse the company id");
 		}
 
-		if (id < 0 || id > CompanyService.getInstance().getCount()) {
-			throw new InvalidIdException("Incorrect id value");
+		if (id < 0 || (id != 0 && !CompanyService.getInstance().getById(id).isPresent())) {
+			throw new InvalidIdException("Incorrect company id value");
 		}
-
 	}
 
+	
+	
 	public static LocalDate checkDate(String date) throws InvalidDateException {
 
 		if (date == null) {
@@ -84,7 +115,9 @@ public class ComputerValidator {
 
 		LocalDate parsedDate = null;
 		try {
-			parsedDate = LocalDate.parse(date);
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DateConstant.FORMAT);
+			formatter = formatter.withLocale(Locale.FRANCE);
+			parsedDate = LocalDate.parse(date, formatter);
 		} catch (DateTimeParseException e) {
 			throw new InvalidDateException("Parse error : " + e.getMessage());
 		}

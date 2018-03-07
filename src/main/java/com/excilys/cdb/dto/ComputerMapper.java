@@ -5,6 +5,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Optional;
 
+import main.java.com.excilys.cdb.constant.DateConstant;
 import main.java.com.excilys.cdb.dao.CompanyDAO;
 import main.java.com.excilys.cdb.model.Company;
 import main.java.com.excilys.cdb.model.Computer;
@@ -13,7 +14,7 @@ public class ComputerMapper {
 
 	public static Computer toComputer(ComputerDTO dto) {
 
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DateConstant.FORMAT);
 		formatter = formatter.withLocale(Locale.FRANCE);
 
 		Computer.ComputerBuilder builder = new Computer.ComputerBuilder().withId(dto.getId()).withName(dto.getName());
@@ -27,7 +28,7 @@ public class ComputerMapper {
 
 	public static ComputerDTO toDTO(Computer computer) {
 
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DateConstant.FORMAT);
 		formatter = formatter.withLocale(Locale.FRANCE);
 
 		ComputerDTO dto = new ComputerDTO();
@@ -47,7 +48,7 @@ public class ComputerMapper {
 
 	public static ComputerDTO toDTO(String name, String introduced, String discontinued, String companyId) {
 		ComputerDTO dto = new ComputerDTO();
-		dto.setCompanyName(name);
+		dto.setName(name);
 		dto.setIntroduced(introduced);
 		dto.setDiscontinued(discontinued);
 		dto.setCompanyId(Long.parseLong(companyId));
@@ -55,6 +56,13 @@ public class ComputerMapper {
 
 		return dto;
 	}
+	
+	public static ComputerDTO toDTO(String id, String name, String introduced, String discontinued, String companyId) {
+		ComputerDTO dto = toDTO(name, introduced, discontinued, companyId);
+		dto.setId(Long.parseLong(id));
+		return dto;
+	}
+	
 
 	private static boolean isNullOrEmpty(String s) {
 		if (s == null || s.equals("")) {

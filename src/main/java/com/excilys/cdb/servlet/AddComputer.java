@@ -1,7 +1,6 @@
 package main.java.com.excilys.cdb.servlet;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -13,60 +12,42 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import main.java.com.excilys.cdb.dto.CompanyDTO;
-import main.java.com.excilys.cdb.dto.CompanyMapper;
-import main.java.com.excilys.cdb.dto.ComputerDTO;
-import main.java.com.excilys.cdb.dto.ComputerMapper;
-import main.java.com.excilys.cdb.model.Computer;
-import main.java.com.excilys.cdb.service.CompanyService;
 import main.java.com.excilys.cdb.service.ComputerService;
-import main.java.com.excilys.cdb.validator.ComputerValidator;
-import main.java.com.excilys.cdb.validator.InvalidInputException;
 
 @SuppressWarnings("serial")
-@WebServlet("/add/computer")
+@WebServlet("/addComputer")
 public class AddComputer extends HttpServlet  {
-	
-	protected List<CompanyDTO> companyList = new ArrayList<>();	
-	protected CompanyService companyService = CompanyService.getInstance();
-	protected List<String> errors = new ArrayList<>();
+
 	protected Logger logger = LogManager.getLogger(this.getClass());
+	ComputerFormManager computerFormManager = new ComputerFormManager();
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {		
-		
-		errors.clear();
-		
-		setRequestValues(request);
+
+		List<String> errors = computerFormManager.setRequestCompanies(request);
+		request.setAttribute("errors", errors);
 		this.getServletContext().getRequestDispatcher("/WEB-INF/views/addComputer.jsp").forward(request, response);
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		String computerName = request.getParameter("computerName");
-        String introduced = request.getParameter("introduced");
-        String discontinued = request.getParameter("discontinued");
-        String companyId = request.getParameter("companyId");
-        
-        errors.clear();
-        
-        try {
-        	ComputerValidator.check(computerName, introduced, discontinued, companyId);
-        	ComputerDTO dto = ComputerMapper.toDTO(computerName, introduced, discontinued, companyId);
-        	Computer computer = ComputerMapper.toComputer(dto);
-        	ComputerService.getInstance().createComputer(computer);
-        } catch (InvalidInputException e) {
-        	logger.info(e.getMessage());
-        	ComputerValidator.getExceptions().forEach(exception -> errors.add(exception.getMessage()));
-        }
-        
-        setRequestValues(request);
-		this.getServletContext().getRequestDispatcher("/WEB-INF/views/addComputer.jsp").forward(request, response);
+		String introduced = request.getParameter("introduced");
+		String discontinued = request.getParameter("discontinued");
+		String companyId = request.getParameter("companyId");
+
+		List<String> errors = computerFormManager.processInput(computerName, introduced, discontinued, companyId, computer -> ComputerService.getInstance().createComputer(computer));
+		
+		logger.error(errors);
+		
+		if (errors.size() > 0) {
+			
+			request.setAttribute("errors", errors);
+			computerFormManager.setRequestCompanies(request);
+			this.getServletContext().getRequestDispatcher("/WEB-INF/views/addComputer.jsp").forward(request, response);
+		} else {
+			response.sendRedirect("dashboard");		
+		}
 	}
-	
-	protected void setRequestValues(HttpServletRequest request) {
-		companyList.clear();
-		companyService.getAll(0, companyService.getCount()).forEach(company -> companyList.add(CompanyMapper.toDTO(company)));
-		request.setAttribute("companyList", companyList);
-		request.setAttribute("errors", errors);
-	}
+
+
 }
