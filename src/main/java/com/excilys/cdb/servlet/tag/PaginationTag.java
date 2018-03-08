@@ -12,7 +12,7 @@ public class PaginationTag extends SimpleTagSupport {
 
 	private long nbPage;
 
-	private long span = 5; //Should be odd
+	private long span = 7; //Should be odd
 
 	public long getCurrentPage() {
 		return currentPage;

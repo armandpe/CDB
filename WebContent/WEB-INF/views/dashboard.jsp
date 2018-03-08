@@ -1,5 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<%@ taglib prefix = "custom" uri = "/WEB-INF/pagination.tld"%>
+<%@ taglib prefix="custom" uri="/WEB-INF/pagination.tld"%>
 
 <!DOCTYPE html>
 <html>
@@ -15,8 +15,8 @@
 <body>
 	<header class="navbar navbar-inverse navbar-fixed-top">
 		<div class="container">
-			<a class="navbar-brand" href="dashboard"> Application -
-				Computer Database </a>
+			<a class="navbar-brand" href="dashboard"> Application - Computer
+				Database </a>
 		</div>
 	</header>
 
@@ -70,7 +70,7 @@
 					<c:forEach items="${pageData.dataList}" var="computer">
 						<tr>
 							<td class="editMode"><input type="checkbox" name="cb"
-								class="cb" value="0"></td>
+								class="cb" value="${computer.id}"></td>
 							<td><a href="editComputer?id=${computer.id}" onclick="">${computer.name}</a></td>
 							<td>${computer.introduced}</td>
 							<td>${computer.discontinued}</td>
@@ -85,17 +85,21 @@
 	<footer class="navbar-fixed-bottom">
 		<div class="container text-center">
 			<ul class="pagination">
-				<custom:pagination nbPage = "${pageData.maxPage}"  currentPage="${pageData.currentPage}"/>
+				<custom:pagination nbPage="${pageData.maxPage}"
+					currentPage="${pageData.currentPage}" />
 			</ul>
 
 			<div class="btn-group btn-group-sm pull-right" role="group">
-				<input type="button" class="btn btn-default" onclick="location.href='dashboard?limit=10'" value="10"/>
-				<input type="button" class="btn btn-default" onclick="location.href='dashboard?limit=50'" value="50"/>
-				<input type="button" class="btn btn-default" onclick="location.href='dashboard?limit=100'" value="100"/>
+				<input type="button" class="btn btn-default"
+					onclick="location.href='dashboard?limit=10'" value="10" /> <input
+					type="button" class="btn btn-default"
+					onclick="location.href='dashboard?limit=50'" value="50" /> <input
+					type="button" class="btn btn-default"
+					onclick="location.href='dashboard?limit=100'" value="100" />
 			</div>
 		</div>
 	</footer>
-	<script src="js/jquery.min.js"></script>
+	<script src=" js/jquery.min.js"></script>
 	<script src="js/bootstrap.min.js"></script>
 	<script src="js/dashboard.js"></script>
 

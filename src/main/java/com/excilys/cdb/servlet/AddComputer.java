@@ -37,10 +37,7 @@ public class AddComputer extends HttpServlet  {
 
 		List<String> errors = computerFormManager.processInput(computerName, introduced, discontinued, companyId, computer -> ComputerService.getInstance().createComputer(computer));
 		
-		logger.error(errors);
-		
 		if (errors.size() > 0) {
-			
 			request.setAttribute("errors", errors);
 			computerFormManager.setRequestCompanies(request);
 			this.getServletContext().getRequestDispatcher("/WEB-INF/views/addComputer.jsp").forward(request, response);

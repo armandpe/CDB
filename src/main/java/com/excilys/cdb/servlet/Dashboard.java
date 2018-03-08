@@ -19,7 +19,6 @@ import main.java.com.excilys.cdb.dto.ComputerMapper;
 import main.java.com.excilys.cdb.model.Computer;
 import main.java.com.excilys.cdb.service.ComputerService;
 import main.java.com.excilys.cdb.service.PageManager;
-import main.java.com.excilys.cdb.servlet.tag.PageData;
 import main.java.com.excilys.cdb.validator.InputValidator;
 import main.java.com.excilys.cdb.validator.InvalidInputException;
 
@@ -33,11 +32,11 @@ public class Dashboard extends HttpServlet {
 	protected PageManager pageManager = null;
 	protected long currentPage = 1;
 	protected PageData<ComputerDTO> pageData = null;
-	
+
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		long count;
-		
+
 		String limitString = request.getParameter("limit");
 		List<Function<Long, Boolean>> limitTests = new ArrayList<>();
 		limitTests.add(limit -> (limit > 0));
@@ -48,10 +47,10 @@ public class Dashboard extends HttpServlet {
 			this.getServletContext().getRequestDispatcher("/WEB-INF/views/403.jsp").forward(request, response);	
 			return;
 		}
-		
+
 		limit = limitString == null ? limit : Long.parseLong(limitString);
-		
-		
+
+
 		String pageString = request.getParameter("page");
 		List<Function<Long, Boolean>> pageTests = new ArrayList<>();
 		try {
@@ -61,8 +60,8 @@ public class Dashboard extends HttpServlet {
 			this.getServletContext().getRequestDispatcher("/WEB-INF/views/403.jsp").forward(request, response);	
 			return;
 		}
-		currentPage = pageString == null ? limit : Long.parseLong(pageString);
-		
+		currentPage = pageString == null ? currentPage : Long.parseLong(pageString);
+
 		if (pageManager == null) {
 			computerService = ComputerService.getInstance();
 			count = computerService.getCount();
@@ -79,9 +78,27 @@ public class Dashboard extends HttpServlet {
 		pageData.setCount(count);
 		pageData.setCurrentPage(pageManager.getPage());
 		pageData.setMaxPage(pageManager.getMaxPage());
-		
+
 		request.setAttribute("pageData", pageData);
 
 		this.getServletContext().getRequestDispatcher("/WEB-INF/views/dashboard.jsp").forward(request, response);
+	}
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		String selection = (String) request.getParameter("selection");
+
+		logger.debug(selection);
+
+		if (selection != null) {
+			String[] toDeleteList = selection.split(",");
+
+			for (String toDelete : toDeleteList) {
+				long id = Long.parseLong(toDelete);
+				computerService.deleteComputer(id);
+			}
+		}
+		
+		response.sendRedirect("dashboard");
 	}
 }

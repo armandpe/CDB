@@ -1,4 +1,4 @@
-package main.java.com.excilys.cdb.servlet.tag;
+package main.java.com.excilys.cdb.servlet;
 
 import java.util.ArrayList;
 import java.util.List;
