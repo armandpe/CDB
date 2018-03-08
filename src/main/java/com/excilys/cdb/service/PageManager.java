@@ -2,21 +2,27 @@ package main.java.com.excilys.cdb.service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.BiFunction;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import main.java.com.excilys.cdb.Main;
+import main.java.com.excilys.cdb.dao.FailedDAOOperationException;
 import main.java.com.excilys.cdb.ihm.UserChoice;
-import main.java.com.excilys.cdb.model.ModelClass;
+import main.java.com.excilys.cdb.utils.BiFunctionException;
 
-public class PageManager {
+public class PageManager<T> {
 	
-	private BiFunction<Long, Long, List<?>> getList;
+	private Logger logger = LogManager.getLogger(PageManager.class);
+
+	private BiFunctionException<Long, Long, List<T>, FailedDAOOperationException> getList;
 	private long limit;
 	private long max;
 	private long maxPage;
 	private long offset;
-	private ArrayList<ModelClass> pageData = new ArrayList<>();
+	private ArrayList<T> pageData = new ArrayList<>();
 	
-	public PageManager(long limit, long max, BiFunction<Long, Long, List<?>> getList) {
+	public PageManager(long limit, long max, BiFunctionException<Long, Long, List<T>, FailedDAOOperationException> getList) {
 		this.offset = 0;
 		this.limit = limit;
 		this.max = max;
@@ -51,7 +57,7 @@ public class PageManager {
 		return (offset / limit) + 1;
 	}
 
-	public ArrayList<ModelClass> getPageData() {
+	public ArrayList<T> getPageData() {
 		return pageData;
 	}
 
@@ -102,7 +108,11 @@ public class PageManager {
 
 	private boolean getItems() {
 		pageData.clear();
-		(getList.apply(offset, limit)).forEach(x -> pageData.add((ModelClass) x));
+		try {
+			(getList.apply(offset, limit)).forEach(x -> pageData.add((T) x));
+		} catch (FailedDAOOperationException e) {
+			logger.error(Main.getErrorMessage(null, e.getMessage()));
+		}
 		return true;
 	}
 

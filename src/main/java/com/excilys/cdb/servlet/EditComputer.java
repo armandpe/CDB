@@ -1,6 +1,7 @@
 package main.java.com.excilys.cdb.servlet;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import main.java.com.excilys.cdb.dao.FailedDAOOperationException;
 import main.java.com.excilys.cdb.dto.ComputerDTO;
 import main.java.com.excilys.cdb.dto.ComputerMapper;
 import main.java.com.excilys.cdb.model.Computer;
@@ -31,15 +33,28 @@ public class EditComputer extends HttpServlet {
 			throws ServletException, IOException {
 		String idString = request.getParameter("id");
 		long id = Long.parseLong(idString);
-		Optional<Computer> gottenComputer = computerService.getById(id);
+		Optional<Computer> gottenComputer = Optional.empty();
+		List<String> errors = new ArrayList<>();
+		
+		try {
+			gottenComputer = computerService.getById(id);
+		} catch (FailedDAOOperationException e) {
+			errors.add(e.getMessage());
+			logger.info(e.getMessage());
+		}
 
 		if (!gottenComputer.isPresent()) {
 			request.getRequestDispatcher("/WEB-INF/views/403.jsp").forward(request, response);
 		} else {
-			lastComputer = ComputerMapper.toDTO(gottenComputer.get());
+			try {
+				lastComputer = ComputerMapper.toDTO(gottenComputer.get());
+			} catch (FailedDAOOperationException e) {
+				errors.add(e.getMessage());
+				logger.info(e.getMessage());
+			}
 			request.setAttribute("computer", lastComputer);
 
-			List<String> errors = computerFormManager.setRequestCompanies(request);
+			errors.addAll(computerFormManager.setRequestCompanies(request));
 
 			request.setAttribute("errors", errors);
 
@@ -58,10 +73,8 @@ public class EditComputer extends HttpServlet {
 		List<String> errors = computerFormManager.processInput(idString, computerName, introduced, discontinued, companyId,
 				computer -> ComputerService.getInstance().updateComputer(computer));
 
-		logger.info(errors);
-		
 		if (errors.size() > 0) {
-			
+			logger.info(errors);
 			computerFormManager.setRequestCompanies(request);
 			request.setAttribute("computer", lastComputer);
 			

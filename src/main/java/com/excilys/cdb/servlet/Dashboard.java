@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import main.java.com.excilys.cdb.dao.FailedDAOOperationException;
 import main.java.com.excilys.cdb.dto.ComputerDTO;
 import main.java.com.excilys.cdb.dto.ComputerMapper;
 import main.java.com.excilys.cdb.model.Computer;
@@ -29,9 +30,10 @@ public class Dashboard extends HttpServlet {
 	protected ComputerService computerService;
 	protected long limit = 10;
 	protected Logger logger = LogManager.getLogger(this.getClass());
-	protected PageManager pageManager = null;
+	protected PageManager<Computer> pageManager = null;
 	protected long currentPage = 1;
 	protected PageData<ComputerDTO> pageData = null;
+	protected List<String> errors = new ArrayList<>();
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
@@ -62,26 +64,37 @@ public class Dashboard extends HttpServlet {
 		}
 		currentPage = pageString == null ? currentPage : Long.parseLong(pageString);
 
-		if (pageManager == null) {
-			computerService = ComputerService.getInstance();
-			count = computerService.getCount();
-			pageManager = new PageManager(limit, count, (x, y) -> computerService.getAll(x, y));
-			pageData = new PageData<>();
-		} else {
-			pageData.getDataList().clear();
-			count = computerService.getCount();
-			pageManager.setLimit(limit);
+		try {
+
+			if (pageManager == null) {
+				computerService = ComputerService.getInstance();
+				count = computerService.getCount();
+				pageManager = new PageManager<Computer>(limit, count, (Long x, Long y) -> computerService.getAll(x, y));
+				pageData = new PageData<>();
+			} else {
+				pageData.getDataList().clear();
+				count = computerService.getCount();
+				pageManager.setLimit(limit);
+			}
+
+
+			pageManager.gotTo(currentPage);
+			
+			for (Computer computer : pageManager.getPageData()) {
+				pageData.getDataList().add(ComputerMapper.toDTO((Computer) computer));
+			}
+			
+			pageData.setCount(count);
+			pageData.setCurrentPage(pageManager.getPage());
+			pageData.setMaxPage(pageManager.getMaxPage());
+
+			request.setAttribute("pageData", pageData);
+
+			this.getServletContext().getRequestDispatcher("/WEB-INF/views/dashboard.jsp").forward(request, response);
+
+		} catch (FailedDAOOperationException e) {
+			logger.error(e.getMessage());
 		}
-
-		pageManager.gotTo(currentPage);
-		pageManager.getPageData().forEach(computer -> pageData.getDataList().add(ComputerMapper.toDTO((Computer) computer)));
-		pageData.setCount(count);
-		pageData.setCurrentPage(pageManager.getPage());
-		pageData.setMaxPage(pageManager.getMaxPage());
-
-		request.setAttribute("pageData", pageData);
-
-		this.getServletContext().getRequestDispatcher("/WEB-INF/views/dashboard.jsp").forward(request, response);
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -95,10 +108,18 @@ public class Dashboard extends HttpServlet {
 
 			for (String toDelete : toDeleteList) {
 				long id = Long.parseLong(toDelete);
-				computerService.deleteComputer(id);
+				try {
+					computerService.deleteComputer(id);
+				} catch (FailedDAOOperationException e) {
+					logger.info(e.getMessage());
+					errors.clear();
+					errors.add(e.getMessage());
+					request.setAttribute("errors", errors);
+					this.getServletContext().getRequestDispatcher("/WEB-INF/views/dashboard.jsp").forward(request, response);
+				}
 			}
 		}
-		
+
 		response.sendRedirect("dashboard");
 	}
 }

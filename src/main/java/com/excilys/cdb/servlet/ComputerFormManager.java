@@ -2,19 +2,20 @@ package main.java.com.excilys.cdb.servlet;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import main.java.com.excilys.cdb.dao.FailedDAOOperationException;
 import main.java.com.excilys.cdb.dto.CompanyDTO;
 import main.java.com.excilys.cdb.dto.CompanyMapper;
 import main.java.com.excilys.cdb.dto.ComputerDTO;
 import main.java.com.excilys.cdb.dto.ComputerMapper;
 import main.java.com.excilys.cdb.model.Computer;
 import main.java.com.excilys.cdb.service.CompanyService;
+import main.java.com.excilys.cdb.utils.ConsumerException;
 import main.java.com.excilys.cdb.validator.ComputerValidator;
 import main.java.com.excilys.cdb.validator.InvalidInputException;
 
@@ -30,13 +31,17 @@ public class ComputerFormManager {
 		List<String> errors = new ArrayList<>();
 		companyList.clear();
 		errors.clear();
-		companyService.getAll(0, companyService.getCount()).forEach(company -> companyList.add(CompanyMapper.toDTO(company)));
+		try {
+			companyService.getAll(0, companyService.getCount()).forEach(company -> companyList.add(CompanyMapper.toDTO(company)));
+		} catch (FailedDAOOperationException e) {
+			errors.add(e.getMessage());
+		}
 		request.setAttribute("companyList", companyList);
 		return errors;
 	}
 
 	public List<String> processInput(String id, String computerName, String introduced, String discontinued, 
-			String companyId, Consumer<Computer> processComputer) {
+			String companyId, ConsumerException<Computer, FailedDAOOperationException> processComputer) {
 
 		List<String> errors = new ArrayList<>();
 		
@@ -47,14 +52,17 @@ public class ComputerFormManager {
 			processComputer.accept(computer);
 		} catch (InvalidInputException e) {
 			logger.info(e.getMessage());
-			ComputerValidator.getExceptions().forEach(exception -> errors.add(exception.getMessage()));
+		} catch (FailedDAOOperationException e) {
+			errors.add(e.getMessage());
 		}
-
+		
+		ComputerValidator.getExceptions().forEach(exception -> errors.add(exception.getMessage()));
+		
 		return errors;
 	}
 
 	public List<String> processInput(String computerName, String introduced, String discontinued, 
-			String companyId, Consumer<Computer> processComputer) {
+			String companyId, ConsumerException<Computer, FailedDAOOperationException> processComputer) {
 		return processInput("0", computerName, introduced, discontinued, companyId, processComputer);
 	}
 

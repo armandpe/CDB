@@ -11,6 +11,7 @@ import org.apache.logging.log4j.Logger;
 
 import main.java.com.excilys.cdb.ParamDescription;
 import main.java.com.excilys.cdb.dao.DAO;
+import main.java.com.excilys.cdb.dao.FailedDAOOperationException;
 import main.java.com.excilys.cdb.model.ModelClass;
 
 public abstract class Service<T extends ModelClass, U extends DAO<T>> {
@@ -20,20 +21,35 @@ public abstract class Service<T extends ModelClass, U extends DAO<T>> {
 	final Logger logger = LogManager.getLogger(this.getClass());
 	
 	@ServiceMethod(name = "Get the list of all elements", forUser = false, fullName = "com.excilys.cdb.Service.getAll")
-	public List<T> getAll(long offset, long limit) {
+	public List<T> getAll(long offset, long limit) throws FailedDAOOperationException {
 		DAO<T> dao = getDAO();
+		try {
 		return dao.getAll(offset, limit);
+		} catch (FailedDAOOperationException e) {
+			e.setMessage(getDaoClassFullName() + " : Get all method failed ");
+			throw e;
+		}
 	}
 	
 	@ServiceMethod(name = "Get an element (by id)")
-	public Optional<T> getById(@ParamDescription(name = "element id") long id) {
+	public Optional<T> getById(@ParamDescription(name = "element id") long id) throws FailedDAOOperationException {
 		DAO<T> dao = getDAO();
+		try {
 		return dao.getById(id);
+		} catch (FailedDAOOperationException e) {
+			e.setMessage(getDaoClassFullName() + " : Get all method failed ");
+			throw e;
+		}
 	}
 	
-	public long getCount() {
+	public long getCount() throws FailedDAOOperationException {
 		DAO<T> dao = getDAO();
-		return dao.getCount();
+		try {
+			return dao.getCount();
+		} catch (FailedDAOOperationException e) {
+			e.setMessage(getDaoClassFullName() + " : Get count failed ");
+			throw e;
+		}
 	}
 	
 	@SuppressWarnings("unchecked")

@@ -25,6 +25,8 @@ import org.apache.logging.log4j.Logger;
 
 import main.java.com.excilys.cdb.Main;
 import main.java.com.excilys.cdb.ParamDescription;
+import main.java.com.excilys.cdb.dao.FailedDAOOperationException;
+import main.java.com.excilys.cdb.model.ModelClass;
 import main.java.com.excilys.cdb.service.CompanyService;
 import main.java.com.excilys.cdb.service.ComputerService;
 import main.java.com.excilys.cdb.service.PageManager;
@@ -98,7 +100,11 @@ public class CLI {
 
 			switch (chosenMethod.getAnnotation(ServiceMethod.class).fullName()) {
 			case "com.excilys.cdb.Service.getAll":
-				return serviceGetAll(usedClass, chosenMethod, sc);
+				try {
+					return serviceGetAll(usedClass, chosenMethod, sc);
+				} catch (FailedDAOOperationException e) {
+					return "Failure";
+				}
 			default:
 				LOGGER.error(Main.getErrorMessage("the method " + chosenMethod.getName() + "is undefined", null));
 				return "The method " + chosenMethod.getName() + " is undefined. We couldn't execute your request.";
@@ -279,9 +285,10 @@ public class CLI {
 		return parameters;
 	}
 
-	private static Service<?, ?> getServiceInstance(Class<? extends Service<?, ?>> serviceClass) {
+	@SuppressWarnings("unchecked")
+	private static <T extends ModelClass> Service<T, ?> getServiceInstance(Class<? extends Service<T, ?>> serviceClass) {
 
-		Service<?, ?> service = null;
+		Service<T, ?> service = null;
 
 		Method method = null;
 		try {
@@ -291,7 +298,7 @@ public class CLI {
 		}
 
 		try {
-			service = (Service<?, ?>) method.invoke(null);
+			service = (Service<T, ?>) method.invoke(null);
 		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 			LOGGER.error(Main.getErrorMessage("reflexion error invoking getInstance", e.getMessage()));
 		}
@@ -342,15 +349,15 @@ public class CLI {
 		return i;
 	}
 
-	private static Object serviceGetAll(Class<? extends Service<?, ?>> usedClass, Method chosenMethod, Scanner sc) {
+	private static <T extends ModelClass> Object serviceGetAll(Class<? extends Service<T, ?>> usedClass, Method chosenMethod, Scanner sc) throws FailedDAOOperationException {
 		boolean keepGoing = true;
 		long offset = 0;
 		long limit = 10;
-		Service<?, ?> myService = getServiceInstance(usedClass);
+		Service<T, ?> myService = getServiceInstance(usedClass);
 		long max = myService.getCount();
-		PageManager pageManager;
+		PageManager<T> pageManager;
 		
-		pageManager = new PageManager(limit, max,  (x, y) -> myService.getAll(x, y));
+		pageManager = new PageManager<T>(limit, max,  (x, y) -> myService.getAll(x, y));
 		
 		while (keepGoing) {
 

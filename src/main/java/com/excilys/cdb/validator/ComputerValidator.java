@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Locale;
 
 import main.java.com.excilys.cdb.constant.DateConstant;
-import main.java.com.excilys.cdb.service.CompanyService;
+import main.java.com.excilys.cdb.dao.FailedDAOOperationException;
 import main.java.com.excilys.cdb.service.ComputerService;
 
 public class ComputerValidator {
@@ -76,15 +76,20 @@ public class ComputerValidator {
 		} catch (NumberFormatException e) {
 			throw new InvalidIdException("Couldn't parse the id");
 		}
-
-		if (id < 0 || (id != 0 && !ComputerService.getInstance().getById(id).isPresent())) {
-			throw new InvalidIdException("Incorrect id value");
+		
+		if (id < 0 && id != 0) {
+			try {
+				if (!ComputerService.getInstance().getById(id).isPresent()) {
+					throw new InvalidIdException("Incorrect id value");
+				}
+			} catch (FailedDAOOperationException e) {
+				throw new InvalidIdException("Incorrect id value");
+			}
 		}
 		
 	}
 
 	public static void checkCompanyId(String companyId) throws InvalidIdException {
-
 		if (companyId == null) {
 			throw new InvalidIdException("Null company id");
 		}
@@ -96,8 +101,14 @@ public class ComputerValidator {
 			throw new InvalidIdException("Couldn't parse the company id");
 		}
 
-		if (id < 0 || (id != 0 && !CompanyService.getInstance().getById(id).isPresent())) {
-			throw new InvalidIdException("Incorrect company id value");
+		if (id < 0 && id != 0) {
+			try {
+				if (!ComputerService.getInstance().getById(id).isPresent()) {
+					throw new InvalidIdException("Incorrect id value");
+				}
+			} catch (FailedDAOOperationException e) {
+				throw new InvalidIdException("Incorrect id value");
+			}
 		}
 	}
 

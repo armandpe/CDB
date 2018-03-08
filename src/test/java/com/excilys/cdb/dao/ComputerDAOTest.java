@@ -2,6 +2,7 @@ package test.java.com.excilys.cdb.dao;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -18,6 +19,7 @@ import org.junit.Test;
 import main.java.com.excilys.cdb.Main;
 import main.java.com.excilys.cdb.connectionmanager.ConnectionManager;
 import main.java.com.excilys.cdb.dao.ComputerDAO;
+import main.java.com.excilys.cdb.dao.FailedDAOOperationException;
 import main.java.com.excilys.cdb.model.Company;
 import main.java.com.excilys.cdb.model.Computer;
 
@@ -97,45 +99,74 @@ public class ComputerDAOTest {
 	@Test
 	public void testCreateComputerComputer() {
 		Computer toAdd = new Computer.ComputerBuilder().withId(2).withName("Mb").withCompany(new Company(1, "Apple Inc.")).build();
-		int result = ComputerDAO.getInstance().createComputer(toAdd);
-		assertTrue(ComputerDAO.getInstance().getCount() == 4 && result >= 0 && ComputerDAO.getInstance().getById(2).get().equals(toAdd));
+		try {
+			ComputerDAO.getInstance().createComputer(toAdd);
+			assertTrue(ComputerDAO.getInstance().getCount() == 4 && ComputerDAO.getInstance().getById(2).get().equals(toAdd));
+		} catch (FailedDAOOperationException e) {
+			LOGGER.error(Main.getErrorMessage(null, e.getMessage()));
+			fail();
+		}
 	}
 
 	@Test
 	public void testDeleteComputer() {
-		//Dépendant de getCount
-		int result = ComputerDAO.getInstance().deleteComputer(1);
-		assertTrue(ComputerDAO.getInstance().getCount() == 2 && result >= 0);
+		try {
+			ComputerDAO.getInstance().deleteComputer(1);
+			assertTrue(ComputerDAO.getInstance().getCount() == 2);
+		} catch (FailedDAOOperationException e) {
+			LOGGER.error(Main.getErrorMessage(null, e.getMessage()));
+			fail();
+		}
 	}
 
 	@Test
 	public void testGetAllLongLong() {
-		assertEquals(3, ComputerDAO.getInstance().getAll(0, 10).size());
+		try {
+			assertEquals(3, ComputerDAO.getInstance().getAll(0, 10).size());
+		} catch (FailedDAOOperationException e) {
+			LOGGER.error(Main.getErrorMessage("Error getAll", e.getMessage()));
+			fail();
+		}
 	}
 
 	@Test
 	public void testGetByIdLong() {
-		Computer c = ComputerDAO.getInstance().getById(1).get();
+		try {
+			Computer c = ComputerDAO.getInstance().getById(1).get();
+			assertEquals(c, new Computer.ComputerBuilder().withId(1).withName("MacBook Pro 15.4 inch").withCompany(new Company(1, "Apple Inc.")).build());
+
+		} catch (FailedDAOOperationException e) {
+			LOGGER.error(Main.getErrorMessage("Error getById", e.getMessage()));
+			fail();
+		}
 		
-		assertEquals(c, new Computer.ComputerBuilder().withId(1).withName("MacBook Pro 15.4 inch").withCompany(new Company(1, "Apple Inc.")).build());
 	}
 
 	@Test
 	public void testGetCount() {
-//		PowerMockito.mockStatic(ConnectionManager.class);
-//		Computer c4 = mock(Computer.class);
-//		when(ConnectionManager.getInstance().getConnection()).thenReturn(getConnection());
-		long count = ComputerDAO.getInstance().getCount();
-		assertTrue(count == 3);
+		long count;
+		try {
+			count = ComputerDAO.getInstance().getCount();
+			assertTrue(count == 3);
+		} catch (FailedDAOOperationException e) {
+			LOGGER.error(Main.getErrorMessage("Error getCount", e.getMessage()));
+			fail();
+		}
 	}
 	
 	@Test
 	public void testUpdateComputer() {
 		Computer computer = new Computer.ComputerBuilder().withId(3).withName("CM-200").withCompany(new Company(1, "Apple Inc.")).build();
 		computer.setName("j");
-		ComputerDAO.getInstance().updateComputer(computer);
-		Computer computer2 = ComputerDAO.getInstance().getById(3).get();
-		assertEquals(computer, computer2);
+		try {
+			ComputerDAO.getInstance().updateComputer(computer);
+			Computer computer2 = ComputerDAO.getInstance().getById(3).get();
+			assertEquals(computer, computer2);
+		} catch (FailedDAOOperationException e) {
+			LOGGER.error(Main.getErrorMessage(null, e.getMessage()));
+			fail();
+		}
+		
 	}
 
 }

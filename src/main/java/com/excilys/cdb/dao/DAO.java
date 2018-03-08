@@ -34,10 +34,12 @@ import main.java.com.excilys.cdb.connectionmanager.ConnectionManager;
 import main.java.com.excilys.cdb.model.ModelClass;
 import main.java.com.excilys.cdb.model.SQLInfo;
 import main.java.com.excilys.cdb.model.SQLTable;
+import main.java.com.excilys.cdb.utils.BiFunctionException;
+import main.java.com.excilys.cdb.utils.FunctionException;
 
 public abstract class DAO<T extends ModelClass> {
 
-	private static Map<Class<?>, BiFunctionSQL<ResultSet, String, ?>> staticResultSetFunctionMap = null;
+	private static Map<Class<?>, BiFunctionException<ResultSet, String, ?, SQLException>> staticResultSetFunctionMap = null;
 
 	public static <T> T[] append(T[] arr, T element) {
 		final int len = arr.length;
@@ -56,7 +58,7 @@ public abstract class DAO<T extends ModelClass> {
 		return false;
 	}
 
-	protected static Map<Class<?>, BiFunctionSQL<ResultSet, String, ?>> getResultSetFunctionMap() {
+	protected static Map<Class<?>, BiFunctionException<ResultSet, String, ?, SQLException>> getResultSetFunctionMap() {
 
 		if (staticResultSetFunctionMap == null) {
 
@@ -120,7 +122,7 @@ public abstract class DAO<T extends ModelClass> {
 		return String.join(", ", array);
 	}
 
-	public <V> V executeWithConnection(Function<Object[], V> f, Object[] objects) {
+	public <V> V executeWithConnection(FunctionException<Object[], V, FailedDAOOperationException> f, Object[] objects) throws FailedDAOOperationException {
 		ConnectionManager cManager = ConnectionManager.getInstance();
 		try (Connection connection = cManager.getConnection()) {
 
@@ -133,18 +135,18 @@ public abstract class DAO<T extends ModelClass> {
 		return null;
 	}
 
-	public List<T> getAll(long offset, long limit) {
+	public List<T> getAll(long offset, long limit) throws FailedDAOOperationException {
 
 		Object[] objects = {offset, limit};
 		return executeWithConnection(x -> this.getAll(x), objects);
 	}
 
-	public Optional<T> getById(long id) {
+	public Optional<T> getById(long id) throws FailedDAOOperationException {
 		Object[] objects = {id};
 		return executeWithConnection(x -> this.getById(x), objects);
 	}
 
-	public long getCount() {
+	public long getCount() throws FailedDAOOperationException {
 		return executeWithConnection(x -> this.getCount(x), new Object[0]);
 	}
 
@@ -274,7 +276,7 @@ public abstract class DAO<T extends ModelClass> {
 		return Optional.ofNullable(result);
 	}
 
-	protected int deleteByPrimaryKey(Object primaryKeyValue) {
+	protected void deleteByPrimaryKey(Object primaryKeyValue) throws FailedDAOOperationException {
 		SimpleEntry<String, Field> primaryKey = getKey(getModelClassFullName(), x -> x.primaryKey());
 
 		String table = getTable(getModelClassFullName());
@@ -287,14 +289,13 @@ public abstract class DAO<T extends ModelClass> {
 		HashMap<String, Integer> keyOrder = new HashMap<>();
 		keyOrder.put(primaryKey.getKey(), 1);
 
-		return executeStatement(query, fieldsClassValues, keyOrder);
+		executeStatement(query, fieldsClassValues, keyOrder);
 	}
 
-	protected int executeStatement(String query, LinkedHashMap<String, SimpleEntry<Field, Object>> fieldsClassValues,
-			HashMap<String, Integer> keyOrder) {
+	protected void executeStatement(String query, LinkedHashMap<String, SimpleEntry<Field, Object>> fieldsClassValues,
+			HashMap<String, Integer> keyOrder) throws FailedDAOOperationException {
 		PreparedStatement preparedStatement;
 		ConnectionManager cManager = ConnectionManager.getInstance();
-		int result = -1;
 
 		try (Connection connection = cManager.getConnection()) {
 			preparedStatement = connection.prepareStatement(query);
@@ -302,13 +303,14 @@ public abstract class DAO<T extends ModelClass> {
 			for (Entry<String, SimpleEntry<Field, Object>> fieldClassValue : fieldsClassValues.entrySet()) {
 				addValueToStatement(preparedStatement, fieldClassValue, keyOrder);
 			}
-			result = preparedStatement.executeUpdate();
+			preparedStatement.executeUpdate();
 			preparedStatement.close();
 
 		} catch (SQLException e) {
 			logger.error(Main.getErrorMessage(null, e.getMessage()));
+			throw new FailedDAOOperationException();
 		}
-		return result;
+		
 	}
 
 	protected List<T> getAll(Object... params) {
@@ -435,21 +437,22 @@ public abstract class DAO<T extends ModelClass> {
 		return result;
 	}
 
-	protected long getCount(Object... objects) {
+	protected long getCount(Object... objects) throws FailedDAOOperationException {
 		Connection connection = (Connection) objects[0];
 
 		String query = "SELECT count(" + getKey(getModelClassFullName(), x -> x.primaryKey()).getKey()
 				+ ") as nbComputer FROM " + getTable(getModelClassFullName());
 
 		ResultSet sqlResults = null;
-
 		int result = -1;
-
+		Statement stmt = null;
+		
 		try {
-			Statement stmt = connection.createStatement();
+			stmt = connection.createStatement();
 			sqlResults = stmt.executeQuery(query);
-		} catch (Exception e) {
+		} catch (SQLException e) {
 			logger.error(Main.getErrorMessage(null, e.getMessage()));
+			throw new FailedDAOOperationException();
 		}
 
 		try {
@@ -457,22 +460,29 @@ public abstract class DAO<T extends ModelClass> {
 				result = sqlResults.getInt("nbComputer");
 			} else {
 				logger.error(Main.getErrorMessage("This isn't supposed to happend", null));
+				throw new FailedDAOOperationException();
 			}
 		} catch (SQLException e) {
 			logger.error(Main.getErrorMessage("Error getting nbComputer", e.getMessage()));
+			throw new FailedDAOOperationException();
 		}
 		try {
-			sqlResults.close();
+			if (stmt != null) {
+				stmt.close();
+			}
 		} catch (SQLException e) {
 			logger.error(Main.getErrorMessage("Error closing sqlResult", e.getMessage()));
+			throw new FailedDAOOperationException();
 		}
+		
+		
 
 		return result;
 	}
 
 	protected Object getFieldValue(Entry<String, Field> sqlEntry, ResultSet resultSet) {
 
-		Map<Class<?>, BiFunctionSQL<ResultSet, String, ?>> resultSetFunctionMap = getResultSetFunctionMap();
+		Map<Class<?>, BiFunctionException<ResultSet, String, ?, SQLException>> resultSetFunctionMap = getResultSetFunctionMap();
 		Class<?> valueType = sqlEntry.getValue().getType();
 		boolean optional = false;
 

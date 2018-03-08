@@ -5,12 +5,18 @@ import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Optional;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import main.java.com.excilys.cdb.constant.DateConstant;
-import main.java.com.excilys.cdb.dao.CompanyDAO;
+import main.java.com.excilys.cdb.dao.FailedDAOOperationException;
 import main.java.com.excilys.cdb.model.Company;
 import main.java.com.excilys.cdb.model.Computer;
+import main.java.com.excilys.cdb.service.CompanyService;
 
 public class ComputerMapper {
+
+	protected Logger logger = LogManager.getLogger(this.getClass());
 
 	public static Computer toComputer(ComputerDTO dto) {
 
@@ -26,7 +32,7 @@ public class ComputerMapper {
 		return builder.build();
 	}
 
-	public static ComputerDTO toDTO(Computer computer) {
+	public static ComputerDTO toDTO(Computer computer) throws FailedDAOOperationException {
 
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DateConstant.FORMAT);
 		formatter = formatter.withLocale(Locale.FRANCE);
@@ -41,9 +47,11 @@ public class ComputerMapper {
 		dto.setId(computer.getId());
 		dto.setName(computer.getName());
 
-		Optional<Company> company = CompanyDAO.getInstance().getById(computer.getId());
+		Optional<Company> company;
+		company = CompanyService.getInstance().getById(computer.getId());
 		company.ifPresent(x -> dto.setCompanyName(x.getName()));
 		return dto;
+
 	}
 
 	public static ComputerDTO toDTO(String name, String introduced, String discontinued, String companyId) {
@@ -56,13 +64,13 @@ public class ComputerMapper {
 
 		return dto;
 	}
-	
+
 	public static ComputerDTO toDTO(String id, String name, String introduced, String discontinued, String companyId) {
 		ComputerDTO dto = toDTO(name, introduced, discontinued, companyId);
 		dto.setId(Long.parseLong(id));
 		return dto;
 	}
-	
+
 
 	private static boolean isNullOrEmpty(String s) {
 		if (s == null || s.equals("")) {

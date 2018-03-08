@@ -38,8 +38,9 @@ public class ComputerDAO extends DAO<Computer> {
 	 * @param computer
 	 *            Computer to create
 	 * @return see {@link executeStatement}
+	 * @throws FailedDAOOperationException 
 	 */
-	public int createComputer(Computer computer) {
+	public void createComputer(Computer computer) throws FailedDAOOperationException {
 		Map<String, Field> mapperSQLFields = getMapperSQLFields(getModelClassFullName());
 		Set<String> keys = mapperSQLFields.keySet();
 
@@ -50,11 +51,11 @@ public class ComputerDAO extends DAO<Computer> {
 
 		String query = generateCreateQuery(fieldsClassValues, keys);
 
-		return executeStatement(query, fieldsClassValues, keyOrder);
+		executeStatement(query, fieldsClassValues, keyOrder);
 	}
 
-	public int deleteComputer(long id) {
-		return deleteByPrimaryKey(id);
+	public void deleteComputer(long id) throws FailedDAOOperationException {
+		deleteByPrimaryKey(id);
 	}
 
 	@Override
@@ -62,7 +63,7 @@ public class ComputerDAO extends DAO<Computer> {
 		return Computer.class.getName();
 	}
 
-	public int updateComputer(Computer computer) {
+	public void updateComputer(Computer computer) throws FailedDAOOperationException {
 		Map<String, Field> mapperSQLFields = getMapperSQLFields(getModelClassFullName());
 		Set<String> keys = mapperSQLFields.keySet();
 
@@ -75,7 +76,7 @@ public class ComputerDAO extends DAO<Computer> {
 
 		String query = generateUpdateQuery(fieldsClassValues, keys, primaryKey);
 
-		return executeStatement(query, fieldsClassValues, keyOrder);
+		executeStatement(query, fieldsClassValues, keyOrder);
 	}
 
 	private String generateCreateQuery(LinkedHashMap<String, SimpleEntry<Field, Object>> paramValues,
