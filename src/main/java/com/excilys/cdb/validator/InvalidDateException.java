@@ -1,5 +1,6 @@
 package main.java.com.excilys.cdb.validator;
 
+@SuppressWarnings("serial")
 public class InvalidDateException extends InvalidInputException {
 
 	public InvalidDateException(String message) {

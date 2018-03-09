@@ -30,6 +30,16 @@ public abstract class Service<T extends ModelClass, U extends DAO<T>> {
 		}
 	}
 	
+	public List<T> getAll(long offset, long limit, String toSearch) throws FailedDAOOperationException {
+		DAO<T> dao = getDAO();
+		try {
+		return dao.getAll(offset, limit);
+		} catch (FailedDAOOperationException e) {
+			e.setMessage(getDaoClassFullName() + " : Get all method failed ");
+			throw e;
+		}
+	}
+	
 	@ServiceMethod(name = "Get an element (by id)")
 	public Optional<T> getById(@ParamDescription(name = "element id") long id) throws FailedDAOOperationException {
 		DAO<T> dao = getDAO();

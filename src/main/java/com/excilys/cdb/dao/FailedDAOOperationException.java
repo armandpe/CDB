@@ -2,6 +2,7 @@ package main.java.com.excilys.cdb.dao;
 
 import main.java.com.excilys.cdb.validator.InvalidDateException;
 
+@SuppressWarnings("serial")
 public class FailedDAOOperationException extends Exception {
 
 	private static String className = InvalidDateException.class.getSimpleName(); 
