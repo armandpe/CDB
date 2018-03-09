@@ -1,5 +1,11 @@
 package main.java.com.excilys.cdb.servlet;
 
+import static main.java.com.excilys.cdb.constant.Servlet.PATH_ADD;
+import static main.java.com.excilys.cdb.constant.Servlet.NAME_DASHBOARD;
+import static main.java.com.excilys.cdb.constant.Servlet.NAME_ADD;
+
+
+
 import java.io.IOException;
 import java.util.List;
 
@@ -17,7 +23,7 @@ import com.google.gson.Gson;
 import main.java.com.excilys.cdb.service.ComputerService;
 
 @SuppressWarnings("serial")
-@WebServlet("/addComputer")
+@WebServlet("/" + NAME_ADD)
 public class AddComputer extends HttpServlet  {
 
 	protected Logger logger = LogManager.getLogger(this.getClass());
@@ -27,7 +33,7 @@ public class AddComputer extends HttpServlet  {
 
 		List<String> errors = computerFormManager.setRequestCompanies(request);
 		request.setAttribute("errors", new Gson().toJson(errors));
-		this.getServletContext().getRequestDispatcher("/WEB-INF/views/addComputer.jsp").forward(request, response);
+		this.getServletContext().getRequestDispatcher(PATH_ADD).forward(request, response);
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -38,13 +44,13 @@ public class AddComputer extends HttpServlet  {
 		String companyId = request.getParameter("companyId");
 
 		List<String> errors = computerFormManager.processInput(computerName, introduced, discontinued, companyId, computer -> ComputerService.getInstance().createComputer(computer));
-		
+		request.setAttribute("errors", new Gson().toJson(errors));
+
 		if (errors.size() > 0) {
-			request.setAttribute("errors", new Gson().toJson(errors));
 			computerFormManager.setRequestCompanies(request);
-			this.getServletContext().getRequestDispatcher("/WEB-INF/views/addComputer.jsp").forward(request, response);
+			this.getServletContext().getRequestDispatcher(PATH_ADD).forward(request, response);
 		} else {
-			response.sendRedirect("dashboard");		
+			response.sendRedirect(NAME_DASHBOARD);
 		}
 	}
 

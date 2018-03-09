@@ -1,5 +1,10 @@
 package main.java.com.excilys.cdb.servlet;
 
+import static main.java.com.excilys.cdb.constant.Servlet.PATH_403;
+import static main.java.com.excilys.cdb.constant.Servlet.PATH_DASHBOARD;
+import static main.java.com.excilys.cdb.constant.Servlet.NAME_DASHBOARD;
+
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +31,7 @@ import main.java.com.excilys.cdb.validator.InputValidator;
 import main.java.com.excilys.cdb.validator.InvalidInputException;
 
 @SuppressWarnings("serial")
-@WebServlet("/dashboard")
+@WebServlet("/" + NAME_DASHBOARD)
 public class Dashboard extends HttpServlet {
 
 	protected ComputerService computerService;
@@ -48,7 +53,7 @@ public class Dashboard extends HttpServlet {
 			InputValidator.isCorrectString(limitString, toParse -> Long.parseLong(toParse), true, false, limitTests);
 		} catch (InvalidInputException | NumberFormatException e) {
 			logger.info(e.getClass().getName() + " : Incorrect limit value " + e.getMessage());
-			this.getServletContext().getRequestDispatcher("/WEB-INF/views/403.jsp").forward(request, response);	
+			this.getServletContext().getRequestDispatcher(PATH_403).forward(request, response);	
 			return;
 		}
 
@@ -61,7 +66,7 @@ public class Dashboard extends HttpServlet {
 			InputValidator.isCorrectString(pageString, toParse -> Long.parseLong(toParse), true, false, pageTests);
 		} catch (InvalidInputException | NumberFormatException e) {
 			logger.info(e.getClass().getName() + " : Incorrect page value " + e.getMessage());
-			this.getServletContext().getRequestDispatcher("/WEB-INF/views/403.jsp").forward(request, response);	
+			this.getServletContext().getRequestDispatcher(PATH_403).forward(request, response);	
 			return;
 		}
 		currentPage = pageString == null ? currentPage : Long.parseLong(pageString);
@@ -94,7 +99,7 @@ public class Dashboard extends HttpServlet {
 			errors.clear();
 			request.setAttribute("errors", new Gson().toJson(errors));
 
-			this.getServletContext().getRequestDispatcher("/WEB-INF/views/dashboard.jsp").forward(request, response);
+			this.getServletContext().getRequestDispatcher(PATH_DASHBOARD).forward(request, response);
 
 		} catch (FailedDAOOperationException e) {
 			logger.error(e.getMessage());
@@ -104,7 +109,8 @@ public class Dashboard extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		String selection = (String) request.getParameter("selection");
-
+		errors.clear();
+		
 		if (selection != null) {
 			String[] toDeleteList = selection.split(",");
 
@@ -117,11 +123,11 @@ public class Dashboard extends HttpServlet {
 					errors.clear();
 					errors.add(e.getMessage());
 					request.setAttribute("errors", new Gson().toJson(errors));
-					this.getServletContext().getRequestDispatcher("/WEB-INF/views/dashboard.jsp").forward(request, response);
+					this.getServletContext().getRequestDispatcher(PATH_DASHBOARD).forward(request, response);
 				}
 			}
 		}
-
-		response.sendRedirect("dashboard");
+		request.setAttribute("errors", new Gson().toJson(errors));
+		request.getRequestDispatcher(PATH_DASHBOARD).forward(request, response);
 	}
 }

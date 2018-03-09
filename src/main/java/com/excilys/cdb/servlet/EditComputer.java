@@ -1,5 +1,11 @@
 package main.java.com.excilys.cdb.servlet;
 
+import static main.java.com.excilys.cdb.constant.Servlet.PATH_EDIT;
+import static main.java.com.excilys.cdb.constant.Servlet.PATH_403;
+import static main.java.com.excilys.cdb.constant.Servlet.NAME_DASHBOARD;
+import static main.java.com.excilys.cdb.constant.Servlet.NAME_EDIT;
+
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +29,7 @@ import main.java.com.excilys.cdb.model.Computer;
 import main.java.com.excilys.cdb.service.ComputerService;
 
 @SuppressWarnings("serial")
-@WebServlet("/editComputer")
+@WebServlet("/" + NAME_EDIT)
 public class EditComputer extends HttpServlet {
 
 	protected Logger logger = LogManager.getLogger(this.getClass());
@@ -39,7 +45,7 @@ public class EditComputer extends HttpServlet {
 			id = Long.parseLong(idString);
 		} catch (NumberFormatException e) {
 			logger.error(e.getMessage() + " - Couldn't parse " + idString);
-			request.getRequestDispatcher("/WEB-INF/views/403.jsp").forward(request, response);
+			request.getRequestDispatcher(PATH_403).forward(request, response);
 		}
 		
 		Optional<Computer> gottenComputer = Optional.empty();
@@ -53,7 +59,7 @@ public class EditComputer extends HttpServlet {
 		}
 
 		if (!gottenComputer.isPresent()) {
-			request.getRequestDispatcher("/WEB-INF/views/403.jsp").forward(request, response);
+			request.getRequestDispatcher(PATH_403).forward(request, response);
 		} else {
 			try {
 				lastComputer = ComputerMapper.toDTO(gottenComputer.get());
@@ -67,7 +73,7 @@ public class EditComputer extends HttpServlet {
 
 			request.setAttribute("errors", new Gson().toJson(errors));
 			
-			request.getRequestDispatcher("/WEB-INF/views/editComputer.jsp").forward(request, response);
+			request.getRequestDispatcher(PATH_EDIT).forward(request, response);
 		}
 	}
 
@@ -88,10 +94,10 @@ public class EditComputer extends HttpServlet {
 			request.setAttribute("computer", lastComputer);
 			
 			request.setAttribute("errors", new Gson().toJson(errors));
-			request.getRequestDispatcher("/WEB-INF/views/editComputer.jsp").forward(request, response);
+			request.getRequestDispatcher(PATH_EDIT).forward(request, response);
 			
 		} else {
-			response.sendRedirect("dashboard");
+			response.sendRedirect(NAME_DASHBOARD);
 		}
 	}
 }
