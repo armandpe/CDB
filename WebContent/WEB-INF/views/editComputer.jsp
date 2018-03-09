@@ -10,7 +10,7 @@
 <link href="css/font-awesome.css" rel="stylesheet" media="screen">
 <link href="css/main.css" rel="stylesheet" media="screen">
 </head>
-<body>
+<body onload='$.fn.alert(${errors});'>
 	<header class="navbar navbar-inverse navbar-fixed-top">
 		<div class="container">
 			<a class="navbar-brand" href="dashboard"> Application - Computer
@@ -23,9 +23,6 @@
 				<div class="col-xs-8 col-xs-offset-2 box">
 					<div class="label label-default pull-right">id: ${computer.id}</div>
 					<h1>Edit Computer</h1>
-					<c:forEach items="${errors}" var="error">
-						<p>${error}</p>
-					</c:forEach>
 					<form action="editComputer" method="POST">
 						<input type="hidden" value="${computer.id}" id="id" name="id" />
 						<!-- TODO: Change this value with the computer id -->

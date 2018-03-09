@@ -11,24 +11,18 @@
 <link href="css/font-awesome.css" rel="stylesheet" media="screen">
 <link href="css/main.css" rel="stylesheet" media="screen">
 </head>
-<body>
+<body onload='$.fn.alert(${errors});'>
 	<header class="navbar navbar-inverse navbar-fixed-top">
 		<div class="container">
-			<a class="navbar-brand" href="dashboard"> Application -
-				Computer Database </a>
+			<a class="navbar-brand" href="dashboard"> Application - Computer
+				Database </a>
 		</div>
 	</header>
-
 	<section id="main">
 		<div class="container">
 			<div class="row">
 				<div class="col-xs-8 col-xs-offset-2 box">
 					<h1>Add Computer</h1>
-					
-					<c:forEach items="${errors}" var="error">
-						<p>${error}</p>
-					</c:forEach>
-					
 					<form action="addComputer" method="POST">
 						<fieldset>
 							<div class="form-group">

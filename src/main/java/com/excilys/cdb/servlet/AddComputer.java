@@ -12,6 +12,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.google.gson.Gson;
+
 import main.java.com.excilys.cdb.service.ComputerService;
 
 @SuppressWarnings("serial")
@@ -24,7 +26,7 @@ public class AddComputer extends HttpServlet  {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {		
 
 		List<String> errors = computerFormManager.setRequestCompanies(request);
-		request.setAttribute("errors", errors);
+		request.setAttribute("errors", new Gson().toJson(errors));
 		this.getServletContext().getRequestDispatcher("/WEB-INF/views/addComputer.jsp").forward(request, response);
 	}
 
@@ -38,7 +40,7 @@ public class AddComputer extends HttpServlet  {
 		List<String> errors = computerFormManager.processInput(computerName, introduced, discontinued, companyId, computer -> ComputerService.getInstance().createComputer(computer));
 		
 		if (errors.size() > 0) {
-			request.setAttribute("errors", errors);
+			request.setAttribute("errors", new Gson().toJson(errors));
 			computerFormManager.setRequestCompanies(request);
 			this.getServletContext().getRequestDispatcher("/WEB-INF/views/addComputer.jsp").forward(request, response);
 		} else {

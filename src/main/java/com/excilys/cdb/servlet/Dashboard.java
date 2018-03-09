@@ -14,6 +14,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.google.gson.Gson;
+
 import main.java.com.excilys.cdb.dao.FailedDAOOperationException;
 import main.java.com.excilys.cdb.dto.ComputerDTO;
 import main.java.com.excilys.cdb.dto.ComputerMapper;
@@ -74,9 +76,9 @@ public class Dashboard extends HttpServlet {
 			} else {
 				pageData.getDataList().clear();
 				count = computerService.getCount();
+				pageManager.setMax(count);
 				pageManager.setLimit(limit);
 			}
-
 
 			pageManager.gotTo(currentPage);
 			
@@ -89,6 +91,8 @@ public class Dashboard extends HttpServlet {
 			pageData.setMaxPage(pageManager.getMaxPage());
 
 			request.setAttribute("pageData", pageData);
+			errors.clear();
+			request.setAttribute("errors", new Gson().toJson(errors));
 
 			this.getServletContext().getRequestDispatcher("/WEB-INF/views/dashboard.jsp").forward(request, response);
 
@@ -101,8 +105,6 @@ public class Dashboard extends HttpServlet {
 			throws ServletException, IOException {
 		String selection = (String) request.getParameter("selection");
 
-		logger.debug(selection);
-
 		if (selection != null) {
 			String[] toDeleteList = selection.split(",");
 
@@ -114,7 +116,7 @@ public class Dashboard extends HttpServlet {
 					logger.info(e.getMessage());
 					errors.clear();
 					errors.add(e.getMessage());
-					request.setAttribute("errors", errors);
+					request.setAttribute("errors", new Gson().toJson(errors));
 					this.getServletContext().getRequestDispatcher("/WEB-INF/views/dashboard.jsp").forward(request, response);
 				}
 			}

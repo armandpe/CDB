@@ -14,6 +14,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.google.gson.Gson;
+
 import main.java.com.excilys.cdb.dao.FailedDAOOperationException;
 import main.java.com.excilys.cdb.dto.ComputerDTO;
 import main.java.com.excilys.cdb.dto.ComputerMapper;
@@ -32,7 +34,15 @@ public class EditComputer extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		String idString = request.getParameter("id");
-		long id = Long.parseLong(idString);
+		logger.info(idString);
+		long id = 0;
+		try {
+			id = Long.parseLong(idString);
+		} catch (NumberFormatException e) {
+			logger.error(e.getMessage() + " - Couldn't parse " + idString);
+			request.getRequestDispatcher("/WEB-INF/views/403.jsp").forward(request, response);
+		}
+		
 		Optional<Computer> gottenComputer = Optional.empty();
 		List<String> errors = new ArrayList<>();
 		
@@ -56,8 +66,8 @@ public class EditComputer extends HttpServlet {
 
 			errors.addAll(computerFormManager.setRequestCompanies(request));
 
-			request.setAttribute("errors", errors);
-
+			request.setAttribute("errors", new Gson().toJson(errors));
+			
 			request.getRequestDispatcher("/WEB-INF/views/editComputer.jsp").forward(request, response);
 		}
 	}
@@ -78,7 +88,7 @@ public class EditComputer extends HttpServlet {
 			computerFormManager.setRequestCompanies(request);
 			request.setAttribute("computer", lastComputer);
 			
-			request.setAttribute("errors", errors);
+			request.setAttribute("errors", new Gson().toJson(errors));
 			request.getRequestDispatcher("/WEB-INF/views/editComputer.jsp").forward(request, response);
 			
 		} else {
