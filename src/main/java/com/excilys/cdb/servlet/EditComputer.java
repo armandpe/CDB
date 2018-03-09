@@ -1,10 +1,9 @@
 package main.java.com.excilys.cdb.servlet;
 
-import static main.java.com.excilys.cdb.constant.Servlet.PATH_EDIT;
-import static main.java.com.excilys.cdb.constant.Servlet.PATH_403;
 import static main.java.com.excilys.cdb.constant.Servlet.NAME_DASHBOARD;
 import static main.java.com.excilys.cdb.constant.Servlet.NAME_EDIT;
-
+import static main.java.com.excilys.cdb.constant.Servlet.PATH_403;
+import static main.java.com.excilys.cdb.constant.Servlet.PATH_EDIT;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -17,8 +16,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
 
@@ -32,7 +31,7 @@ import main.java.com.excilys.cdb.service.ComputerService;
 @WebServlet("/" + NAME_EDIT)
 public class EditComputer extends HttpServlet {
 
-	protected Logger logger = LogManager.getLogger(this.getClass());
+	protected Logger logger = LoggerFactory.getLogger(this.getClass());
 	protected ComputerFormManager computerFormManager = new ComputerFormManager();
 	protected ComputerService computerService = ComputerService.getInstance();
 	protected ComputerDTO lastComputer = new ComputerDTO();
@@ -89,7 +88,7 @@ public class EditComputer extends HttpServlet {
 				computer -> ComputerService.getInstance().updateComputer(computer));
 
 		if (errors.size() > 0) {
-			logger.info(errors);
+			logger.info(errors.toString());
 			computerFormManager.setRequestCompanies(request);
 			request.setAttribute("computer", lastComputer);
 			

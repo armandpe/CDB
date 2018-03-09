@@ -5,9 +5,8 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import main.java.com.excilys.cdb.ParamDescription;
 import main.java.com.excilys.cdb.dao.DAO;
@@ -18,7 +17,7 @@ public abstract class Service<T extends ModelClass, U extends DAO<T>> {
 
 	String daoClassName;
 	
-	final Logger logger = LogManager.getLogger(this.getClass());
+	final Logger logger = LoggerFactory.getLogger(this.getClass());
 	
 	@ServiceMethod(name = "Get the list of all elements", forUser = false, fullName = "com.excilys.cdb.Service.getAll")
 	public List<T> getAll(long offset, long limit) throws FailedDAOOperationException {
@@ -63,7 +62,7 @@ public abstract class Service<T extends ModelClass, U extends DAO<T>> {
 		} catch (ClassNotFoundException e) {
 			final StackTraceElement[] ste = Thread.currentThread().getStackTrace();
 			String methodName = ste[1].getMethodName(); 
-			logger.log(Level.ERROR, "Error in method " + methodName + " : " + e.getMessage());
+			logger.error("Error in method " + methodName + " : " + e.getMessage());
 		}
 		
 		try {
@@ -71,7 +70,7 @@ public abstract class Service<T extends ModelClass, U extends DAO<T>> {
 		} catch (NoSuchMethodException | SecurityException e) {
 			final StackTraceElement[] ste = Thread.currentThread().getStackTrace();
 			String methodName = ste[1].getMethodName(); 
-			logger.log(Level.ERROR, "Error in method " + methodName + " : " + e.getMessage());
+			logger.error("Error in method " + methodName + " : " + e.getMessage());
 		}
 		
 		try {
@@ -79,7 +78,7 @@ public abstract class Service<T extends ModelClass, U extends DAO<T>> {
 		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 			final StackTraceElement[] ste = Thread.currentThread().getStackTrace();
 			String methodName = ste[1].getMethodName(); 
-			logger.log(Level.ERROR, "Error in method " + methodName + " : " + e.getMessage());
+			logger.error("Error in method " + methodName + " : " + e.getMessage());
 		}
 		
 		return dao;

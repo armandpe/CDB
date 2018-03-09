@@ -8,8 +8,9 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -27,7 +28,7 @@ public class ComputerDAOTest {
 
 	private static boolean first = true;
 	
-	static final Logger LOGGER = LogManager.getLogger(ComputerDAOTest.class);
+	static final Logger LOGGER = LoggerFactory.getLogger(ComputerDAOTest.class);
 	
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {

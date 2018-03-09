@@ -5,8 +5,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Optional;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import main.java.com.excilys.cdb.constant.DateConstant;
 import main.java.com.excilys.cdb.dao.FailedDAOOperationException;
@@ -16,7 +16,7 @@ import main.java.com.excilys.cdb.service.CompanyService;
 
 public class ComputerMapper {
 
-	protected Logger logger = LogManager.getLogger(this.getClass());
+	protected Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	public static Computer toComputer(ComputerDTO dto) {
 

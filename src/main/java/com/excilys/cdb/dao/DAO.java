@@ -26,8 +26,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import main.java.com.excilys.cdb.Main;
 import main.java.com.excilys.cdb.connectionmanager.ConnectionManager;
@@ -83,7 +83,7 @@ public abstract class DAO<T extends ModelClass> {
 		return staticResultSetFunctionMap;
 	}
 
-	protected final Logger logger = LogManager.getLogger(this.getClass());
+	protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	public String addConditions(String query, Map<String, Object> conditions) {
 		query = query + " WHERE ";

@@ -17,10 +17,19 @@
 		<jstl>1.2</jstl>
 		<gson>2.2.2</gson>
 		<HikariCP>2.7.8</HikariCP>
+		<slf4j>1.7.25</slf4j>
 	</properties>
 	<packaging>war</packaging>
+
 	<!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core -->
 	<dependencies>
+		<!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>${slf4j}</version>
+		</dependency>
+
 		<dependency>
 			<groupId>com.zaxxer</groupId>
 			<artifactId>HikariCP</artifactId>

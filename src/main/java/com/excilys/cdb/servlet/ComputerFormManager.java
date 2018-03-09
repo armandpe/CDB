@@ -5,8 +5,8 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import main.java.com.excilys.cdb.dao.FailedDAOOperationException;
 import main.java.com.excilys.cdb.dto.CompanyDTO;
@@ -22,7 +22,7 @@ import main.java.com.excilys.cdb.validator.InvalidInputException;
 public class ComputerFormManager {
 
 
-	protected Logger logger = LogManager.getLogger(this.getClass());
+	protected Logger logger = LoggerFactory.getLogger(this.getClass());
 	protected List<CompanyDTO> companyList = new ArrayList<>();	
 	protected CompanyService companyService = CompanyService.getInstance();
 

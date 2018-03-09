@@ -16,8 +16,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
 
@@ -36,7 +36,7 @@ public class Dashboard extends HttpServlet {
 
 	protected ComputerService computerService;
 	protected long limit = 10;
-	protected Logger logger = LogManager.getLogger(this.getClass());
+	protected Logger logger = LoggerFactory.getLogger(this.getClass());
 	protected PageManager<Computer> pageManager = null;
 	protected long currentPage = 1;
 	protected PageData<ComputerDTO> pageData = null;

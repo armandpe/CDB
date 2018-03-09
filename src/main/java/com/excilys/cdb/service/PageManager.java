@@ -3,8 +3,8 @@ package main.java.com.excilys.cdb.service;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import main.java.com.excilys.cdb.Main;
 import main.java.com.excilys.cdb.dao.FailedDAOOperationException;
@@ -13,7 +13,7 @@ import main.java.com.excilys.cdb.utils.BiFunctionException;
 
 public class PageManager<T> {
 	
-	private Logger logger = LogManager.getLogger(PageManager.class);
+	private Logger logger = LoggerFactory.getLogger(PageManager.class);
 
 	private BiFunctionException<Long, Long, List<T>, FailedDAOOperationException> getList;
 	private long limit;

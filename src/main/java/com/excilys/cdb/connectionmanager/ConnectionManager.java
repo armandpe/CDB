@@ -5,8 +5,8 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import main.java.com.excilys.cdb.Main;
 
@@ -25,7 +25,7 @@ public class ConnectionManager {
 	}
 	private Connection connection;
 	
-	final Logger logger = LogManager.getLogger(this.getClass());
+	final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	private ConnectionManager() { 
 		ResourceBundle bundle = ResourceBundle.getBundle("connection");

@@ -3,8 +3,8 @@ package main.java.com.excilys.cdb.model;
 import java.time.LocalDate;
 import java.util.Optional;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import main.java.com.excilys.cdb.ParamDescription;
 
@@ -53,7 +53,7 @@ public class Computer implements ModelClass {
 		}
 	}
 
-	static final Logger LOGGER = LogManager.getLogger(Computer.class);
+	static final Logger LOGGER = LoggerFactory.getLogger(Computer.class);
 
 	@SQLInfo(name = "company_id", foreignKey = true)
 	private Optional<Company> company;

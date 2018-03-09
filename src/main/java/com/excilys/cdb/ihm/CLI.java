@@ -20,8 +20,8 @@ import java.util.Optional;
 import java.util.Scanner;
 import java.util.Set;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import main.java.com.excilys.cdb.Main;
 import main.java.com.excilys.cdb.ParamDescription;
@@ -36,7 +36,7 @@ import main.java.com.excilys.cdb.service.ServiceMethod;
 
 public class CLI {
 
-	static final Logger LOGGER = LogManager.getLogger(CLI.class);
+	static final Logger LOGGER = LoggerFactory.getLogger(CLI.class);
 	static ArrayList<Class<? extends Service<?, ?>>> services = new ArrayList<>();
 	
 	public static void start() {
