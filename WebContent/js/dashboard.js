@@ -85,7 +85,6 @@ $(function() {
 }( jQuery ));
 
 
-
 //Event handling
 //Onkeydown
 $(document).keydown(function(e) {

@@ -16,10 +16,17 @@
 		<taglibs>1.1.2</taglibs>
 		<jstl>1.2</jstl>
 		<gson>2.2.2</gson>
+		<HikariCP>2.7.8</HikariCP>
 	</properties>
 	<packaging>war</packaging>
 	<!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core -->
 	<dependencies>
+		<dependency>
+			<groupId>com.zaxxer</groupId>
+			<artifactId>HikariCP</artifactId>
+			<version>${HikariCP}</version>
+			<scope>compile</scope>
+		</dependency>
 		<!-- Gson: Java to Json conversion -->
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
@@ -107,7 +114,7 @@
 			<version>${jstl}</version>
 		</dependency>
 	</dependencies>
-		<build>
+	<build>
 		<sourceDirectory>src</sourceDirectory>
 		<plugins>
 			<plugin>
