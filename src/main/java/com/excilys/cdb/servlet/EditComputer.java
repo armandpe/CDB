@@ -34,7 +34,6 @@ public class EditComputer extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		String idString = request.getParameter("id");
-		logger.info(idString);
 		long id = 0;
 		try {
 			id = Long.parseLong(idString);

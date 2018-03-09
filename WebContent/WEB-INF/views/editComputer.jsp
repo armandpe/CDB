@@ -21,7 +21,8 @@
 		<div class="container">
 			<div class="row">
 				<div class="col-xs-8 col-xs-offset-2 box">
-					<div class="label label-default pull-right">id: ${computer.id}</div>
+					<div class="label label-default pull-right">id:
+						${computer.id}</div>
 					<h1>Edit Computer</h1>
 					<form action="editComputer" method="POST">
 						<input type="hidden" value="${computer.id}" id="id" name="id" />
@@ -65,5 +66,8 @@
 			</div>
 		</div>
 	</section>
+	<script src=" js/jquery.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script src="js/dashboard.js"></script>
 </body>
 </html>
