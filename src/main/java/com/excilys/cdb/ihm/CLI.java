@@ -27,9 +27,9 @@ import main.java.com.excilys.cdb.Main;
 import main.java.com.excilys.cdb.ParamDescription;
 import main.java.com.excilys.cdb.dao.FailedDAOOperationException;
 import main.java.com.excilys.cdb.model.ModelClass;
+import main.java.com.excilys.cdb.pagemanager.PageManagerLimit;
 import main.java.com.excilys.cdb.service.CompanyService;
 import main.java.com.excilys.cdb.service.ComputerService;
-import main.java.com.excilys.cdb.service.PageManager;
 import main.java.com.excilys.cdb.service.Service;
 import main.java.com.excilys.cdb.service.ServiceClass;
 import main.java.com.excilys.cdb.service.ServiceMethod;
@@ -355,9 +355,9 @@ public class CLI {
 		long limit = 10;
 		Service<T, ?> myService = getServiceInstance(usedClass);
 		long max = myService.getCount();
-		PageManager<T> pageManager;
+		PageManagerLimit<T> pageManager;
 		
-		pageManager = new PageManager<T>(limit, max,  (x, y) -> myService.getAll(x, y));
+		pageManager = new PageManagerLimit<T>(limit, max,  (x, y) -> myService.getAll(x, y));
 		
 		while (keepGoing) {
 
@@ -368,7 +368,7 @@ public class CLI {
 			boolean invalidInput = true;
 			int choice = -1;
 			ArrayList<Method> methods = new ArrayList<>();
-			for (Method method : PageManager.class.getMethods()) {
+			for (Method method : PageManagerLimit.class.getMethods()) {
 				if (method.isAnnotationPresent(UserChoice.class)) {
 					methods.add(method);
 				}

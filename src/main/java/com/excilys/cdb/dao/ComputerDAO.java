@@ -122,7 +122,7 @@ public class ComputerDAO extends DAO<Computer> {
 						value = ((Optional<?>) value).isPresent() ? ((Optional<?>) value).get() : null;
 					}
 
-					SimpleEntry<String, Field> primaryKey = getKey(fieldType.getName(), x -> x.primaryKey());
+					Entry<String, Field> primaryKey = getKey(fieldType.getName(), x -> x.primaryKey());
 					Field primaryField = primaryKey.getValue();
 					field = primaryKey.getValue();
 					if (value == null) {
@@ -192,7 +192,6 @@ public class ComputerDAO extends DAO<Computer> {
 				keyOrder.put(entry.getKey(), ++i);
 			}
 		}
-
 		keyOrder.put(primaryKey, ++i);
 
 		return keyOrder;

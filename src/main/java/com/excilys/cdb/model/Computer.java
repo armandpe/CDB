@@ -55,7 +55,7 @@ public class Computer implements ModelClass {
 
 	static final Logger LOGGER = LoggerFactory.getLogger(Computer.class);
 
-	@SQLInfo(name = "company_id", foreignKey = true)
+	@SQLInfo(name = "company_id", foreignKey = true, searchable = true)
 	private Optional<Company> company;
 
 	@SQLInfo(name = "discontinued")
@@ -67,7 +67,7 @@ public class Computer implements ModelClass {
 	@SQLInfo(name = "introduced")
 	private Optional<LocalDate> introduced;
 
-	@SQLInfo(name = "name")
+	@SQLInfo(name = "name", searchable = true)
 	private String name;
 
 	public Computer(@ParamDescription(name = "computer id") long id, 

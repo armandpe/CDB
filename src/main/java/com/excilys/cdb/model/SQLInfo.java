@@ -11,4 +11,5 @@ public @interface SQLInfo {
 	String name();
 	boolean primaryKey() default false;
 	boolean foreignKey() default false;
+	boolean searchable() default false;
 }
