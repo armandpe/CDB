@@ -96,9 +96,8 @@ public class Dashboard extends HttpServlet {
 			pageData.setMaxPage(pageManager.getMaxPage());
 
 			request.setAttribute("pageData", pageData);
-			errors.clear();
 			request.setAttribute("errors", new Gson().toJson(errors));
-
+			errors.clear();
 			this.getServletContext().getRequestDispatcher(PATH_DASHBOARD).forward(request, response);
 
 		} catch (FailedDAOOperationException e) {
@@ -122,12 +121,10 @@ public class Dashboard extends HttpServlet {
 					logger.info(e.getMessage());
 					errors.clear();
 					errors.add(e.getMessage());
-					request.setAttribute("errors", new Gson().toJson(errors));
-					this.getServletContext().getRequestDispatcher(PATH_DASHBOARD).forward(request, response);
+					doGet(request, response);
 				}
 			}
 		}
-		request.setAttribute("errors", new Gson().toJson(errors));
-		request.getRequestDispatcher(PATH_DASHBOARD).forward(request, response);
+		response.sendRedirect(NAME_DASHBOARD);
 	}
 }
