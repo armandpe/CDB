@@ -105,37 +105,16 @@ public abstract class DAO<T extends ModelClass> {
 		return query;
 	}
 
-	public String addLeftJoin(String query, String[] names, String table, Map<String, String> jointureCriterias) {
-
-		String afterVariables = query.contains(AFTER_VARIABLE_COUNT) ? AFTER_VARIABLE_COUNT : AFTER_VARIABLE_SELECT;
-		
-		logger.error(query); 
-		
-		String[] query2 = query.split(afterVariables, 2);
-		query = query2[0] + ", " + String.join(", ", names) + afterVariables + query2[1];
-		query += " LEFT JOIN " + table + " ON ";
-
-		Set<String> keys = jointureCriterias.keySet();
-		Iterator<String> iterator = keys.iterator();
-		while (iterator.hasNext()) {
-			String key = iterator.next();
-			query += key + " = " + jointureCriterias.get(key);
-			if (iterator.hasNext()) {
-				query += " AND ";
-			}
-		}
-		return query;
-	}
-
 	public String arrayToString(String[] array) {
 		return String.join(", ", array);
 	}
-
+	
 	public String countQuery() {
-		String query = "SELECT count(" + arrayToString(getSQLArgs());
+		String query = "SELECT count(" + getKey(getModelClassFullName(), x -> x.primaryKey()).getKey();
 		query += AFTER_VARIABLE_COUNT + getTable(getModelClassFullName());
 		return query;
 	}
+	
 
 	public <V> V executeWithConnection(FunctionException<Object[], V, FailedDAOOperationException> f, Object[] objects) throws FailedDAOOperationException {
 		ConnectionManager cManager = ConnectionManager.getInstance();
@@ -171,7 +150,7 @@ public abstract class DAO<T extends ModelClass> {
 		Object[] args = {search};
 		return executeWithConnection(x -> this.getCount(x), args);
 	}
-	
+
 	/**
 	 * Get the SQL fields and field names of a class
 	 * 
@@ -198,7 +177,7 @@ public abstract class DAO<T extends ModelClass> {
 	}
 
 	public abstract String getModelClassFullName();
-
+	
 	public String selectQuery() {
 		String query = "SELECT " + arrayToString(getSQLArgs());
 		query += AFTER_VARIABLE_SELECT + getTable(getModelClassFullName());
@@ -223,13 +202,40 @@ public abstract class DAO<T extends ModelClass> {
 
 		for (int i = 1; i <= nbToSearch; ++i) {
 			try {
-				preparedStatement.setString(i, searchWith);
+				preparedStatement.setString(i, searchWith + '%');
 			} catch (SQLException e) {
 				logger.error(Main.getErrorMessage("Error during search query", e.getMessage()));
 			}
 		}
 
 
+	}
+
+	protected String addLeftJoin(String query, String table, Map<String, String> jointureCriterias) {
+		query += " LEFT JOIN " + table + " ON ";
+		
+		Set<String> keys = jointureCriterias.keySet();
+		Iterator<String> iterator = keys.iterator();
+		while (iterator.hasNext()) {
+			String key = iterator.next();
+			query += key + " = " + jointureCriterias.get(key);
+			if (iterator.hasNext()) {
+				query += " AND ";
+			}
+		}
+		return query;
+	}
+
+	protected String addLeftJoinWithFields(String query, String[] names, String table, Map<String, String> jointureCriterias) {
+		String afterVariables = query.contains(AFTER_VARIABLE_COUNT) ? AFTER_VARIABLE_COUNT : AFTER_VARIABLE_SELECT;
+		
+		afterVariables = afterVariables.replace(")", "\\)");
+		
+		String[] query2 = query.split(afterVariables, 2);
+		query = query2[0] + ", " + String.join(", ", names) + afterVariables + query2[1];
+		query = query.replace("\\", "");
+		query = addLeftJoin(query, table, jointureCriterias);
+		return query;
 	}
 
 	protected void addValueToStatement(PreparedStatement ps, Entry<String, SimpleEntry<Field, Object>> fieldClassValue,
@@ -365,18 +371,19 @@ public abstract class DAO<T extends ModelClass> {
 	protected List<T> getAll(Object... params) {
 		long offset = (long) params[0];
 		long limit = (long) params[1];
-		String searchWith = params.length == 3 ? (String) params[2] : null;
-		Connection connection = (Connection) params[2];
+		String search = params.length == 4 ? (String) params[2] : null;
+		Connection connection = (Connection) params[params.length - 1];
 		ArrayList<T> result = new ArrayList<>();
 		Map<String, Field> foreignFields = new HashMap<>();
 		String query = selectQuery();
 
 		if (hasKey(getModelClassFullName(), x -> x.foreignKey())) {
 			query = getForeignKeyQuery(query, foreignFields);
+			logger.info(foreignFields.toString());
 		}
 
 		int nbToSearch = 0;
-		if (searchWith != null) {
+		if (search != null) {
 			SimpleEntry<Integer, String> nbToSearchAndQuery = getSearchQuery(query, foreignFields);
 			nbToSearch = nbToSearchAndQuery.getKey();
 			query = nbToSearchAndQuery.getValue();
@@ -384,11 +391,14 @@ public abstract class DAO<T extends ModelClass> {
 
 		query += " LIMIT " + offset + ", " + limit;
 
+		logger.info(query);
+		logger.info(search);
+		
 		ResultSet sqlResults = null;
 		PreparedStatement preparedStatement = null;
 		try {
 			preparedStatement = connection.prepareStatement(query);
-			addSearchToStatement(searchWith, nbToSearch, preparedStatement);
+			addSearchToStatement(search, nbToSearch, preparedStatement);
 			sqlResults = preparedStatement.executeQuery();
 		
 			while (sqlResults.next()) {
@@ -438,7 +448,7 @@ public abstract class DAO<T extends ModelClass> {
 			constraints.put(getKey(fieldTypeName, x -> x.primaryKey()).getKey(),
 					getKey(getModelClassFullName(), x -> x.foreignKey()).getKey());
 
-			query = addLeftJoin(query, sqlFieldsMap.keySet().toArray(new String[sqlFieldsMap.keySet().size()]),
+			query = addLeftJoinWithFields(query, sqlFieldsMap.keySet().toArray(new String[sqlFieldsMap.keySet().size()]),
 					tableName, constraints);
 		}
 
@@ -475,11 +485,17 @@ public abstract class DAO<T extends ModelClass> {
 		Map<String, Field> foreignFields = new HashMap<>();
 		
 		String query = countQuery();
-				
+		String foreignTableName = null;
 		if (hasKey(getModelClassFullName(), x -> x.foreignKey())) {
-			query = getForeignKeyQuery(query, foreignFields);
+			String fieldTypeName = getForeignFieldTypeName();
+			foreignTableName = getTable(fieldTypeName);				
+			foreignFields = getMapperSQLFields(fieldTypeName);	
+			Map<String, String> constraints = new HashMap<>();
+			constraints.put(getKey(fieldTypeName, x -> x.primaryKey()).getKey(),
+					getKey(getModelClassFullName(), x -> x.foreignKey()).getKey());
+			query = addLeftJoin(query, foreignTableName, constraints);
 		}
-
+		
 		int nbToSearch = 0;
 		if (search != null) {
 			SimpleEntry<Integer, String> nbToSearchAndQuery = getSearchQuery(query, foreignFields);
@@ -490,6 +506,9 @@ public abstract class DAO<T extends ModelClass> {
 		ResultSet sqlResults = null;
 		int result = -1;
 		PreparedStatement preparedStatement = null;
+		
+		logger.info(query);
+		logger.info(search);
 		
 		try {
 			preparedStatement = connection.prepareStatement(query);
@@ -550,8 +569,7 @@ public abstract class DAO<T extends ModelClass> {
 		}
 	}
 	
-	protected String getForeignKeyQuery(String query, Map<String, Field> foreignFields) {
-
+	protected String getForeignFieldTypeName() {
 		Entry<String, Field> foreign = getKey(getModelClassFullName(), x -> x.foreignKey());
 		Class<?> fieldType = foreign.getValue().getType();
 
@@ -559,16 +577,20 @@ public abstract class DAO<T extends ModelClass> {
 			fieldType = (Class<?>) ((ParameterizedType) foreign.getValue().getGenericType())
 					.getActualTypeArguments()[0];
 		}
-		String fieldTypeName = fieldType.getName();
+		return fieldType.getName();
+	}
+	
+	protected String getForeignKeyQuery(String query, Map<String, Field> foreignFields) {
 
-		foreignFields = getMapperSQLFields(fieldTypeName);
+		String fieldTypeName = getForeignFieldTypeName();
+		foreignFields.putAll(getMapperSQLFields(fieldTypeName));
 		Map<String, String> constraints = new HashMap<>();
 		String tableName = getTable(fieldTypeName);
 
 		constraints.put(getKey(fieldTypeName, x -> x.primaryKey()).getKey(),
 				getKey(getModelClassFullName(), x -> x.foreignKey()).getKey());
 
-		query = addLeftJoin(query, foreignFields.keySet().toArray(new String[foreignFields.keySet().size()]),
+		query = addLeftJoinWithFields(query, foreignFields.keySet().toArray(new String[foreignFields.keySet().size()]),
 				tableName, constraints);
 
 		return query;
@@ -597,7 +619,7 @@ public abstract class DAO<T extends ModelClass> {
 				fieldsToSearch.put(field.getKey(), field.getValue()); 
 			}
 		});
-
+		
 		query = addSearch(query, fieldsToSearch.keySet().toArray(new String[fieldsToSearch.size()]));
 
 		return new SimpleEntry<Integer, String>(fieldsToSearch.size(), query);

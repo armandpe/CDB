@@ -8,7 +8,7 @@ public class Company implements ModelClass {
 	@SQLInfo(name = "id", primaryKey = true)
 	private Long id;
 
-	@SQLInfo(name = "name")
+	@SQLInfo(name = "name", searchable = true)
 	private String name;
 
 	public Company() { }

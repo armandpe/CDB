@@ -27,7 +27,6 @@ public class ConnectionManager {
 		return connectionManager;
 	}
 	
-	
 	private HikariProxyConnection connection;
 	private HikariConfig config = new HikariConfig();
 	private HikariDataSource dsConnectionPool;
