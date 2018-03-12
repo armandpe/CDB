@@ -101,7 +101,7 @@ public class ComputerDAOTest {
 	public void testCreateComputerComputer() {
 		Computer toAdd = new Computer.ComputerBuilder().withId(2).withName("Mb").withCompany(new Company(1, "Apple Inc.")).build();
 		try {
-			ComputerDAO.getInstance().createComputer(toAdd);
+			ComputerDAO.getInstance().create(toAdd);
 			assertTrue(ComputerDAO.getInstance().getCount(null) == 4 && ComputerDAO.getInstance().getById(2).get().equals(toAdd));
 		} catch (FailedDAOOperationException e) {
 			LOGGER.error(Main.getErrorMessage(null, e.getMessage()));
@@ -112,7 +112,7 @@ public class ComputerDAOTest {
 	@Test
 	public void testDeleteComputer() {
 		try {
-			ComputerDAO.getInstance().deleteComputer(1);
+			ComputerDAO.getInstance().delete(1);
 			assertTrue(ComputerDAO.getInstance().getCount(null) == 2);
 		} catch (FailedDAOOperationException e) {
 			LOGGER.error(Main.getErrorMessage(null, e.getMessage()));
@@ -160,7 +160,7 @@ public class ComputerDAOTest {
 		Computer computer = new Computer.ComputerBuilder().withId(3).withName("CM-200").withCompany(new Company(1, "Apple Inc.")).build();
 		computer.setName("j");
 		try {
-			ComputerDAO.getInstance().updateComputer(computer);
+			ComputerDAO.getInstance().update(computer);
 			Computer computer2 = ComputerDAO.getInstance().getById(3).get();
 			assertEquals(computer, computer2);
 		} catch (FailedDAOOperationException e) {

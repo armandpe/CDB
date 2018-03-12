@@ -21,10 +21,10 @@ public class ComputerService extends Service<Computer, ComputerDAO> {
 	}
 
 	@ServiceMethod(name = "Add a new computer")
-	public void createComputer(@ParamDescription(name = "computer to add (id is automatically set)") Computer computer) throws FailedDAOOperationException {
+	public void create(@ParamDescription(name = "computer to add (id is automatically set)") Computer computer) throws FailedDAOOperationException {
 		computer.setId(0);
 		try {
-			((ComputerDAO) getDAO()).createComputer(computer);
+			((ComputerDAO) getDAO()).create(computer);
 		} catch (FailedDAOOperationException e) {
 			e.setMessage(getDaoClassFullName() + " : create computer failed");
 			throw e;
@@ -32,9 +32,9 @@ public class ComputerService extends Service<Computer, ComputerDAO> {
 	}
 
 	@ServiceMethod(name = "Remove a computer (based on id)")
-	public void deleteComputer(@ParamDescription(name = "id of the computer ") long id) throws FailedDAOOperationException {
+	public void delete(@ParamDescription(name = "id of the computer ") long id) throws FailedDAOOperationException {
 		try {
-			((ComputerDAO) getDAO()).deleteComputer(id);
+			((ComputerDAO) getDAO()).delete(id);
 		} catch (FailedDAOOperationException e) {
 			e.setMessage(getDaoClassFullName() + " : delete computer failed ");
 			throw e;
@@ -47,9 +47,9 @@ public class ComputerService extends Service<Computer, ComputerDAO> {
 	}
 
 	@ServiceMethod(name = "Update a computer")
-	public void updateComputer(@ParamDescription(name = "computer to update") Computer computer) throws FailedDAOOperationException {
+	public void update(@ParamDescription(name = "computer to update") Computer computer) throws FailedDAOOperationException {
 		try {
-			((ComputerDAO) getDAO()).updateComputer(computer);
+			((ComputerDAO) getDAO()).update(computer);
 		} catch (FailedDAOOperationException e) {
 			e.setMessage(getDaoClassFullName() + " :  failed ");
 			throw e;

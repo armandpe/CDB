@@ -66,7 +66,7 @@ public class CLI {
 				print("Invalid input - Please try again ...");
 				continue;
 			}
-			print(applyChoice(choice, servicesMethods, sc).toString());
+			applyChoice(choice, servicesMethods, sc);
 			print("\n Press ENTER");
 			sc.nextLine();
 			for (int i = 0; i < 10; ++i) {

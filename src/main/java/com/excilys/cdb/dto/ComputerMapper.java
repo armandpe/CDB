@@ -3,16 +3,13 @@ package main.java.com.excilys.cdb.dto;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
-import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import main.java.com.excilys.cdb.constant.DateConstant;
-import main.java.com.excilys.cdb.dao.FailedDAOOperationException;
 import main.java.com.excilys.cdb.model.Company;
 import main.java.com.excilys.cdb.model.Computer;
-import main.java.com.excilys.cdb.service.CompanyService;
 
 public class ComputerMapper {
 
@@ -32,7 +29,7 @@ public class ComputerMapper {
 		return builder.build();
 	}
 
-	public static ComputerDTO toDTO(Computer computer) throws FailedDAOOperationException {
+	public static ComputerDTO toDTO(Computer computer) {
 
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DateConstant.FORMAT);
 		formatter = formatter.withLocale(Locale.FRANCE);
@@ -47,11 +44,7 @@ public class ComputerMapper {
 		dto.setId(computer.getId());
 		dto.setName(computer.getName());
 
-		Optional<Company> company;
-		company = CompanyService.getInstance().getById(computer.getId());
-		company.ifPresent(x -> dto.setCompanyName(x.getName()));
 		return dto;
-
 	}
 
 	public static ComputerDTO toDTO(String name, String introduced, String discontinued, String companyId) {

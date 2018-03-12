@@ -43,7 +43,7 @@ public class AddComputer extends HttpServlet  {
 		String discontinued = request.getParameter("discontinued");
 		String companyId = request.getParameter("companyId");
 
-		List<String> errors = computerFormManager.processInput(computerName, introduced, discontinued, companyId, computer -> ComputerService.getInstance().createComputer(computer));
+		List<String> errors = computerFormManager.processInput(computerName, introduced, discontinued, companyId, computer -> ComputerService.getInstance().create(computer));
 		request.setAttribute("errors", new Gson().toJson(errors));
 
 		if (errors.size() > 0) {

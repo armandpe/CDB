@@ -92,9 +92,7 @@ public class Dashboard extends HttpServlet {
 			pageManager.setToSearch(search);
 			pageManager.gotTo(currentPage);
 			
-			for (Computer computer : pageManager.getPageData()) {
-				pageData.getDataList().add(ComputerMapper.toDTO((Computer) computer));
-			}
+			pageManager.getPageData().stream().map(ComputerMapper::toDTO).forEach(pageData.getDataList()::add);
 			
 			pageData.setCount(count);
 			pageData.setCurrentPage(pageManager.getPage());
@@ -122,7 +120,7 @@ public class Dashboard extends HttpServlet {
 			for (String toDelete : toDeleteList) {
 				long id = Long.parseLong(toDelete);
 				try {
-					computerService.deleteComputer(id);
+					computerService.delete(id);
 				} catch (FailedDAOOperationException e) {
 					logger.info(e.getMessage());
 					errors.clear();

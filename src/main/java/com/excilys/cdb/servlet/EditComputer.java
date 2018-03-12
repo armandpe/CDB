@@ -60,12 +60,7 @@ public class EditComputer extends HttpServlet {
 		if (!gottenComputer.isPresent()) {
 			request.getRequestDispatcher(PATH_403).forward(request, response);
 		} else {
-			try {
-				lastComputer = ComputerMapper.toDTO(gottenComputer.get());
-			} catch (FailedDAOOperationException e) {
-				errors.add(e.getMessage());
-				logger.info(e.getMessage());
-			}
+			lastComputer = ComputerMapper.toDTO(gottenComputer.get());
 			request.setAttribute("computer", lastComputer);
 
 			errors.addAll(computerFormManager.setRequestCompanies(request));
@@ -85,7 +80,7 @@ public class EditComputer extends HttpServlet {
 		String idString = request.getParameter("id");
 
 		List<String> errors = computerFormManager.processInput(idString, computerName, introduced, discontinued, companyId,
-				computer -> ComputerService.getInstance().updateComputer(computer));
+				computer -> ComputerService.getInstance().update(computer));
 
 		if (errors.size() > 0) {
 			logger.info(errors.toString());

@@ -49,16 +49,6 @@ public abstract class DAO<T extends ModelClass> {
 		return arr;
 	}
 
-	public static boolean isNull(Object o) {
-		if (o == null) {
-			return true;
-		}
-		if (o instanceof Optional) {
-			return !((Optional<?>) o).isPresent();
-		}
-		return false;
-	}
-
 	protected static Map<Class<?>, BiFunctionException<ResultSet, String, ?, SQLException>> getResultSetFunctionMap() {
 
 		if (staticResultSetFunctionMap == null) {
@@ -84,62 +74,38 @@ public abstract class DAO<T extends ModelClass> {
 		return staticResultSetFunctionMap;
 	}
 
+	protected static boolean isNull(Object o) {
+		if (o == null) {
+			return true;
+		}
+		if (o instanceof Optional) {
+			return !((Optional<?>) o).isPresent();
+		}
+		return false;
+	}
+
 	private final String AFTER_VARIABLE_COUNT = ") as " + DbConstant.COUNT_VAR + " FROM ";
 
 	private final String AFTER_VARIABLE_SELECT = " FROM ";
 
 	protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-	public String addConditions(String query, Map<String, Object> conditions) {
-		query = query + " WHERE ";
-		Set<String> keys = conditions.keySet();
-		Iterator<String> iterator = keys.iterator();
-
-		while (iterator.hasNext()) {
-			String key = iterator.next();
-			query += key + " = " + conditions.get(key);
-			if (iterator.hasNext()) {
-				query += " AND ";
-			}
-		}
-		return query;
-	}
-
 	public String arrayToString(String[] array) {
 		return String.join(", ", array);
-	}
-	
-	public String countQuery() {
-		String query = "SELECT count(" + getKey(getModelClassFullName(), x -> x.primaryKey()).getKey();
-		query += AFTER_VARIABLE_COUNT + getTable(getModelClassFullName());
-		return query;
-	}
-	
-
-	public <V> V executeWithConnection(FunctionException<Object[], V, FailedDAOOperationException> f, Object[] objects) throws FailedDAOOperationException {
-		ConnectionManager cManager = ConnectionManager.getInstance();
-		try (Connection connection = cManager.getConnection()) {
-
-			return f.apply(append(objects, connection));
-
-		} catch (SQLException e) {
-			logger.error(Main.getErrorMessage(null, e.getMessage()));
-		}
-
-		return null;
 	}
 
 	public List<T> getAll(long offset, long limit) throws FailedDAOOperationException {
 
-		Object[] objects = {offset, limit};
+		Object[] objects = {offset, limit, null};
 		return executeWithConnection(x -> this.getAll(x), objects);
 	}
-
+	
 	public List<T> getAll(long offset, long limit, String toSearch) throws FailedDAOOperationException {
 
 		Object[] objects = {offset, limit, toSearch};
 		return executeWithConnection(x -> this.getAll(x), objects);
 	}
+	
 
 	public Optional<T> getById(long id) throws FailedDAOOperationException {
 		Object[] objects = {id};
@@ -177,38 +143,20 @@ public abstract class DAO<T extends ModelClass> {
 	}
 
 	public abstract String getModelClassFullName();
-	
-	public String selectQuery() {
-		String query = "SELECT " + arrayToString(getSQLArgs());
-		query += AFTER_VARIABLE_SELECT + getTable(getModelClassFullName());
-		return query;
-	}
 
-	private String addSearch(String query, String[] keySet) {
-		//		SEARCH("SELECT computer.id, computer.name, introduced, discontinued, company_id, company.name FROM computer LEFT JOIN company ON company_id = company.id"
-		//	            + " WHERE (computer.name LIKE ? OR company.name LIKE ?) LIMIT ? OFFSET ?;")
+	protected String addConditions(String query, Map<String, String> conditions) {
+		query = query + " WHERE ";
+		Set<String> keys = conditions.keySet();
+		Iterator<String> iterator = keys.iterator();
 
-		query += " WHERE (";
-
-		for (int i = 0; i < keySet.length; ++i) {
-			query += keySet[i] + " LIKE ?" + (i == keySet.length - 1 ? "" : " OR ");
-		}
-		query += ")";
-
-		return query;
-	}
-
-	private void addSearchToStatement(String searchWith, int nbToSearch, PreparedStatement preparedStatement) {
-
-		for (int i = 1; i <= nbToSearch; ++i) {
-			try {
-				preparedStatement.setString(i, searchWith + '%');
-			} catch (SQLException e) {
-				logger.error(Main.getErrorMessage("Error during search query", e.getMessage()));
+		while (iterator.hasNext()) {
+			String key = iterator.next();
+			query += key + " = " + conditions.get(key);
+			if (iterator.hasNext()) {
+				query += " AND ";
 			}
 		}
-
-
+		return query;
 	}
 
 	protected String addLeftJoin(String query, String table, Map<String, String> jointureCriterias) {
@@ -236,6 +184,31 @@ public abstract class DAO<T extends ModelClass> {
 		query = query.replace("\\", "");
 		query = addLeftJoin(query, table, jointureCriterias);
 		return query;
+	}
+	
+	protected String addSearch(String query, String[] keySet) {
+		//		SEARCH("SELECT computer.id, computer.name, introduced, discontinued, company_id, company.name FROM computer LEFT JOIN company ON company_id = company.id"
+		//	            + " WHERE (computer.name LIKE ? OR company.name LIKE ?) LIMIT ? OFFSET ?;")
+
+		query += " WHERE (";
+
+		for (int i = 0; i < keySet.length; ++i) {
+			query += keySet[i] + " LIKE ?" + (i == keySet.length - 1 ? "" : " OR ");
+		}
+		query += ")";
+
+		return query;
+	}
+
+	protected void addSearchToStatement(String searchWith, int nbToSearch, PreparedStatement preparedStatement) {
+
+		for (int i = 1; i <= nbToSearch; ++i) {
+			try {
+				preparedStatement.setString(i, searchWith + '%');
+			} catch (SQLException e) {
+				logger.error(Main.getErrorMessage("Error during search query", e.getMessage()));
+			}
+		}
 	}
 
 	protected void addValueToStatement(PreparedStatement ps, Entry<String, SimpleEntry<Field, Object>> fieldClassValue,
@@ -331,7 +304,13 @@ public abstract class DAO<T extends ModelClass> {
 		return Optional.ofNullable(result);
 	}
 
-	protected void deleteByPrimaryKey(Object primaryKeyValue) throws FailedDAOOperationException {
+	protected String countQuery() {
+		String query = "SELECT count(" + getKey(getModelClassFullName(), x -> x.primaryKey()).getKey();
+		query += AFTER_VARIABLE_COUNT + getTable(getModelClassFullName());
+		return query;
+	}
+
+	protected void deleteByPrimaryKey(Object primaryKeyValue, Connection connection) throws FailedDAOOperationException {
 		Entry<String, Field> primaryKey = getKey(getModelClassFullName(), x -> x.primaryKey());
 
 		String table = getTable(getModelClassFullName());
@@ -344,35 +323,44 @@ public abstract class DAO<T extends ModelClass> {
 		HashMap<String, Integer> keyOrder = new HashMap<>();
 		keyOrder.put(primaryKey.getKey(), 1);
 
-		executeStatement(query, fieldsClassValues, keyOrder);
+		executeStatement(query, fieldsClassValues, keyOrder, connection);
+	}
+	
+	protected void deleteByPrimaryKey(Object primaryKey) throws FailedDAOOperationException {
+		Object[] args = {primaryKey};
+		executeWithConnection(x -> deleteByPrimaryKey(x), args);
+	}
+	
+	protected int deleteByPrimaryKey(Object...objects) throws FailedDAOOperationException {
+		Object primaryKeyValue = objects[0];
+		Connection connection = (Connection) objects[1];
+		deleteByPrimaryKey(primaryKeyValue, connection);
+		return 0;
 	}
 
-	protected void executeStatement(String query, LinkedHashMap<String, SimpleEntry<Field, Object>> fieldsClassValues,
-			HashMap<String, Integer> keyOrder) throws FailedDAOOperationException {
-		PreparedStatement preparedStatement;
+	protected <V> V executeWithConnection(FunctionException<Object[], V, FailedDAOOperationException> f, Object[] objects) throws FailedDAOOperationException {
 		ConnectionManager cManager = ConnectionManager.getInstance();
-
+		V result = null;
 		try (Connection connection = cManager.getConnection()) {
-			preparedStatement = connection.prepareStatement(query);
-
-			for (Entry<String, SimpleEntry<Field, Object>> fieldClassValue : fieldsClassValues.entrySet()) {
-				addValueToStatement(preparedStatement, fieldClassValue, keyOrder);
+			connection.setAutoCommit(false);
+			try {
+				result =  f.apply(append(objects, connection));
+				connection.commit();
+			} catch (SQLException e) {
+				logger.error(Main.getErrorMessage(null, e.getMessage()));
+				connection.rollback();
+			} catch (FailedDAOOperationException e) {
+				connection.rollback();
+				throw e;
 			}
-			preparedStatement.executeUpdate();
-			preparedStatement.close();
-
 		} catch (SQLException e) {
 			logger.error(Main.getErrorMessage(null, e.getMessage()));
-			throw new FailedDAOOperationException();
 		}
-
+		
+		return result;
 	}
-
-	protected List<T> getAll(Object... params) {
-		long offset = (long) params[0];
-		long limit = (long) params[1];
-		String search = params.length == 4 ? (String) params[2] : null;
-		Connection connection = (Connection) params[params.length - 1];
+	
+	protected List<T> getAll(long offset, long limit, String search, Connection connection) {
 		ArrayList<T> result = new ArrayList<>();
 		Map<String, Field> foreignFields = new HashMap<>();
 		String query = selectQuery();
@@ -414,49 +402,52 @@ public abstract class DAO<T extends ModelClass> {
 		return result;
 	}
 
-	protected Optional<T> getById(Object... objects) {
-		long id = (long) objects[0];
-		Connection connection = (Connection) objects[1];
-		Optional<T> result = Optional.empty();
-		String query = selectQuery();
-		Entry<String, Field> primaryKey = getKey(getModelClassFullName(), x -> x.primaryKey());
-		Map<String, Field> foreignFields = new HashMap<>();
-		Map<String, Object> conditions = new HashMap<>();
-		conditions.put(primaryKey.getKey(), id);
+	protected void executeStatement(String query, LinkedHashMap<String, SimpleEntry<Field, Object>> fieldsClassValues,
+			HashMap<String, Integer> keyOrder, Connection connection) throws FailedDAOOperationException {
+		
+		try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
 
-		if (hasKey(getModelClassFullName(), x -> x.foreignKey())) {
-			query = getForeignKeyQuery(query, foreignFields);
-		}
-
-		query = addConditions(query, conditions);
-
-		ResultSet sqlResults = null;
-		try {
-			Statement stmt = connection.createStatement();
-			sqlResults = stmt.executeQuery(query);
-		} catch (Exception e) {
-			logger.error(Main.getErrorMessage("query : " + query, e.getMessage()));
-		}
-
-		try {
-			if (sqlResults.next()) {
-				result = buildItem(getModelClassFullName(), sqlResults);
+			for (Entry<String, SimpleEntry<Field, Object>> fieldClassValue : fieldsClassValues.entrySet()) {
+				addValueToStatement(preparedStatement, fieldClassValue, keyOrder);
 			}
+			preparedStatement.executeUpdate();
 		} catch (SQLException e) {
 			logger.error(Main.getErrorMessage(null, e.getMessage()));
+			throw new FailedDAOOperationException();
 		}
-		try {
-			sqlResults.close();
-		} catch (SQLException e) {
-			logger.error(Main.getErrorMessage(null, e.getMessage()));
-		}
-
-		return result;
+	}
+	
+	protected List<T> getAll(Object... params) {
+		long offset = (long) params[0];
+		long limit = (long) params[1];
+		String search = (String) params[2];
+		Connection connection = (Connection) params[3];
+		return getAll(offset, limit, search, connection);
 	}
 
+	protected Optional<T> getById(long id, Connection connection) throws FailedDAOOperationException {
+		Entry<String, Field> primaryKey = getKey(getModelClassFullName(), x -> x.primaryKey());
+		Map<String, String> conditions = new HashMap<>();
+		conditions.put(primaryKey.getKey(), "" + id);
+		
+		List<T> result = getWithConditions(conditions, connection);
+		
+		return result.size() == 0 ? Optional.empty() : Optional.ofNullable(result.get(0));
+	}
+	
+	protected Optional<T> getById(Object... objects) throws FailedDAOOperationException {
+		long id = (long) objects[0];
+		Connection connection = (Connection) objects[1];
+		return getById(id, connection);
+	}
+	
 	protected long getCount(Object... objects) throws FailedDAOOperationException {
 		String search = (String) objects[0];
 		Connection connection = (Connection) objects[1];
+		return getCount(search, connection);
+	}
+	
+	protected long getCount(String search, Connection connection) throws FailedDAOOperationException {
 		Map<String, Field> foreignFields = new HashMap<>();
 		
 		String query = countQuery();
@@ -540,7 +531,7 @@ public abstract class DAO<T extends ModelClass> {
 			return optional ? Optional.empty() : null;
 		}
 	}
-	
+
 	protected String getForeignFieldTypeName() {
 		Entry<String, Field> foreign = getKey(getModelClassFullName(), x -> x.foreignKey());
 		Class<?> fieldType = foreign.getValue().getType();
@@ -567,7 +558,7 @@ public abstract class DAO<T extends ModelClass> {
 
 		return query;
 	}
-
+	
 	protected Entry<String, Field> getKey(String className, Function<SQLInfo, Boolean> getKey) {
 
 		for (Entry<String, Field> pair : getWithAnnotation(className, getKey).entrySet()) {
@@ -575,7 +566,7 @@ public abstract class DAO<T extends ModelClass> {
 		}
 		return null;
 	}
-
+	
 	protected SimpleEntry<Integer, String> getSearchQuery(String query, Map<String, Field> foreignFields) {
 		Map<String, Field> primaryFields = this.getMapperSQLFields(getModelClassFullName());
 		Map<String, Field> fieldsToSearch = new HashMap<>();
@@ -629,6 +620,44 @@ public abstract class DAO<T extends ModelClass> {
 		return result;
 	}
 
+	protected List<T> getWithConditions(Map<String, String> conditions, Connection connection) throws FailedDAOOperationException {
+		List<T> result = new ArrayList<>();
+		String query = selectQuery();
+		Map<String, Field> foreignFields = new HashMap<>();
+		
+		if (hasKey(getModelClassFullName(), x -> x.foreignKey())) {
+			query = getForeignKeyQuery(query, foreignFields);
+		}
+
+		query = addConditions(query, conditions);
+
+		ResultSet sqlResults = null;
+		try {
+			Statement stmt = connection.createStatement();
+			sqlResults = stmt.executeQuery(query);
+		} catch (SQLException e) {
+			logger.error(Main.getErrorMessage("query : " + query, e.getMessage()));
+			throw new FailedDAOOperationException();
+		}
+
+		try {
+			while (sqlResults.next()) {
+				buildItem(getModelClassFullName(), sqlResults).ifPresent(item -> result.add(item));
+			}
+		} catch (SQLException e) {
+			logger.error(Main.getErrorMessage(null, e.getMessage()));
+			throw new FailedDAOOperationException();
+		}
+		
+		try {
+			sqlResults.close();
+		} catch (SQLException e) {
+			logger.error(Main.getErrorMessage(null, e.getMessage()));
+			throw new FailedDAOOperationException();
+		}
+		return result;
+	}
+
 	protected boolean hasKey(String className, Function<SQLInfo, Boolean> getKey) {
 		Class<?> objectClass;
 		try {
@@ -644,5 +673,11 @@ public abstract class DAO<T extends ModelClass> {
 			logger.error(Main.getErrorMessage(null, e.getMessage()));
 		}
 		return false;
+	}
+
+	protected String selectQuery() {
+		String query = "SELECT " + arrayToString(getSQLArgs());
+		query += AFTER_VARIABLE_SELECT + getTable(getModelClassFullName());
+		return query;
 	}
 }

@@ -3,9 +3,11 @@ package main.java.com.excilys.cdb.dao;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
+import java.sql.Connection;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -34,13 +36,23 @@ public class ComputerDAO extends DAO<Computer> {
 	private ComputerDAO() {
 	}
 
-	/**
-	 * @param computer
-	 *            Computer to create
-	 * @return see {@link executeStatement}
-	 * @throws FailedDAOOperationException 
-	 */
-	public void createComputer(Computer computer) throws FailedDAOOperationException {
+
+	
+	public void create(Computer computer) throws FailedDAOOperationException {
+		Object[] args = {computer};
+		executeWithConnection(x -> create(x), args);	
+	}
+	
+	
+	protected int create(Object...objects) throws FailedDAOOperationException {
+		Computer computer = (Computer) objects[0];
+		Connection connection = (Connection) objects[1];
+		create(computer, connection);
+		return 0;
+	}
+	
+	
+	protected void create(Computer computer, Connection connection) throws FailedDAOOperationException {
 		Map<String, Field> mapperSQLFields = getMapperSQLFields(getModelClassFullName());
 		Set<String> keys = mapperSQLFields.keySet();
 
@@ -51,10 +63,10 @@ public class ComputerDAO extends DAO<Computer> {
 
 		String query = generateCreateQuery(fieldsClassValues, keys);
 
-		executeStatement(query, fieldsClassValues, keyOrder);
+		executeStatement(query, fieldsClassValues, keyOrder, connection);
 	}
 
-	public void deleteComputer(long id) throws FailedDAOOperationException {
+	public void delete(long id) throws FailedDAOOperationException {
 		deleteByPrimaryKey(id);
 	}
 
@@ -63,7 +75,19 @@ public class ComputerDAO extends DAO<Computer> {
 		return Computer.class.getName();
 	}
 
-	public void updateComputer(Computer computer) throws FailedDAOOperationException {
+	public void update(Computer computer) throws FailedDAOOperationException {
+		Object[] args = {computer};
+		executeWithConnection(x -> update(x), args);
+	}
+	
+	protected int update(Object...objects) throws FailedDAOOperationException {
+		Computer computer = (Computer) objects[0];
+		Connection connection = (Connection) objects[1];
+		update(computer, connection);
+		return 0;
+	}
+	
+	protected void update(Computer computer, Connection connection) throws FailedDAOOperationException {
 		Map<String, Field> mapperSQLFields = getMapperSQLFields(getModelClassFullName());
 		Set<String> keys = mapperSQLFields.keySet();
 
@@ -76,7 +100,7 @@ public class ComputerDAO extends DAO<Computer> {
 
 		String query = generateUpdateQuery(fieldsClassValues, keys, primaryKey);
 
-		executeStatement(query, fieldsClassValues, keyOrder);
+		executeStatement(query, fieldsClassValues, keyOrder, connection);
 	}
 
 	private String generateCreateQuery(LinkedHashMap<String, SimpleEntry<Field, Object>> paramValues,
@@ -91,9 +115,7 @@ public class ComputerDAO extends DAO<Computer> {
 		}
 
 		query = query.substring(0, query.length() - 1);
-
 		query += " )";
-
 		return query;
 	}
 
@@ -156,7 +178,17 @@ public class ComputerDAO extends DAO<Computer> {
 		return fieldsClassValues;
 	}
 
-	private String generateUpdateQuery(LinkedHashMap<String, SimpleEntry<Field, Object>> paramValues, Set<String> keys,
+	protected List<Computer> getByCompanyId(long companyId, Connection connection) throws FailedDAOOperationException {
+		Entry<String, Field> foreignKey = getKey(getModelClassFullName(), x -> x.foreignKey());
+		Map<String, String> conditions = new HashMap<>();
+		conditions.put(foreignKey.getKey(), "" + companyId);
+		
+		List<Computer> result = getWithConditions(conditions, connection);
+		
+		return result;
+	}
+	
+	protected String generateUpdateQuery(LinkedHashMap<String, SimpleEntry<Field, Object>> paramValues, Set<String> keys,
 			String primaryKey) {
 
 		String query = "UPDATE " + getTable(getModelClassFullName()) + " SET ";
