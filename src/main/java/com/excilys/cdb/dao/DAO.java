@@ -379,7 +379,6 @@ public abstract class DAO<T extends ModelClass> {
 
 		if (hasKey(getModelClassFullName(), x -> x.foreignKey())) {
 			query = getForeignKeyQuery(query, foreignFields);
-			logger.info(foreignFields.toString());
 		}
 
 		int nbToSearch = 0;
@@ -391,9 +390,6 @@ public abstract class DAO<T extends ModelClass> {
 
 		query += " LIMIT " + offset + ", " + limit;
 
-		logger.info(query);
-		logger.info(search);
-		
 		ResultSet sqlResults = null;
 		PreparedStatement preparedStatement = null;
 		try {
@@ -421,41 +417,20 @@ public abstract class DAO<T extends ModelClass> {
 	protected Optional<T> getById(Object... objects) {
 		long id = (long) objects[0];
 		Connection connection = (Connection) objects[1];
-
 		Optional<T> result = Optional.empty();
-
 		String query = selectQuery();
-
 		Entry<String, Field> primaryKey = getKey(getModelClassFullName(), x -> x.primaryKey());
-
+		Map<String, Field> foreignFields = new HashMap<>();
 		Map<String, Object> conditions = new HashMap<>();
 		conditions.put(primaryKey.getKey(), id);
 
 		if (hasKey(getModelClassFullName(), x -> x.foreignKey())) {
-			Entry<String, Field> foreign = getKey(getModelClassFullName(), x -> x.foreignKey());
-			Class<?> fieldType = foreign.getValue().getType();
-
-			if (fieldType == Optional.class) {
-				fieldType = (Class<?>) ((ParameterizedType) foreign.getValue().getGenericType())
-						.getActualTypeArguments()[0];
-			}
-			String fieldTypeName = fieldType.getName();
-
-			Map<String, Field> sqlFieldsMap = getMapperSQLFields(fieldTypeName);
-			Map<String, String> constraints = new HashMap<>();
-			String tableName = getTable(fieldTypeName);
-
-			constraints.put(getKey(fieldTypeName, x -> x.primaryKey()).getKey(),
-					getKey(getModelClassFullName(), x -> x.foreignKey()).getKey());
-
-			query = addLeftJoinWithFields(query, sqlFieldsMap.keySet().toArray(new String[sqlFieldsMap.keySet().size()]),
-					tableName, constraints);
+			query = getForeignKeyQuery(query, foreignFields);
 		}
 
 		query = addConditions(query, conditions);
 
 		ResultSet sqlResults = null;
-
 		try {
 			Statement stmt = connection.createStatement();
 			sqlResults = stmt.executeQuery(query);
@@ -506,9 +481,6 @@ public abstract class DAO<T extends ModelClass> {
 		ResultSet sqlResults = null;
 		int result = -1;
 		PreparedStatement preparedStatement = null;
-		
-		logger.info(query);
-		logger.info(search);
 		
 		try {
 			preparedStatement = connection.prepareStatement(query);
