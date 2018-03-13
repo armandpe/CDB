@@ -5,17 +5,20 @@ import java.util.ArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import main.java.com.excilys.cdb.dao.FailedDAOOperationException;
 import main.java.com.excilys.cdb.ihm.UserChoice;
+import main.java.com.excilys.cdb.utils.FunctionException;
 
 public abstract class PageManagerAbstract<T> {
 	
 	protected Logger logger = LoggerFactory.getLogger(PageManagerLimit.class);
 
-	protected long limit;
+	protected long limit = 10;
 	protected long max;
 	protected long maxPage;
-	protected long offset;
+	protected long offset = 0;
 	protected ArrayList<T> pageData = new ArrayList<>();
+	protected FunctionException<String, Long, FailedDAOOperationException> getMaxFunction;
 	
 	@UserChoice(name = "Get first page")
 	public void first() {
@@ -42,7 +45,7 @@ public abstract class PageManagerAbstract<T> {
 		return (offset / limit) + 1;
 	}
 
-	public ArrayList<T> getPageData() {
+	public ArrayList<T> getPageData() throws FailedDAOOperationException {
 		getItems();
 		return pageData;
 	}
@@ -78,10 +81,11 @@ public abstract class PageManagerAbstract<T> {
 	
 	protected void refreshMaxPage() {
 		this.maxPage = (long) Math.ceil(((double) max) / (double) limit);
+		gotTo(getPage());
 	}
 
-	public void setMax(long max) {
-		this.max = max;
+	protected void setMax() throws FailedDAOOperationException {
+		this.max = getMaxFunction.apply(null);
 		refreshMaxPage();
 	}
 
@@ -89,7 +93,7 @@ public abstract class PageManagerAbstract<T> {
 		this.offset = offset;
 	}
 
-	protected abstract boolean getItems();
+	protected abstract boolean getItems() throws FailedDAOOperationException;
 
 	public void gotTo(long page) {
 		page = Math.min(page, maxPage);

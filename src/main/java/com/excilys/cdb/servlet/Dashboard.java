@@ -1,8 +1,8 @@
 package main.java.com.excilys.cdb.servlet;
 
 import static main.java.com.excilys.cdb.constant.Servlet.NAME_DASHBOARD;
-import static main.java.com.excilys.cdb.constant.Servlet.PATH_403;
 import static main.java.com.excilys.cdb.constant.Servlet.PATH_DASHBOARD;
+import static main.java.com.excilys.cdb.constant.Servlet.PATH_403;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -24,7 +24,7 @@ import main.java.com.excilys.cdb.dao.FailedDAOOperationException;
 import main.java.com.excilys.cdb.dto.ComputerDTO;
 import main.java.com.excilys.cdb.dto.ComputerMapper;
 import main.java.com.excilys.cdb.model.Computer;
-import main.java.com.excilys.cdb.pagemanager.PageManagerSearchLimit;
+import main.java.com.excilys.cdb.pagemanager.PageManagerComplete;
 import main.java.com.excilys.cdb.service.ComputerService;
 import main.java.com.excilys.cdb.validator.InputValidator;
 import main.java.com.excilys.cdb.validator.InvalidInputException;
@@ -33,24 +33,19 @@ import main.java.com.excilys.cdb.validator.InvalidInputException;
 @WebServlet("/" + NAME_DASHBOARD)
 public class Dashboard extends HttpServlet {
 
-	protected ComputerService computerService;
-	protected long limit = 10;
+	protected ComputerService computerService = ComputerService.getInstance();
 	protected Logger logger = LoggerFactory.getLogger(this.getClass());
-	protected PageManagerSearchLimit<Computer> pageManager = null;
-	protected long currentPage = 1;
-	protected PageData<ComputerDTO> pageData = null;
+	protected PageManagerComplete<Computer> pageManager = new PageManagerComplete<Computer>(computerService::getCount, computerService::getAll);
+	protected PageData<ComputerDTO> pageData = new PageData<>();
 	protected List<String> errors = new ArrayList<>();
-	protected String search;
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		long count;
 
 		String limitString = request.getParameter("limit");
 		String searchString = request.getParameter("search");
-		
-		search = searchString == null ? search : (searchString.equals("") ? null : searchString);
-		
+		String pageString = request.getParameter("page");
+
 		List<Function<Long, Boolean>> limitTests = new ArrayList<>();
 		limitTests.add(limit -> (limit > 0));
 		try {
@@ -61,10 +56,6 @@ public class Dashboard extends HttpServlet {
 			return;
 		}
 
-		limit = limitString == null ? limit : Long.parseLong(limitString);
-		
-
-		String pageString = request.getParameter("page");
 		List<Function<Long, Boolean>> pageTests = new ArrayList<>();
 		try {
 			InputValidator.isCorrectString(pageString, toParse -> Long.parseLong(toParse), true, false, pageTests);
@@ -72,35 +63,28 @@ public class Dashboard extends HttpServlet {
 			logger.info(e.getClass().getName() + " : Incorrect page value " + e.getMessage());
 			this.getServletContext().getRequestDispatcher(PATH_403).forward(request, response);	
 			return;
-		}
-		currentPage = pageString == null ? currentPage : Long.parseLong(pageString);
+		}	
 
 		try {
-
-			if (pageManager == null) {
-				computerService = ComputerService.getInstance();
-				count = computerService.getCount(search);
-				pageManager = new PageManagerSearchLimit<Computer>(limit, count, (Long x, Long y, String s) -> computerService.getAll(x, y, s));
-				pageData = new PageData<>();
-			} else {
-				pageData.getDataList().clear();
-				count = computerService.getCount(search);
-				pageManager.setMax(count);
-				pageManager.setLimit(limit);
+			pageData.getDataList().clear();
+			
+			if (limitString != null) {
+				pageManager.setLimit(Long.parseLong(limitString));
+			}
+			if (searchString != null) {
+				pageManager.setToSearch(searchString.equals("") ? null : searchString);				
 			}
 			
-			pageManager.setToSearch(search);
-			pageManager.gotTo(currentPage);
-			
+			pageManager.gotTo(pageString == null ? pageManager.getPage() : Long.parseLong(pageString));
 			pageManager.getPageData().stream().map(ComputerMapper::toDTO).forEach(pageData.getDataList()::add);
-			
-			pageData.setCount(count);
+
 			pageData.setCurrentPage(pageManager.getPage());
 			pageData.setMaxPage(pageManager.getMaxPage());
-
+			pageData.setCount(pageManager.getMax());
+			
 			request.setAttribute("pageData", pageData);
 			request.setAttribute("errors", new Gson().toJson(errors));
-			request.setAttribute("search", search);
+			request.setAttribute("search", pageManager.getToSearch());
 			errors.clear();
 			this.getServletContext().getRequestDispatcher(PATH_DASHBOARD).forward(request, response);
 
@@ -113,7 +97,7 @@ public class Dashboard extends HttpServlet {
 			throws ServletException, IOException {
 		String selection = (String) request.getParameter("selection");
 		errors.clear();
-		
+
 		if (selection != null) {
 			String[] toDeleteList = selection.split(",");
 

@@ -33,7 +33,17 @@ public abstract class Service<T extends ModelClass, U extends DAO<T>> {
 	public List<T> getAll(long offset, long limit, String toSearch) throws FailedDAOOperationException {
 		DAO<T> dao = getDAO();
 		try {
-		return dao.getAll(offset, limit, toSearch);
+		return dao.getAll(offset, limit, toSearch, null, true);
+		} catch (FailedDAOOperationException e) {
+			e.setMessage(getDaoClassFullName() + " : Get all method failed ");
+			throw e;
+		}
+	}
+	
+	public List<T> getAll(long offset, long limit, String toSearch, ComputerOrderBy orderByVar, boolean ascd) throws FailedDAOOperationException {
+		DAO<T> dao = getDAO();
+		try {
+		return dao.getAll(offset, limit, toSearch, orderByVar, ascd);
 		} catch (FailedDAOOperationException e) {
 			e.setMessage(getDaoClassFullName() + " : Get all method failed ");
 			throw e;
