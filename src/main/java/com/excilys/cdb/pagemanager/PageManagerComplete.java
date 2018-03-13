@@ -13,22 +13,26 @@ public class PageManagerComplete<T> extends PageManagerAbstract<T> {
 	protected PentiFunctionException<Long, Long, String, ComputerOrderBy, Boolean, List<T>, FailedDAOOperationException> getList;
 	protected String toSearch = null;
 	protected ComputerOrderBy orderBy = ComputerOrderBy.NAME;
-	protected boolean ascd = true;
+	protected boolean asc = true;
 	
 	public ComputerOrderBy getOrderBy() {
 		return orderBy;
 	}
 
 	public void setOrderBy(ComputerOrderBy orderBy) {
+		if (orderBy == this.orderBy) {
+			asc = !asc;
+		}
+		
 		this.orderBy = orderBy;
 	}
 
 	public boolean isAscd() {
-		return ascd;
+		return asc;
 	}
 
 	public void setAscd(boolean ascd) {
-		this.ascd = ascd;
+		this.asc = ascd;
 	}
 
 	public String getToSearch() {
@@ -54,7 +58,7 @@ public class PageManagerComplete<T> extends PageManagerAbstract<T> {
 		setMax();
 		pageData.clear();
 		try {
-			(getList.apply(offset, limit, toSearch, orderBy, ascd)).forEach(x -> pageData.add((T) x));
+			(getList.apply(offset, limit, toSearch, orderBy, asc)).forEach(x -> pageData.add((T) x));
 		} catch (FailedDAOOperationException e) {
 			logger.error(Main.getErrorMessage(null, e.getMessage()));
 		}

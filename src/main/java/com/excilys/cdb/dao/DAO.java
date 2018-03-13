@@ -378,7 +378,7 @@ public abstract class DAO<T extends ModelClass> {
 		return result;
 	}
 
-	protected List<T> getAll(long offset, long limit, String search, String orderByVar, boolean ascd, Connection connection) {
+	protected List<T> getAll(long offset, long limit, String search, String orderByVar, boolean asc, Connection connection) {
 		ArrayList<T> result = new ArrayList<>();
 		Map<String, Field> foreignFields = new HashMap<>();
 		String query = selectQuery();
@@ -394,6 +394,8 @@ public abstract class DAO<T extends ModelClass> {
 			query = nbToSearchAndQuery.getValue();
 		}
 
+		query += " ORDER BY " + orderByVar + (asc ? " ASC" : " DESC");
+		
 		query += " LIMIT " + offset + ", " + limit;
 
 		ResultSet sqlResults = null;

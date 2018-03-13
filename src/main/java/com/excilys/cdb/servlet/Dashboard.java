@@ -20,11 +20,13 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
 
+import main.java.com.excilys.cdb.constant.Servlet;
 import main.java.com.excilys.cdb.dao.FailedDAOOperationException;
 import main.java.com.excilys.cdb.dto.ComputerDTO;
 import main.java.com.excilys.cdb.dto.ComputerMapper;
 import main.java.com.excilys.cdb.model.Computer;
 import main.java.com.excilys.cdb.pagemanager.PageManagerComplete;
+import main.java.com.excilys.cdb.service.ComputerOrderBy;
 import main.java.com.excilys.cdb.service.ComputerService;
 import main.java.com.excilys.cdb.validator.InputValidator;
 import main.java.com.excilys.cdb.validator.InvalidInputException;
@@ -42,9 +44,10 @@ public class Dashboard extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
-		String limitString = request.getParameter("limit");
-		String searchString = request.getParameter("search");
-		String pageString = request.getParameter("page");
+		String limitString = request.getParameter(Servlet.LIMIT);
+		String searchString = request.getParameter(Servlet.SEARCH);
+		String pageString = request.getParameter(Servlet.PAGE);
+		String orderByString = request.getParameter(Servlet.ORDER_BY);
 
 		List<Function<Long, Boolean>> limitTests = new ArrayList<>();
 		limitTests.add(limit -> (limit > 0));
@@ -65,26 +68,55 @@ public class Dashboard extends HttpServlet {
 			return;
 		}	
 
+		List<Function<String, Boolean>> orderByTest = new ArrayList<>();
+		orderByTest.add(s -> s.equals(Servlet.ORDER_BY_NAME) || 
+				s.equals(Servlet.ORDER_BY_COMPANY_NAME) || 
+				s.equals(Servlet.ORDER_BY_DISCONTINUED) || 
+				s.equals(Servlet.ORDER_BY_INTRODUCED));
+		try {
+			InputValidator.isCorrectString(orderByString, x -> x, true, false, orderByTest);
+		} catch (InvalidInputException | NumberFormatException e) {
+			logger.info(e.getClass().getName() + " : Incorrect orderby value " + orderByString + e.getMessage());
+			this.getServletContext().getRequestDispatcher(PATH_403).forward(request, response);	
+			return;
+		}	
+
 		try {
 			pageData.getDataList().clear();
-			
+
 			if (limitString != null) {
 				pageManager.setLimit(Long.parseLong(limitString));
 			}
 			if (searchString != null) {
 				pageManager.setToSearch(searchString.equals("") ? null : searchString);				
 			}
-			
+			if (orderByString != null) {
+				switch (orderByString) {
+				case Servlet.ORDER_BY_NAME :
+					pageManager.setOrderBy(ComputerOrderBy.NAME);
+					break;
+				case Servlet.ORDER_BY_COMPANY_NAME :
+					pageManager.setOrderBy(ComputerOrderBy.COMPANY_NAME);
+					break;
+				case Servlet.ORDER_BY_DISCONTINUED :
+					pageManager.setOrderBy(ComputerOrderBy.DISCONTINUED);
+					break;
+				case Servlet.ORDER_BY_INTRODUCED :
+					pageManager.setOrderBy(ComputerOrderBy.INTRODUCED);
+					break;
+				}
+			}
+
 			pageManager.gotTo(pageString == null ? pageManager.getPage() : Long.parseLong(pageString));
 			pageManager.getPageData().stream().map(ComputerMapper::toDTO).forEach(pageData.getDataList()::add);
 
 			pageData.setCurrentPage(pageManager.getPage());
 			pageData.setMaxPage(pageManager.getMaxPage());
 			pageData.setCount(pageManager.getMax());
-			
-			request.setAttribute("pageData", pageData);
-			request.setAttribute("errors", new Gson().toJson(errors));
-			request.setAttribute("search", pageManager.getToSearch());
+
+			request.setAttribute(Servlet.PAGE_DATA, pageData);
+			request.setAttribute(Servlet.ERRORS, new Gson().toJson(errors));
+			request.setAttribute(Servlet.SEARCH, pageManager.getToSearch());
 			errors.clear();
 			this.getServletContext().getRequestDispatcher(PATH_DASHBOARD).forward(request, response);
 
@@ -95,7 +127,7 @@ public class Dashboard extends HttpServlet {
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		String selection = (String) request.getParameter("selection");
+		String selection = (String) request.getParameter(Servlet.DELETE_SELECTION);
 		errors.clear();
 
 		if (selection != null) {

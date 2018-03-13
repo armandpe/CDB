@@ -58,10 +58,10 @@
 									class="fa fa-trash-o fa-lg"></i>
 							</a>
 						</span></th>
-						<th>Computer name</th>
-						<th>Introduced date</th>
-						<th>Discontinued date</th>
-						<th>Company</th>
+						<th> <a href="dashboard?orderby=name">Computer name</a></th>
+						<th> <a href="dashboard?orderby=introduced">Introduced date</a></th>
+						<th> <a href="dashboard?orderby=discontinued">Discontinued date</a></th>
+						<th> <a href="dashboard?orderby=company">Company</a></th>
 					</tr>
 				</thead>
 				<!-- Browse attribute computers -->
