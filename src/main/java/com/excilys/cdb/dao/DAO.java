@@ -97,7 +97,7 @@ public abstract class DAO<T extends ModelClass> {
 
 	public List<T> getAll(long offset, long limit) throws FailedDAOOperationException {
 
-		Object[] objects = {offset, limit, null};
+		Object[] objects = {offset, limit, null, "computer.name", true};
 		return executeWithConnection(x -> this.getAll(x), objects);
 	}
 

@@ -351,18 +351,15 @@ public class CLI {
 
 	private static <T extends ModelClass> Object serviceGetAll(Class<? extends Service<T, ?>> usedClass, Method chosenMethod, Scanner sc) throws FailedDAOOperationException {
 		boolean keepGoing = true;
-		long offset = 0;
-		long limit = 10;
 		Service<T, ?> myService = getServiceInstance(usedClass);
-		long max = myService.getCount();
 		PageManagerLimit<T> pageManager;
 		
-		pageManager = new PageManagerLimit<T>(limit, max,  (x, y) -> myService.getAll(x, y));
+		pageManager = new PageManagerLimit<T>(search -> myService.getCount(search),  (x, y) -> myService.getAll(x, y));
 		
 		while (keepGoing) {
-
+			ArrayList<T> data = pageManager.getPageData();
 			print("Page " + pageManager.getPage() + "/" + pageManager.getMaxPage() + " :");
-			print(pageManager.getPageData().toString());
+			data.forEach(element -> print("\t- " + element.toString() + "\n\r"));
 
 			boolean first = true;
 			boolean invalidInput = true;
@@ -374,7 +371,7 @@ public class CLI {
 				}
 			}
 
-			while (invalidInput && offset < max) {
+			while (invalidInput) {
 				if (!first) {
 					print("Invalid input. Please enter a correct value");
 				}
