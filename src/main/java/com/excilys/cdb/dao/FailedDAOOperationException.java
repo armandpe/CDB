@@ -1,6 +1,6 @@
-package main.java.com.excilys.cdb.dao;
+package com.excilys.cdb.dao;
 
-import main.java.com.excilys.cdb.validator.InvalidDateException;
+import com.excilys.cdb.validator.InvalidDateException;
 
 @SuppressWarnings("serial")
 public class FailedDAOOperationException extends Exception {

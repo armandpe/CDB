@@ -1,4 +1,4 @@
-package main.java.com.excilys.cdb.dao;
+package com.excilys.cdb.dao;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -10,12 +10,13 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import com.excilys.cdb.Main;
+import com.excilys.cdb.model.Computer;
+import com.excilys.cdb.model.SQLInfo;
+
 import java.util.Optional;
 import java.util.Set;
-
-import main.java.com.excilys.cdb.Main;
-import main.java.com.excilys.cdb.model.Computer;
-import main.java.com.excilys.cdb.model.SQLInfo;
 
 /**
  * @author excilys
@@ -35,22 +36,18 @@ public class ComputerDAO extends DAO<Computer> {
 
 	private ComputerDAO() {
 	}
-
-
 	
 	public void create(Computer computer) throws FailedDAOOperationException {
 		Object[] args = {computer};
 		executeWithConnection(x -> create(x), args);	
 	}
-	
-	
+		
 	protected int create(Object...objects) throws FailedDAOOperationException {
 		Computer computer = (Computer) objects[0];
 		Connection connection = (Connection) objects[1];
 		create(computer, connection);
 		return 0;
 	}
-	
 	
 	protected void create(Computer computer, Connection connection) throws FailedDAOOperationException {
 		Map<String, Field> mapperSQLFields = getMapperSQLFields(getModelClassFullName());
@@ -228,5 +225,4 @@ public class ComputerDAO extends DAO<Computer> {
 
 		return keyOrder;
 	}
-
 }

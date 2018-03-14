@@ -1,4 +1,4 @@
-package main.java.com.excilys.cdb.connectionmanager;
+package com.excilys.cdb.connectionmanager;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -7,11 +7,10 @@ import java.util.ResourceBundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.excilys.cdb.Main;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import com.zaxxer.hikari.pool.HikariProxyConnection;
-
-import main.java.com.excilys.cdb.Main;
 
 
 public class ConnectionManager {
@@ -38,6 +37,8 @@ public class ConnectionManager {
         login = bundle.getString("login");
         password = bundle.getString("password");
         url = bundle.getString("url");
+        
+        logger.debug(url);
         
         config.setJdbcUrl(url);
         config.setPassword(password);

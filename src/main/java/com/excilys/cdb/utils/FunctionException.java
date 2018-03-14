@@ -1,4 +1,4 @@
-package main.java.com.excilys.cdb.utils;
+package com.excilys.cdb.utils;
 
 @FunctionalInterface
 public interface FunctionException<T, R, E extends Exception> {

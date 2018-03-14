@@ -1,13 +1,13 @@
-package main.java.com.excilys.cdb.pagemanager;
+package com.excilys.cdb.pagemanager;
 
 import java.util.ArrayList;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import main.java.com.excilys.cdb.dao.FailedDAOOperationException;
-import main.java.com.excilys.cdb.ihm.UserChoice;
-import main.java.com.excilys.cdb.utils.FunctionException;
+import com.excilys.cdb.dao.FailedDAOOperationException;
+import com.excilys.cdb.ihm.UserChoice;
+import com.excilys.cdb.utils.FunctionException;
 
 public abstract class PageManagerAbstract<T> {
 	

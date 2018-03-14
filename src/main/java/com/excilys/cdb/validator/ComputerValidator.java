@@ -1,4 +1,4 @@
-package main.java.com.excilys.cdb.validator;
+package com.excilys.cdb.validator;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -7,9 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import main.java.com.excilys.cdb.constant.DateConstant;
-import main.java.com.excilys.cdb.dao.FailedDAOOperationException;
-import main.java.com.excilys.cdb.service.ComputerService;
+import com.excilys.cdb.constant.DateConstant;
+import com.excilys.cdb.dao.FailedDAOOperationException;
+import com.excilys.cdb.service.ComputerService;
 
 public class ComputerValidator {
 

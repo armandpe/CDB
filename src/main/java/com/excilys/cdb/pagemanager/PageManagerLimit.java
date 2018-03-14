@@ -1,11 +1,11 @@
-package main.java.com.excilys.cdb.pagemanager;
+package com.excilys.cdb.pagemanager;
 
 import java.util.List;
 
-import main.java.com.excilys.cdb.Main;
-import main.java.com.excilys.cdb.dao.FailedDAOOperationException;
-import main.java.com.excilys.cdb.utils.BiFunctionException;
-import main.java.com.excilys.cdb.utils.FunctionException;
+import com.excilys.cdb.Main;
+import com.excilys.cdb.dao.FailedDAOOperationException;
+import com.excilys.cdb.utils.BiFunctionException;
+import com.excilys.cdb.utils.FunctionException;
 
 public class PageManagerLimit<T> extends PageManagerAbstract<T> {
 	

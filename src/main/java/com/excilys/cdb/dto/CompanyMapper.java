@@ -1,6 +1,6 @@
-package main.java.com.excilys.cdb.dto;
+package com.excilys.cdb.dto;
 
-import main.java.com.excilys.cdb.model.Company;
+import com.excilys.cdb.model.Company;
 
 public class CompanyMapper {
 	

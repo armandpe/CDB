@@ -1,9 +1,9 @@
-package main.java.com.excilys.cdb.servlet;
+package com.excilys.cdb.servlet;
 
-import static main.java.com.excilys.cdb.constant.Servlet.NAME_DASHBOARD;
-import static main.java.com.excilys.cdb.constant.Servlet.NAME_EDIT;
-import static main.java.com.excilys.cdb.constant.Servlet.PATH_403;
-import static main.java.com.excilys.cdb.constant.Servlet.PATH_EDIT;
+import static com.excilys.cdb.constant.Servlet.NAME_DASHBOARD;
+import static com.excilys.cdb.constant.Servlet.NAME_EDIT;
+import static com.excilys.cdb.constant.Servlet.PATH_403;
+import static com.excilys.cdb.constant.Servlet.PATH_EDIT;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -19,13 +19,12 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.excilys.cdb.dao.FailedDAOOperationException;
+import com.excilys.cdb.dto.ComputerDTO;
+import com.excilys.cdb.dto.ComputerMapper;
+import com.excilys.cdb.model.Computer;
+import com.excilys.cdb.service.ComputerService;
 import com.google.gson.Gson;
-
-import main.java.com.excilys.cdb.dao.FailedDAOOperationException;
-import main.java.com.excilys.cdb.dto.ComputerDTO;
-import main.java.com.excilys.cdb.dto.ComputerMapper;
-import main.java.com.excilys.cdb.model.Computer;
-import main.java.com.excilys.cdb.service.ComputerService;
 
 @SuppressWarnings("serial")
 @WebServlet("/" + NAME_EDIT)

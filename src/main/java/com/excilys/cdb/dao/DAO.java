@@ -1,4 +1,4 @@
-package main.java.com.excilys.cdb.dao;
+package com.excilys.cdb.dao;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -29,15 +29,15 @@ import java.util.function.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import main.java.com.excilys.cdb.Main;
-import main.java.com.excilys.cdb.connectionmanager.ConnectionManager;
-import main.java.com.excilys.cdb.constant.DbConstant;
-import main.java.com.excilys.cdb.model.ModelClass;
-import main.java.com.excilys.cdb.model.SQLInfo;
-import main.java.com.excilys.cdb.model.SQLTable;
-import main.java.com.excilys.cdb.service.ComputerOrderBy;
-import main.java.com.excilys.cdb.utils.BiFunctionException;
-import main.java.com.excilys.cdb.utils.FunctionException;
+import com.excilys.cdb.Main;
+import com.excilys.cdb.connectionmanager.ConnectionManager;
+import com.excilys.cdb.constant.DbConstant;
+import com.excilys.cdb.model.ModelClass;
+import com.excilys.cdb.model.SQLInfo;
+import com.excilys.cdb.model.SQLTable;
+import com.excilys.cdb.service.ComputerOrderBy;
+import com.excilys.cdb.utils.BiFunctionException;
+import com.excilys.cdb.utils.FunctionException;
 
 public abstract class DAO<T extends ModelClass> {
 

@@ -1,12 +1,12 @@
-package main.java.com.excilys.cdb.pagemanager;
+package com.excilys.cdb.pagemanager;
 
 import java.util.List;
 
-import main.java.com.excilys.cdb.Main;
-import main.java.com.excilys.cdb.dao.FailedDAOOperationException;
-import main.java.com.excilys.cdb.service.ComputerOrderBy;
-import main.java.com.excilys.cdb.utils.FunctionException;
-import main.java.com.excilys.cdb.utils.PentiFunctionException;
+import com.excilys.cdb.Main;
+import com.excilys.cdb.dao.FailedDAOOperationException;
+import com.excilys.cdb.service.ComputerOrderBy;
+import com.excilys.cdb.utils.FunctionException;
+import com.excilys.cdb.utils.PentiFunctionException;
 
 public class PageManagerComplete<T> extends PageManagerAbstract<T> {
 	

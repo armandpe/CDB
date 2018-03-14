@@ -1,4 +1,4 @@
-package main.java.com.excilys.cdb.constant;
+package com.excilys.cdb.constant;
 
 public final class Servlet {
 	public static final String PATH = "/WEB-INF/views/";

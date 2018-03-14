@@ -1,10 +1,8 @@
-package main.java.com.excilys.cdb.servlet;
+package com.excilys.cdb.servlet;
 
-import static main.java.com.excilys.cdb.constant.Servlet.PATH_ADD;
-import static main.java.com.excilys.cdb.constant.Servlet.NAME_DASHBOARD;
-import static main.java.com.excilys.cdb.constant.Servlet.NAME_ADD;
-
-
+import static com.excilys.cdb.constant.Servlet.NAME_ADD;
+import static com.excilys.cdb.constant.Servlet.NAME_DASHBOARD;
+import static com.excilys.cdb.constant.Servlet.PATH_ADD;
 
 import java.io.IOException;
 import java.util.List;
@@ -18,9 +16,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.excilys.cdb.service.ComputerService;
 import com.google.gson.Gson;
-
-import main.java.com.excilys.cdb.service.ComputerService;
 
 @SuppressWarnings("serial")
 @WebServlet("/" + NAME_ADD)

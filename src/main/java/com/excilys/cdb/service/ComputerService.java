@@ -1,9 +1,9 @@
-package main.java.com.excilys.cdb.service;
+package com.excilys.cdb.service;
 
-import main.java.com.excilys.cdb.ParamDescription;
-import main.java.com.excilys.cdb.dao.ComputerDAO;
-import main.java.com.excilys.cdb.dao.FailedDAOOperationException;
-import main.java.com.excilys.cdb.model.Computer;
+import com.excilys.cdb.ParamDescription;
+import com.excilys.cdb.dao.ComputerDAO;
+import com.excilys.cdb.dao.FailedDAOOperationException;
+import com.excilys.cdb.model.Computer;
 
 @ServiceClass(name = "computers")
 public class ComputerService extends Service<Computer, ComputerDAO> {

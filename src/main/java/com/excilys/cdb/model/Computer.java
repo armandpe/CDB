@@ -1,4 +1,4 @@
-package main.java.com.excilys.cdb.model;
+package com.excilys.cdb.model;
 
 import java.time.LocalDate;
 import java.util.Optional;
@@ -6,7 +6,7 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import main.java.com.excilys.cdb.ParamDescription;
+import com.excilys.cdb.ParamDescription;
 
 @SQLTable(name = "computer")
 public class Computer implements ModelClass {

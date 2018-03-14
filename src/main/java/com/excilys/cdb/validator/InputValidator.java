@@ -1,4 +1,4 @@
-package main.java.com.excilys.cdb.validator;
+package com.excilys.cdb.validator;
 
 import java.util.List;
 import java.util.function.Function;

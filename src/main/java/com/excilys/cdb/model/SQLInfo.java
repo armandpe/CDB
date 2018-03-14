@@ -1,4 +1,4 @@
-package main.java.com.excilys.cdb.model;
+package com.excilys.cdb.model;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

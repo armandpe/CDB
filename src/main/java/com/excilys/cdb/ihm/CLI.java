@@ -1,4 +1,4 @@
-package main.java.com.excilys.cdb.ihm;
+package com.excilys.cdb.ihm;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -23,16 +23,16 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import main.java.com.excilys.cdb.Main;
-import main.java.com.excilys.cdb.ParamDescription;
-import main.java.com.excilys.cdb.dao.FailedDAOOperationException;
-import main.java.com.excilys.cdb.model.ModelClass;
-import main.java.com.excilys.cdb.pagemanager.PageManagerLimit;
-import main.java.com.excilys.cdb.service.CompanyService;
-import main.java.com.excilys.cdb.service.ComputerService;
-import main.java.com.excilys.cdb.service.Service;
-import main.java.com.excilys.cdb.service.ServiceClass;
-import main.java.com.excilys.cdb.service.ServiceMethod;
+import com.excilys.cdb.Main;
+import com.excilys.cdb.ParamDescription;
+import com.excilys.cdb.dao.FailedDAOOperationException;
+import com.excilys.cdb.model.ModelClass;
+import com.excilys.cdb.pagemanager.PageManagerLimit;
+import com.excilys.cdb.service.CompanyService;
+import com.excilys.cdb.service.ComputerService;
+import com.excilys.cdb.service.Service;
+import com.excilys.cdb.service.ServiceClass;
+import com.excilys.cdb.service.ServiceMethod;
 
 public class CLI {
 

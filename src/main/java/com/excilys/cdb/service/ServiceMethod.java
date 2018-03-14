@@ -1,4 +1,4 @@
-package main.java.com.excilys.cdb.service;
+package com.excilys.cdb.service;
 
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;

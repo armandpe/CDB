@@ -1,4 +1,4 @@
-package test.java.com.excilys.cdb.dao;
+package com.excilys.cdb.dao;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -8,21 +8,18 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import main.java.com.excilys.cdb.Main;
-import main.java.com.excilys.cdb.connectionmanager.ConnectionManager;
-import main.java.com.excilys.cdb.dao.ComputerDAO;
-import main.java.com.excilys.cdb.dao.FailedDAOOperationException;
-import main.java.com.excilys.cdb.model.Company;
-import main.java.com.excilys.cdb.model.Computer;
+import com.excilys.cdb.Main;
+import com.excilys.cdb.connectionmanager.ConnectionManager;
+import com.excilys.cdb.model.Company;
+import com.excilys.cdb.model.Computer;
 
 public class ComputerDAOTest {
 
@@ -102,7 +99,7 @@ public class ComputerDAOTest {
 		Computer toAdd = new Computer.ComputerBuilder().withId(2).withName("Mb").withCompany(new Company(1, "Apple Inc.")).build();
 		try {
 			ComputerDAO.getInstance().create(toAdd);
-			assertTrue(ComputerDAO.getInstance().getCount(null) == 4 && ComputerDAO.getInstance().getById(2).get().equals(toAdd));
+			assertTrue(ComputerDAO.getInstance().getCount((String) null) == 4 && ComputerDAO.getInstance().getById(2).get().equals(toAdd));
 		} catch (FailedDAOOperationException e) {
 			LOGGER.error(Main.getErrorMessage(null, e.getMessage()));
 			fail();
@@ -113,7 +110,7 @@ public class ComputerDAOTest {
 	public void testDeleteComputer() {
 		try {
 			ComputerDAO.getInstance().delete(1);
-			assertTrue(ComputerDAO.getInstance().getCount(null) == 2);
+			assertTrue(ComputerDAO.getInstance().getCount((String) null) == 2);
 		} catch (FailedDAOOperationException e) {
 			LOGGER.error(Main.getErrorMessage(null, e.getMessage()));
 			fail();
@@ -147,7 +144,7 @@ public class ComputerDAOTest {
 	public void testGetCount() {
 		long count;
 		try {
-			count = ComputerDAO.getInstance().getCount(null);
+			count = ComputerDAO.getInstance().getCount((String) null);
 			assertTrue(count == 3);
 		} catch (FailedDAOOperationException e) {
 			LOGGER.error(Main.getErrorMessage("Error getCount", e.getMessage()));

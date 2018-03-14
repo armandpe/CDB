@@ -1,4 +1,4 @@
-package main.java.com.excilys.cdb.service;
+package com.excilys.cdb.service;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -8,10 +8,10 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import main.java.com.excilys.cdb.ParamDescription;
-import main.java.com.excilys.cdb.dao.DAO;
-import main.java.com.excilys.cdb.dao.FailedDAOOperationException;
-import main.java.com.excilys.cdb.model.ModelClass;
+import com.excilys.cdb.ParamDescription;
+import com.excilys.cdb.dao.DAO;
+import com.excilys.cdb.dao.FailedDAOOperationException;
+import com.excilys.cdb.model.ModelClass;
 
 public abstract class Service<T extends ModelClass, U extends DAO<T>> {
 

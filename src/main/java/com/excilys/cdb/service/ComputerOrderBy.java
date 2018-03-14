@@ -1,4 +1,4 @@
-package main.java.com.excilys.cdb.service;
+package com.excilys.cdb.service;
 
 public enum ComputerOrderBy {
 	NAME,

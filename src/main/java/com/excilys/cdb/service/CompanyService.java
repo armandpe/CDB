@@ -1,9 +1,9 @@
-package main.java.com.excilys.cdb.service;
+package com.excilys.cdb.service;
 
-import main.java.com.excilys.cdb.ParamDescription;
-import main.java.com.excilys.cdb.dao.CompanyDAO;
-import main.java.com.excilys.cdb.dao.FailedDAOOperationException;
-import main.java.com.excilys.cdb.model.Company;
+import com.excilys.cdb.ParamDescription;
+import com.excilys.cdb.dao.CompanyDAO;
+import com.excilys.cdb.dao.FailedDAOOperationException;
+import com.excilys.cdb.model.Company;
 
 @ServiceClass(name = "companies")
 public class CompanyService extends Service<Company, CompanyDAO> {

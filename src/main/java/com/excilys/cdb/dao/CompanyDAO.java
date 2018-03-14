@@ -1,4 +1,4 @@
-package main.java.com.excilys.cdb.dao;
+package com.excilys.cdb.dao;
 
 import java.lang.reflect.Field;
 import java.sql.Connection;
@@ -10,9 +10,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Map.Entry;
 
-import main.java.com.excilys.cdb.Main;
-import main.java.com.excilys.cdb.model.Company;
-import main.java.com.excilys.cdb.model.Computer;
+import com.excilys.cdb.Main;
+import com.excilys.cdb.model.Company;
+import com.excilys.cdb.model.Computer;
 
 public class CompanyDAO extends DAO<Company> {
 	

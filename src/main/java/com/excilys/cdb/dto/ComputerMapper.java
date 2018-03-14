@@ -1,4 +1,4 @@
-package main.java.com.excilys.cdb.dto;
+package com.excilys.cdb.dto;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -7,9 +7,9 @@ import java.util.Locale;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import main.java.com.excilys.cdb.constant.DateConstant;
-import main.java.com.excilys.cdb.model.Company;
-import main.java.com.excilys.cdb.model.Computer;
+import com.excilys.cdb.constant.DateConstant;
+import com.excilys.cdb.model.Company;
+import com.excilys.cdb.model.Computer;
 
 public class ComputerMapper {
 

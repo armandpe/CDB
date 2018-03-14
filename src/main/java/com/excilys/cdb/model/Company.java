@@ -1,6 +1,6 @@
-package main.java.com.excilys.cdb.model;
+package com.excilys.cdb.model;
 
-import main.java.com.excilys.cdb.ParamDescription;
+import com.excilys.cdb.ParamDescription;
 
 @SQLTable(name = "company")
 public class Company implements ModelClass {

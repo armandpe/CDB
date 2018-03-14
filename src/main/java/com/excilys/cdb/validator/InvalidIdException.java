@@ -1,4 +1,4 @@
-package main.java.com.excilys.cdb.validator;
+package com.excilys.cdb.validator;
 
 @SuppressWarnings("serial")
 public class InvalidIdException extends InvalidInputException {

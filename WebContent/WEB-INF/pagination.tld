@@ -5,7 +5,7 @@
    
    <tag>
       <name>pagination</name>
-      <tag-class>main.java.com.excilys.cdb.servlet.tag.PaginationTag</tag-class>
+      <tag-class>com.excilys.cdb.servlet.tag.PaginationTag</tag-class>
       <body-content>empty</body-content>
       
       <attribute>

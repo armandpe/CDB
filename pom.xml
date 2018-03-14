@@ -129,7 +129,6 @@
 		</dependency>
 	</dependencies>
 	<build>
-		<sourceDirectory>src</sourceDirectory>
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -146,7 +145,7 @@
 					<!-- <warSourceDirectory>WebContent</warSourceDirectory> -->
 					<archive>
 						<manifest>
-							<mainClass>main.java.com.excilys.cdb.Main</mainClass>
+							<mainClass>com.excilys.cdb.Main</mainClass>
 						</manifest>
 					</archive>
 				</configuration>
