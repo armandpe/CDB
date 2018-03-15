@@ -7,18 +7,19 @@ import org.slf4j.LoggerFactory;
 
 import com.excilys.cdb.dao.FailedDAOOperationException;
 import com.excilys.cdb.ihm.UserChoice;
-import com.excilys.cdb.utils.FunctionException;
+import com.excilys.cdb.model.ModelClass;
+import com.excilys.cdb.service.Service;
 
-public abstract class PageManagerAbstract<T> {
+public abstract class PageManagerAbstract<T extends ModelClass> {
 	
-	protected Logger logger = LoggerFactory.getLogger(PageManagerLimit.class);
-
 	protected long limit = 10;
+
+	protected Logger logger = LoggerFactory.getLogger(PageManagerLimit.class);
 	protected long max;
 	protected long maxPage;
 	protected long offset = 0;
 	protected ArrayList<T> pageData = new ArrayList<>();
-	protected FunctionException<String, Long, FailedDAOOperationException> getMaxFunction;
+	protected Service<?, ?> service;
 	
 	@UserChoice(name = "Get first page")
 	public void first() {
@@ -50,9 +51,17 @@ public abstract class PageManagerAbstract<T> {
 		return pageData;
 	}
 
+	public void gotTo(long page) {
+		page = Math.min(page, maxPage);
+		page = Math.max(1, page);
+		
+		offset = (page - 1) * limit;
+	}
+
 	@UserChoice(name = "Get last page")
-	public void last() {
+	public boolean last() {
 		offset = (maxPage - 1) * limit;
+		return true;
 	}
 
 	@UserChoice(name = "Get next page")
@@ -72,20 +81,10 @@ public abstract class PageManagerAbstract<T> {
 		offset -= limit;
 		return true;
 	}
-
+	
 	public void setLimit(long limit) {
 		this.limit = limit;
 		setOffset(0);
-		refreshMaxPage();
-	}
-	
-	protected void refreshMaxPage() {
-		this.maxPage = (long) Math.ceil(((double) max) / (double) limit);
-		gotTo(getPage());
-	}
-
-	protected void setMax() throws FailedDAOOperationException {
-		this.max = getMaxFunction.apply(null);
 		refreshMaxPage();
 	}
 
@@ -95,11 +94,14 @@ public abstract class PageManagerAbstract<T> {
 
 	protected abstract boolean getItems() throws FailedDAOOperationException;
 
-	public void gotTo(long page) {
-		page = Math.min(page, maxPage);
-		page = Math.max(1, page);
-		
-		offset = (page - 1) * limit;
+	protected void refreshMaxPage() {
+		this.maxPage = (long) Math.ceil(((double) max) / (double) limit);
+		gotTo(getPage());
+	}
+
+	protected void setMax() throws FailedDAOOperationException {
+		this.max = service.getCount();
+		refreshMaxPage();
 	}
 	
 }

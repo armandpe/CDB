@@ -32,17 +32,17 @@
 //	static final Logger LOGGER = LoggerFactory.getLogger(ComputerDAOTest.class);
 //	
 //	@BeforeClass
-//	public static void setUpBeforeClass() throws Exception {
+//	public void setUpBeforeClass() throws Exception {
 //		
 //	}
 //	
 //	@AfterClass
-//	public static void tearDownAfterClass() throws Exception {
+//	public void tearDownAfterClass() throws Exception {
 //		
 //	}
 //	
 //	private static void dropDatabase() {
-//
+//		
 //	}
 //
 //	private static void initDatabase() {

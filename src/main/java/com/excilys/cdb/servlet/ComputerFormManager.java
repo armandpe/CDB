@@ -30,8 +30,7 @@ public class ComputerFormManager {
 	protected List<CompanyDTO> companyList = new ArrayList<>();	
 	
 	@Autowired
-	protected CompanyService companyService;
-
+	protected CompanyService companyService;;
 
 	public List<String> setRequestCompanies(HttpServletRequest request) {
 		List<String> errors = new ArrayList<>();

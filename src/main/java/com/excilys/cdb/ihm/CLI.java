@@ -351,7 +351,7 @@ public class CLI {
 		Service<T, ?> myService = getServiceInstance(usedClass);
 		PageManagerLimit<T> pageManager;
 		
-		pageManager = new PageManagerLimit<T>(search -> myService.getCount(search),  (x, y) -> myService.getAll(x, y));
+		pageManager = new PageManagerLimit<T>(myService);
 		
 		while (keepGoing) {
 			ArrayList<T> data = pageManager.getPageData();

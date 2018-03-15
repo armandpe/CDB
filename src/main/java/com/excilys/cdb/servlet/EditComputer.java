@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -19,7 +21,10 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.excilys.cdb.dao.FailedDAOOperationException;
 import com.excilys.cdb.dto.ComputerDTO;
@@ -34,10 +39,21 @@ import com.google.gson.Gson;
 public class EditComputer extends HttpServlet {
 
 	@Autowired
+	protected ComputerFormManager computerFormManager = new ComputerFormManager();
+	
+	@Autowired
 	protected ComputerService computerService;
 	protected ComputerDTO lastComputer = new ComputerDTO();
 	protected Logger logger = LoggerFactory.getLogger(this.getClass());
-	protected ComputerFormManager computerFormManager = new ComputerFormManager();
+	
+	@Override
+	public void init(ServletConfig config) throws ServletException {
+		super.init(config);
+		ServletContext servletContext = config.getServletContext();
+		WebApplicationContext webApplicationContext = WebApplicationContextUtils.getWebApplicationContext(servletContext);
+		AutowireCapableBeanFactory autowireCapableBeanFactory = webApplicationContext.getAutowireCapableBeanFactory();
+		autowireCapableBeanFactory.autowireBean(this);
+	}
 	
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {

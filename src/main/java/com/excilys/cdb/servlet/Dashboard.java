@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -18,7 +20,11 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.excilys.cdb.constant.Servlet;
 import com.excilys.cdb.dao.FailedDAOOperationException;
@@ -37,12 +43,24 @@ import com.google.gson.Gson;
 @WebServlet("/" + NAME_DASHBOARD)
 public class Dashboard extends HttpServlet {
 	@Autowired
-	protected ComputerService computerService;
-	
-	protected Logger logger = LoggerFactory.getLogger(this.getClass());
-	protected PageManagerComplete<Computer> pageManager = new PageManagerComplete<Computer>(computerService::getCount, computerService::getAll);
-	protected PageData<ComputerDTO> pageData = new PageData<>();
+	private ComputerService computerService;
+
 	protected List<String> errors = new ArrayList<>();
+
+	protected Logger logger = LoggerFactory.getLogger(this.getClass());
+	protected PageData<ComputerDTO> pageData = new PageData<>();
+	@Autowired
+	@Qualifier("computerPageManager")
+	protected PageManagerComplete<Computer> pageManager;
+
+	@Override
+	public void init(ServletConfig config) throws ServletException {
+		super.init(config);
+		ServletContext servletContext = config.getServletContext();
+		WebApplicationContext webApplicationContext = WebApplicationContextUtils.getWebApplicationContext(servletContext);
+		AutowireCapableBeanFactory autowireCapableBeanFactory = webApplicationContext.getAutowireCapableBeanFactory();
+		autowireCapableBeanFactory.autowireBean(this);
+	}
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
