@@ -8,8 +8,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.stereotype.Controller;
+
 @SuppressWarnings("serial")
 @WebServlet("/403")
+@Controller
 public class Error403 extends HttpServlet {
 
 	

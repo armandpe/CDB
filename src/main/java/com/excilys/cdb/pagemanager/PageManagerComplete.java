@@ -50,7 +50,7 @@ public class PageManagerComplete<T> extends PageManagerAbstract<T> {
 	
 	@Override
 	protected void setMax() throws FailedDAOOperationException {
-		this.max = getMaxFunction.apply(this.toSearch);
+		this.max = getMaxFunction.apply(this.toSearch);	
 		refreshMaxPage();
 	}
 	

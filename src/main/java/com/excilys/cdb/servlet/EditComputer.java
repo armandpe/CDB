@@ -18,6 +18,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 
 import com.excilys.cdb.dao.FailedDAOOperationException;
 import com.excilys.cdb.dto.ComputerDTO;
@@ -28,13 +30,15 @@ import com.google.gson.Gson;
 
 @SuppressWarnings("serial")
 @WebServlet("/" + NAME_EDIT)
+@Controller
 public class EditComputer extends HttpServlet {
 
+	@Autowired
+	protected ComputerService computerService;
+	protected ComputerDTO lastComputer = new ComputerDTO();
 	protected Logger logger = LoggerFactory.getLogger(this.getClass());
 	protected ComputerFormManager computerFormManager = new ComputerFormManager();
-	protected ComputerService computerService = ComputerService.getInstance();
-	protected ComputerDTO lastComputer = new ComputerDTO();
-
+	
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		String idString = request.getParameter("id");
@@ -79,7 +83,7 @@ public class EditComputer extends HttpServlet {
 		String idString = request.getParameter("id");
 
 		List<String> errors = computerFormManager.processInput(idString, computerName, introduced, discontinued, companyId,
-				computer -> ComputerService.getInstance().update(computer));
+				computer -> computerService.update(computer));
 
 		if (errors.size() > 0) {
 			logger.info(errors.toString());

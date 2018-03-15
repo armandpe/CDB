@@ -7,15 +7,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import com.excilys.cdb.constant.DateConstant;
 import com.excilys.cdb.dao.FailedDAOOperationException;
 import com.excilys.cdb.service.ComputerService;
 
+@Component
 public class ComputerValidator {
 
-	private static List<InvalidInputException> exceptions = new ArrayList<>();
+	private List<InvalidInputException> exceptions = new ArrayList<>();
+	
+	@Autowired
+	private ComputerService computerService;
 
-	public static void check(String computerName, String introduced, String discontinued, String companyId)
+	public void check(String computerName, String introduced, String discontinued, String companyId)
 			throws InvalidInputException {
 
 		exceptions.clear();
@@ -57,7 +64,7 @@ public class ComputerValidator {
 		}
 	}
 	
-	public static void check(String id, String computerName, String introduced, String discontinued, String companyId)
+	public void check(String id, String computerName, String introduced, String discontinued, String companyId)
 			throws InvalidInputException {
 		
 		checkId(id);
@@ -65,7 +72,7 @@ public class ComputerValidator {
 		check(computerName, introduced, discontinued, companyId);
 	}
 
-	private static void checkId(String idString) throws InvalidIdException {
+	private void checkId(String idString) throws InvalidIdException {
 		if (idString == null) {
 			throw new InvalidIdException("Null id");
 		}
@@ -79,7 +86,7 @@ public class ComputerValidator {
 		
 		if (id < 0 && id != 0) {
 			try {
-				if (!ComputerService.getInstance().getById(id).isPresent()) {
+				if (!computerService.getById(id).isPresent()) {
 					throw new InvalidIdException("Incorrect id value");
 				}
 			} catch (FailedDAOOperationException e) {
@@ -89,7 +96,7 @@ public class ComputerValidator {
 		
 	}
 
-	public static void checkCompanyId(String companyId) throws InvalidIdException {
+	public void checkCompanyId(String companyId) throws InvalidIdException {
 		if (companyId == null) {
 			throw new InvalidIdException("Null company id");
 		}
@@ -103,7 +110,7 @@ public class ComputerValidator {
 
 		if (id < 0 && id != 0) {
 			try {
-				if (!ComputerService.getInstance().getById(id).isPresent()) {
+				if (!computerService.getById(id).isPresent()) {
 					throw new InvalidIdException("Incorrect id value");
 				}
 			} catch (FailedDAOOperationException e) {
@@ -114,7 +121,7 @@ public class ComputerValidator {
 
 	
 	
-	public static LocalDate checkDate(String date) throws InvalidDateException {
+	public LocalDate checkDate(String date) throws InvalidDateException {
 
 		if (date == null) {
 			throw new InvalidDateException("Null date");
@@ -140,7 +147,7 @@ public class ComputerValidator {
 		return parsedDate;
 	}
 
-	public static void checkName(String computerName) throws InvalidNameException {
+	public void checkName(String computerName) throws InvalidNameException {
 		if (computerName == null) {
 			throw new InvalidNameException("Null name");
 		} else if (computerName.trim() == null || computerName.trim() == "") {
@@ -148,7 +155,7 @@ public class ComputerValidator {
 		}
 	}
 
-	public static List<InvalidInputException> getExceptions() {
+	public List<InvalidInputException> getExceptions() {
 		return exceptions;
 	}
 

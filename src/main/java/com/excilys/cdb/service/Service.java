@@ -1,7 +1,5 @@
 package com.excilys.cdb.service;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,8 +12,6 @@ import com.excilys.cdb.dao.FailedDAOOperationException;
 import com.excilys.cdb.model.ModelClass;
 
 public abstract class Service<T extends ModelClass, U extends DAO<T>> {
-
-	String daoClassName;
 	
 	final Logger logger = LoggerFactory.getLogger(this.getClass());
 	
@@ -43,7 +39,7 @@ public abstract class Service<T extends ModelClass, U extends DAO<T>> {
 	public List<T> getAll(long offset, long limit, String toSearch, ComputerOrderBy orderByVar, boolean ascd) throws FailedDAOOperationException {
 		DAO<T> dao = getDAO();
 		try {
-		return dao.getAll(offset, limit, toSearch, orderByVar, ascd);
+		return dao.getAll(offset, limit, toSearch, Optional.of(orderByVar), ascd);
 		} catch (FailedDAOOperationException e) {
 			e.setMessage(getDaoClassFullName() + " : Get all method failed ");
 			throw e;
@@ -75,38 +71,7 @@ public abstract class Service<T extends ModelClass, U extends DAO<T>> {
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
-	public DAO<T> getDAO() {
-		Class<?> c = null;
-		DAO<T> dao = null;
-		Method method = null;
-		
-		try {
-			c = Class.forName(getDaoClassFullName());
-		} catch (ClassNotFoundException e) {
-			final StackTraceElement[] ste = Thread.currentThread().getStackTrace();
-			String methodName = ste[1].getMethodName(); 
-			logger.error("Error in method " + methodName + " : " + e.getMessage());
-		}
-		
-		try {
-			method = c.getMethod("getInstance");
-		} catch (NoSuchMethodException | SecurityException e) {
-			final StackTraceElement[] ste = Thread.currentThread().getStackTrace();
-			String methodName = ste[1].getMethodName(); 
-			logger.error("Error in method " + methodName + " : " + e.getMessage());
-		}
-		
-		try {
-			dao = (DAO<T>) method.invoke(null);
-		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-			final StackTraceElement[] ste = Thread.currentThread().getStackTrace();
-			String methodName = ste[1].getMethodName(); 
-			logger.error("Error in method " + methodName + " : " + e.getMessage());
-		}
-		
-		return dao;
-	}
-	
 	public abstract String getDaoClassFullName();
+	
+	public abstract DAO<T> getDAO();
 }

@@ -15,14 +15,20 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 
 import com.excilys.cdb.service.ComputerService;
 import com.google.gson.Gson;
 
 @SuppressWarnings("serial")
 @WebServlet("/" + NAME_ADD)
+@Controller
 public class AddComputer extends HttpServlet  {
 
+	@Autowired
+	ComputerService computerService;
+	
 	protected Logger logger = LoggerFactory.getLogger(this.getClass());
 	ComputerFormManager computerFormManager = new ComputerFormManager();
 
@@ -40,7 +46,7 @@ public class AddComputer extends HttpServlet  {
 		String discontinued = request.getParameter("discontinued");
 		String companyId = request.getParameter("companyId");
 
-		List<String> errors = computerFormManager.processInput(computerName, introduced, discontinued, companyId, computer -> ComputerService.getInstance().create(computer));
+		List<String> errors = computerFormManager.processInput(computerName, introduced, discontinued, companyId, computer -> computerService.create(computer));
 		request.setAttribute("errors", new Gson().toJson(errors));
 
 		if (errors.size() > 0) {

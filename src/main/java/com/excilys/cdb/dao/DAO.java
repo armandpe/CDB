@@ -28,6 +28,7 @@ import java.util.function.Function;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.excilys.cdb.Main;
 import com.excilys.cdb.connectionmanager.ConnectionManager;
@@ -40,6 +41,9 @@ import com.excilys.cdb.utils.BiFunctionException;
 import com.excilys.cdb.utils.FunctionException;
 
 public abstract class DAO<T extends ModelClass> {
+
+	@Autowired
+	private ConnectionManager connectionManager;
 
 	private static Map<Class<?>, BiFunctionException<ResultSet, String, ?, SQLException>> staticResultSetFunctionMap = null;
 
@@ -97,27 +101,29 @@ public abstract class DAO<T extends ModelClass> {
 
 	public List<T> getAll(long offset, long limit) throws FailedDAOOperationException {
 
-		Object[] objects = {offset, limit, null, "computer.name", true};
+		Object[] objects = {offset, limit, null, null, true};
 		return executeWithConnection(x -> this.getAll(x), objects);
 	}
 
-	public List<T> getAll(long offset, long limit, String toSearch, ComputerOrderBy orderBy, boolean ascd) throws FailedDAOOperationException {
+	public List<T> getAll(long offset, long limit, String toSearch, Optional<ComputerOrderBy> orderBy, boolean ascd) throws FailedDAOOperationException {
 
 		String orderByVar = null;
 
-		switch (orderBy) {
-		case COMPANY_NAME : 
-			orderByVar = "company.name"; 
-			break;
-		case DISCONTINUED : 
-			orderByVar = "computer.discontinued"; 
-			break;
-		case INTRODUCED : 
-			orderByVar = "computer.introduced"; 
-			break;
-		case NAME : 
-			orderByVar = "computer.name"; 
-			break;
+		if (orderBy.isPresent()) {
+			switch (orderBy.get()) {
+			case COMPANY_NAME : 
+				orderByVar = "company.name"; 
+				break;
+			case DISCONTINUED : 
+				orderByVar = "computer.discontinued"; 
+				break;
+			case INTRODUCED : 
+				orderByVar = "computer.introduced"; 
+				break;
+			case NAME : 
+				orderByVar = "computer.name"; 
+				break;
+			}
 		}
 
 		Object[] objects = {offset, limit, toSearch, orderByVar, ascd};
@@ -357,9 +363,8 @@ public abstract class DAO<T extends ModelClass> {
 	}
 
 	protected <V> V executeWithConnection(FunctionException<Object[], V, FailedDAOOperationException> f, Object[] objects) throws FailedDAOOperationException {
-		ConnectionManager cManager = ConnectionManager.getInstance();
 		V result = null;
-		try (Connection connection = cManager.getConnection()) {
+		try (Connection connection = connectionManager.getConnection()) {
 			connection.setAutoCommit(false);
 			try {
 				result =  f.apply(append(objects, connection));
@@ -395,7 +400,7 @@ public abstract class DAO<T extends ModelClass> {
 		}
 
 		query += " ORDER BY " + orderByVar + (asc ? " ASC" : " DESC");
-		
+
 		query += " LIMIT " + offset + ", " + limit;
 
 		ResultSet sqlResults = null;
@@ -677,6 +682,7 @@ public abstract class DAO<T extends ModelClass> {
 			logger.error(Main.getErrorMessage(null, e.getMessage()));
 			throw new FailedDAOOperationException();
 		}
+		
 		return result;
 	}
 

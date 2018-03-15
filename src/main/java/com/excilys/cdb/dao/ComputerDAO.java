@@ -10,32 +10,17 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.Set;
+
+import org.springframework.stereotype.Repository;
 
 import com.excilys.cdb.Main;
 import com.excilys.cdb.model.Computer;
 import com.excilys.cdb.model.SQLInfo;
 
-import java.util.Optional;
-import java.util.Set;
-
-/**
- * @author excilys
- *
- */
+@Repository
 public class ComputerDAO extends DAO<Computer> {
-
-	private static ComputerDAO computerDAO;
-
-	public static ComputerDAO getInstance() {
-		if (computerDAO == null) {
-			computerDAO = new ComputerDAO();
-		}
-
-		return computerDAO;
-	}
-
-	private ComputerDAO() {
-	}
 	
 	public void create(Computer computer) throws FailedDAOOperationException {
 		Object[] args = {computer};

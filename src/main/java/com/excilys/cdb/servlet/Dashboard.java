@@ -17,6 +17,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 
 import com.excilys.cdb.constant.Servlet;
 import com.excilys.cdb.dao.FailedDAOOperationException;
@@ -31,10 +33,12 @@ import com.excilys.cdb.validator.InvalidInputException;
 import com.google.gson.Gson;
 
 @SuppressWarnings("serial")
+@Controller
 @WebServlet("/" + NAME_DASHBOARD)
 public class Dashboard extends HttpServlet {
-
-	protected ComputerService computerService = ComputerService.getInstance();
+	@Autowired
+	protected ComputerService computerService;
+	
 	protected Logger logger = LoggerFactory.getLogger(this.getClass());
 	protected PageManagerComplete<Computer> pageManager = new PageManagerComplete<Computer>(computerService::getCount, computerService::getAll);
 	protected PageData<ComputerDTO> pageData = new PageData<>();

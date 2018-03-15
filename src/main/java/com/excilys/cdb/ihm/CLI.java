@@ -22,6 +22,8 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import com.excilys.cdb.Main;
 import com.excilys.cdb.ParamDescription;
@@ -34,15 +36,23 @@ import com.excilys.cdb.service.Service;
 import com.excilys.cdb.service.ServiceClass;
 import com.excilys.cdb.service.ServiceMethod;
 
+@Component
 public class CLI {
 
 	static final Logger LOGGER = LoggerFactory.getLogger(CLI.class);
-	static ArrayList<Class<? extends Service<?, ?>>> services = new ArrayList<>();
 	
-	public static void start() {
+	private ArrayList<Service<?, ?>> services = new ArrayList<>();
+	
+	@Autowired
+	private ComputerService computerService; 
+
+	@Autowired
+	private CompanyService companyService;
+	
+	public void start() {
 		
-		services.add(ComputerService.class);
-		services.add(CompanyService.class);
+		services.add(companyService);
+		services.add(computerService);
 
 		boolean continuer = true;
 		Scanner sc = new Scanner(System.in);
@@ -77,7 +87,7 @@ public class CLI {
 		sc.close();
 	}
 
-	private static Object applyChoice(int choice,
+	private Object applyChoice(int choice,
 			LinkedHashMap<Class<? extends Service<?, ?>>, Method[]> servicesMethods, Scanner sc) {
 
 		Class<? extends Service<?, ?>> usedClass = null;
@@ -121,7 +131,7 @@ public class CLI {
 		}
 	}
 
-	private static Object applyServiceMethod(Class<? extends Service<?, ?>> usedClass, Method chosenMethod,
+	private Object applyServiceMethod(Class<? extends Service<?, ?>> usedClass, Method chosenMethod,
 			Object[] parameters) {
 		try {
 			return chosenMethod.invoke(getServiceInstance(usedClass), parameters);
@@ -286,32 +296,18 @@ public class CLI {
 	}
 
 	@SuppressWarnings("unchecked")
-	private static <T extends ModelClass> Service<T, ?> getServiceInstance(Class<? extends Service<T, ?>> serviceClass) {
-
-		Service<T, ?> service = null;
-
-		Method method = null;
-		try {
-			method = serviceClass.getMethod("getInstance");
-		} catch (NoSuchMethodException | SecurityException e) {
-			LOGGER.error(Main.getErrorMessage("reflexion error getting getInstance", e.getMessage()));
-		}
-
-		try {
-			service = (Service<T, ?>) method.invoke(null);
-		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-			LOGGER.error(Main.getErrorMessage("reflexion error invoking getInstance", e.getMessage()));
-		}
-
-		return service;
+	private <T extends ModelClass> Service<T, ?> getServiceInstance(Class<? extends Service<T, ?>> serviceClass) {
+		return (Service<T, ?>) services.stream().filter(service -> service.getClass().equals(serviceClass)).findFirst().get();
 	}
 
 	private static LinkedHashMap<Class<? extends Service<?, ?>>, Method[]> getSQLMethods(
-			ArrayList<Class<? extends Service<?, ?>>> services) {
+			ArrayList<Service<?, ?>> services) {
 
 		LinkedHashMap<Class<? extends Service<?, ?>>, Method[]> result = new LinkedHashMap<>();
 
-		for (Class<? extends Service<?, ?>> currentClass : services) {
+		for (Service<?, ?> currentService : services) {
+			@SuppressWarnings("unchecked")
+			Class<? extends Service<?, ?>> currentClass = (Class<? extends Service<?, ?>>) currentService.getClass();
 			Set<Method> toAdd = new HashSet<>();
 
 			for (Method method : currentClass.getMethods()) {
@@ -330,12 +326,13 @@ public class CLI {
 		System.out.println(s);
 	}
 
-	private static int printChoices(ArrayList<Class<? extends Service<?, ?>>> services,
+	private static int printChoices(ArrayList<Service<?, ?>> services,
 			LinkedHashMap<Class<? extends Service<?, ?>>, Method[]> servicesMethods) {
 		print("Here is the command list :");
 		print("\t0 - Exit the program");
 		int i = 0;
-		for (Class<?> serviceClass : services) {
+		for (Service<?, ?> service : services) {
+			Class<?> serviceClass = service.getClass();
 			print("For " + serviceClass.getAnnotation(ServiceClass.class).name() + " : ");
 
 			for (Method method : servicesMethods.get(serviceClass)) {
@@ -349,7 +346,7 @@ public class CLI {
 		return i;
 	}
 
-	private static <T extends ModelClass> Object serviceGetAll(Class<? extends Service<T, ?>> usedClass, Method chosenMethod, Scanner sc) throws FailedDAOOperationException {
+	private <T extends ModelClass> Object serviceGetAll(Class<? extends Service<T, ?>> usedClass, Method chosenMethod, Scanner sc) throws FailedDAOOperationException {
 		boolean keepGoing = true;
 		Service<T, ?> myService = getServiceInstance(usedClass);
 		PageManagerLimit<T> pageManager;

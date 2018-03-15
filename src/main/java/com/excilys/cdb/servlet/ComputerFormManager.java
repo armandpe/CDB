@@ -7,6 +7,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import com.excilys.cdb.dao.FailedDAOOperationException;
 import com.excilys.cdb.dto.CompanyDTO;
@@ -19,12 +21,16 @@ import com.excilys.cdb.utils.ConsumerException;
 import com.excilys.cdb.validator.ComputerValidator;
 import com.excilys.cdb.validator.InvalidInputException;
 
+@Component
 public class ComputerFormManager {
 
-
+	@Autowired
+	private ComputerValidator computerValidator;
 	protected Logger logger = LoggerFactory.getLogger(this.getClass());
 	protected List<CompanyDTO> companyList = new ArrayList<>();	
-	protected CompanyService companyService = CompanyService.getInstance();
+	
+	@Autowired
+	protected CompanyService companyService;
 
 
 	public List<String> setRequestCompanies(HttpServletRequest request) {
@@ -46,7 +52,7 @@ public class ComputerFormManager {
 		List<String> errors = new ArrayList<>();
 		
 		try {
-			ComputerValidator.check(id, computerName, introduced, discontinued, companyId);
+			computerValidator.check(id, computerName, introduced, discontinued, companyId);
 			ComputerDTO dto = ComputerMapper.toDTO(id, computerName, introduced, discontinued, companyId);
 			Computer computer = ComputerMapper.toComputer(dto);
 			processComputer.accept(computer);
@@ -56,7 +62,7 @@ public class ComputerFormManager {
 			errors.add(e.getMessage());
 		}
 		
-		ComputerValidator.getExceptions().forEach(exception -> errors.add(exception.getMessage()));
+		computerValidator.getExceptions().forEach(exception -> errors.add(exception.getMessage()));
 		
 		return errors;
 	}
