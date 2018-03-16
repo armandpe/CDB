@@ -1,4 +1,4 @@
-package com.excilys.cdb.connectionmanager;
+package com.excilys.cdb.dao.connectionmanager;
 
 import java.sql.Connection;
 import java.sql.SQLException;

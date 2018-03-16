@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import com.excilys.cdb.ihm.CLI;
-import com.excilys.cdb.spring.SpringConfiguration;
+import com.excilys.cdb.web.spring.SpringConfiguration;
 
 
 public class Main {
@@ -48,7 +48,7 @@ public class Main {
 		}
 		cli.start();	
 	}
-
+	
 	private static String getCallerCallerClassName() { 
 		StackTraceElement[] stElements = Thread.currentThread().getStackTrace();
 		String callerClassName = null;

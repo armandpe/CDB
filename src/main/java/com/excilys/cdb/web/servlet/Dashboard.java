@@ -1,4 +1,4 @@
-package com.excilys.cdb.servlet;
+package com.excilys.cdb.web.servlet;
 
 import static com.excilys.cdb.constant.Servlet.NAME_DASHBOARD;
 import static com.excilys.cdb.constant.Servlet.PATH_403;
@@ -28,14 +28,14 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.excilys.cdb.constant.Servlet;
 import com.excilys.cdb.dao.FailedDAOOperationException;
-import com.excilys.cdb.dto.ComputerDTO;
-import com.excilys.cdb.dto.ComputerMapper;
 import com.excilys.cdb.model.Computer;
 import com.excilys.cdb.pagemanager.PageManagerComplete;
 import com.excilys.cdb.service.ComputerOrderBy;
 import com.excilys.cdb.service.ComputerService;
 import com.excilys.cdb.validator.InputValidator;
 import com.excilys.cdb.validator.InvalidInputException;
+import com.excilys.cdb.web.dto.ComputerDTO;
+import com.excilys.cdb.web.dto.ComputerMapper;
 import com.google.gson.Gson;
 
 @SuppressWarnings("serial")

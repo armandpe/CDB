@@ -1,4 +1,4 @@
-package com.excilys.cdb.dto;
+package com.excilys.cdb.web.dto;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;

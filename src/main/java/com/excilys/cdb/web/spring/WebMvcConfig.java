@@ -1,4 +1,4 @@
-package com.excilys.cdb.spring;
+package com.excilys.cdb.web.spring;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -11,14 +11,13 @@ import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
 @Configuration
 @EnableWebMvc
-@ComponentScan(basePackages = { "com.excilys.formation.tbezenger" })
+@ComponentScan(basePackages = { "com.excilys.cdb" })
 public class WebMvcConfig implements WebMvcConfigurer  {
 
 	@Override
 	public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {
 	    configurer.enable();
 	}
-
 
     /**
      * Provide a view resolver to map views to the correct template files.

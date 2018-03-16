@@ -1,4 +1,4 @@
-package com.excilys.cdb.servlet;
+package com.excilys.cdb.web.servlet;
 
 import java.io.IOException;
 
@@ -16,10 +16,10 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 @SuppressWarnings("serial")
-@WebServlet("/404")
+@WebServlet("/500")
 @Controller
-public class Error404 extends HttpServlet {
-	
+public class Error500 extends HttpServlet {
+
 	@Override
 	public void init(ServletConfig config) throws ServletException {
 		super.init(config);
@@ -28,10 +28,11 @@ public class Error404 extends HttpServlet {
 		AutowireCapableBeanFactory autowireCapableBeanFactory = webApplicationContext.getAutowireCapableBeanFactory();
 		autowireCapableBeanFactory.autowireBean(this);
 	}
-	
+
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		
-		request.getRequestDispatcher("/WEB-INF/views/404.jsp").forward(request, response);
+
+		request.getRequestDispatcher("/WEB-INF/views/500.jsp").forward(request, response);
+
 	}
-	
+
 }

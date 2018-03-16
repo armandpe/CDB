@@ -3,7 +3,6 @@ package com.excilys.cdb.dao;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
-import java.sql.Connection;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -21,20 +20,8 @@ import com.excilys.cdb.model.SQLInfo;
 
 @Repository
 public class ComputerDAO extends DAO<Computer> {
-	
+
 	public void create(Computer computer) throws FailedDAOOperationException {
-		Object[] args = {computer};
-		executeWithConnection(x -> create(x), args);	
-	}
-		
-	protected int create(Object...objects) throws FailedDAOOperationException {
-		Computer computer = (Computer) objects[0];
-		Connection connection = (Connection) objects[1];
-		create(computer, connection);
-		return 0;
-	}
-	
-	protected void create(Computer computer, Connection connection) throws FailedDAOOperationException {
 		Map<String, Field> mapperSQLFields = getMapperSQLFields(getModelClassFullName());
 		Set<String> keys = mapperSQLFields.keySet();
 
@@ -45,7 +32,7 @@ public class ComputerDAO extends DAO<Computer> {
 
 		String query = generateCreateQuery(fieldsClassValues, keys);
 
-		executeStatement(query, fieldsClassValues, keyOrder, connection);
+		executeQuery(query, fieldsClassValues, keyOrder);
 	}
 
 	public void delete(long id) throws FailedDAOOperationException {
@@ -58,18 +45,6 @@ public class ComputerDAO extends DAO<Computer> {
 	}
 
 	public void update(Computer computer) throws FailedDAOOperationException {
-		Object[] args = {computer};
-		executeWithConnection(x -> update(x), args);
-	}
-	
-	protected int update(Object...objects) throws FailedDAOOperationException {
-		Computer computer = (Computer) objects[0];
-		Connection connection = (Connection) objects[1];
-		update(computer, connection);
-		return 0;
-	}
-	
-	protected void update(Computer computer, Connection connection) throws FailedDAOOperationException {
 		Map<String, Field> mapperSQLFields = getMapperSQLFields(getModelClassFullName());
 		Set<String> keys = mapperSQLFields.keySet();
 
@@ -82,10 +57,32 @@ public class ComputerDAO extends DAO<Computer> {
 
 		String query = generateUpdateQuery(fieldsClassValues, keys, primaryKey);
 
-		executeStatement(query, fieldsClassValues, keyOrder, connection);
+		for (Entry<String, SimpleEntry<Field, Object>> fieldClassValue : fieldsClassValues.entrySet()) {
+			Object value = fieldClassValue.getValue().getValue();
+
+			Field field = fieldClassValue.getValue().getKey();
+			Class<?> type = field.getType();
+
+			if (type == Optional.class) {
+				type = (Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
+				if (((Optional<?>) value).isPresent()) {
+					value = ((Optional<?>) value).get();
+				}
+			}
+
+			if (value != null && value.getClass() == Optional.class) {
+				if (((Optional<?>) value).isPresent()) {
+					value = ((Optional<?>) value).get();
+				}
+			}
+
+			int order = keyOrder.get(fieldClassValue.getKey());
+		}
+
+		executeQuery(query, fieldsClassValues, keyOrder);
 	}
 
-	private String generateCreateQuery(LinkedHashMap<String, SimpleEntry<Field, Object>> paramValues,
+	protected String generateCreateQuery(LinkedHashMap<String, SimpleEntry<Field, Object>> paramValues,
 			Set<String> keys) {
 
 		String[] template = {};
@@ -101,7 +98,7 @@ public class ComputerDAO extends DAO<Computer> {
 		return query;
 	}
 
-	private LinkedHashMap<String, SimpleEntry<Field, Object>> generateFieldsClassValues(
+	protected LinkedHashMap<String, SimpleEntry<Field, Object>> generateFieldsClassValues(
 			Map<String, Field> mapperSQLFields, Computer computer) {
 		LinkedHashMap<String, SimpleEntry<Field, Object>> fieldsClassValues = new LinkedHashMap<>();
 
@@ -160,16 +157,6 @@ public class ComputerDAO extends DAO<Computer> {
 		return fieldsClassValues;
 	}
 
-	protected List<Computer> getByCompanyId(long companyId, Connection connection) throws FailedDAOOperationException {
-		Entry<String, Field> foreignKey = getKey(getModelClassFullName(), x -> x.foreignKey());
-		Map<String, String> conditions = new HashMap<>();
-		conditions.put(foreignKey.getKey(), "" + companyId);
-		
-		List<Computer> result = getWithConditions(conditions, connection);
-		
-		return result;
-	}
-	
 	protected String generateUpdateQuery(LinkedHashMap<String, SimpleEntry<Field, Object>> paramValues, Set<String> keys,
 			String primaryKey) {
 
@@ -185,7 +172,17 @@ public class ComputerDAO extends DAO<Computer> {
 		return query;
 	}
 
-	private HashMap<String, Integer> getKeyOrder(LinkedHashMap<String, SimpleEntry<Field, Object>> fieldsClassValues) {
+	protected List<Computer> getByCompanyId(long companyId) throws FailedDAOOperationException {
+		Entry<String, Field> foreignKey = getKey(getModelClassFullName(), x -> x.foreignKey());
+		Map<String, String> conditions = new HashMap<>();
+		conditions.put(foreignKey.getKey(), "" + companyId);
+
+		List<Computer> result = getWithConditions(conditions);
+
+		return result;
+	}
+
+	protected HashMap<String, Integer> getKeyOrder(LinkedHashMap<String, SimpleEntry<Field, Object>> fieldsClassValues) {
 		HashMap<String, Integer> keyOrder = new HashMap<>();
 
 		int i = 0;
@@ -196,7 +193,7 @@ public class ComputerDAO extends DAO<Computer> {
 		return keyOrder;
 	}
 
-	private HashMap<String, Integer> getKeyOrder(LinkedHashMap<String, SimpleEntry<Field, Object>> fieldsClassValues,
+	protected HashMap<String, Integer> getKeyOrder(LinkedHashMap<String, SimpleEntry<Field, Object>> fieldsClassValues,
 			String primaryKey) {
 		HashMap<String, Integer> keyOrder = new HashMap<>();
 

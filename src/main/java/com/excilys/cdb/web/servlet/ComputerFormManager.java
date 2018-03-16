@@ -1,4 +1,4 @@
-package com.excilys.cdb.servlet;
+package com.excilys.cdb.web.servlet;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,15 +11,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.excilys.cdb.dao.FailedDAOOperationException;
-import com.excilys.cdb.dto.CompanyDTO;
-import com.excilys.cdb.dto.CompanyMapper;
-import com.excilys.cdb.dto.ComputerDTO;
-import com.excilys.cdb.dto.ComputerMapper;
 import com.excilys.cdb.model.Computer;
 import com.excilys.cdb.service.CompanyService;
 import com.excilys.cdb.utils.ConsumerException;
 import com.excilys.cdb.validator.ComputerValidator;
 import com.excilys.cdb.validator.InvalidInputException;
+import com.excilys.cdb.web.dto.CompanyDTO;
+import com.excilys.cdb.web.dto.CompanyMapper;
+import com.excilys.cdb.web.dto.ComputerDTO;
+import com.excilys.cdb.web.dto.ComputerMapper;
 
 @Component
 public class ComputerFormManager {

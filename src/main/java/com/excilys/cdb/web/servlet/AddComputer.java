@@ -1,4 +1,4 @@
-package com.excilys.cdb.servlet;
+package com.excilys.cdb.web.servlet;
 
 import static com.excilys.cdb.constant.Servlet.NAME_ADD;
 import static com.excilys.cdb.constant.Servlet.NAME_DASHBOARD;

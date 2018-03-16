@@ -1,7 +1,6 @@
 package com.excilys.cdb.dao;
 
 import java.lang.reflect.Field;
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -25,7 +24,19 @@ public class CompanyDAO extends DAO<Company> {
 	
 	private String modelClassFullName = null;
 	
-	private CompanyDAO() { }
+	public void delete(long id) throws FailedDAOOperationException {
+		Entry<String, Field> primaryKey = getKey(getModelClassFullName(), x -> x.primaryKey());
+		Map<String, Object> conditions = new HashMap<>();
+		conditions.put(primaryKey.getKey(), id);
+		
+		List<Computer> computers = computerDAO.getByCompanyId(id);
+		
+		for (long computerId : computers.stream().mapToLong(computer -> computer.getId()).toArray()) {
+			computerDAO.deleteByPrimaryKey(computerId);
+		}
+		
+		deleteByPrimaryKey(id);
+	}
 	
 	@Override
 	public String getModelClassFullName() {
@@ -46,32 +57,6 @@ public class CompanyDAO extends DAO<Company> {
 			logger.error(Main.getErrorMessage(null, e.getMessage()));
 			return Optional.empty();
 		}
-	}
-
-	public void delete(long id) throws FailedDAOOperationException {
-		Object[] args = {id};
-		executeWithConnection(x -> delete(x), args);
-	}
-	
-	protected int delete(Object...objects) throws FailedDAOOperationException {
-		long id = (long) objects[0];
-		Connection connection = (Connection) objects[1];
-		delete(id, connection);
-		return 0;
-	}
-	
-	protected void delete(long id, Connection connection) throws FailedDAOOperationException {
-		Entry<String, Field> primaryKey = getKey(getModelClassFullName(), x -> x.primaryKey());
-		Map<String, Object> conditions = new HashMap<>();
-		conditions.put(primaryKey.getKey(), id);
-		
-		List<Computer> computers = computerDAO.getByCompanyId(id, connection);
-		
-		for (long computerId : computers.stream().mapToLong(computer -> computer.getId()).toArray()) {
-			computerDAO.deleteByPrimaryKey(computerId, connection);
-		}
-		
-		deleteByPrimaryKey(id, connection);
 	}
 
 }

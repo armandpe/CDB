@@ -1,4 +1,4 @@
-package com.excilys.cdb.spring;
+package com.excilys.cdb.web.spring;
 
 import java.util.ResourceBundle;
 
