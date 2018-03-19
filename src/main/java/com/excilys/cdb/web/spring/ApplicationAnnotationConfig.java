@@ -8,7 +8,7 @@ public class ApplicationAnnotationConfig extends AbstractAnnotationConfigDispatc
 
     @Override
     protected Class<?>[] getRootConfigClasses() {
-        return new Class<?>[] {SpringConfiguration.class};
+        return new Class<?>[] {SpringConfig.class};
     }
 
     @Override

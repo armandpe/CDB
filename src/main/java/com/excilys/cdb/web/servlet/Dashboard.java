@@ -163,6 +163,7 @@ public class Dashboard extends HttpServlet {
 					errors.clear();
 					errors.add(e.getMessage());
 					doGet(request, response);
+					return;
 				}
 			}
 		}

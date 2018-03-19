@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import com.excilys.cdb.ihm.CLI;
-import com.excilys.cdb.web.spring.SpringConfiguration;
+import com.excilys.cdb.web.spring.SpringConfig;
 
 
 public class Main {
@@ -43,7 +43,7 @@ public class Main {
 
 	public static void main(String[] args) {
 		CLI cli;
-		try (AnnotationConfigApplicationContext vApplicationContext = new AnnotationConfigApplicationContext(SpringConfiguration.class)) {
+		try (AnnotationConfigApplicationContext vApplicationContext = new AnnotationConfigApplicationContext(SpringConfig.class)) {
 			cli = vApplicationContext.getBean(CLI.class);
 		}
 		cli.start();	

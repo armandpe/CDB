@@ -75,8 +75,6 @@ public class ComputerDAO extends DAO<Computer> {
 					value = ((Optional<?>) value).get();
 				}
 			}
-
-			int order = keyOrder.get(fieldClassValue.getKey());
 		}
 
 		executeQuery(query, fieldsClassValues, keyOrder);

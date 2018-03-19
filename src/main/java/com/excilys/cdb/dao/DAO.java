@@ -26,6 +26,7 @@ import java.util.function.Function;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -83,11 +84,13 @@ public abstract class DAO<T extends ModelClass> {
 		}
 		return false;
 	}
-	private final String AFTER_VARIABLE_COUNT = ") as " + DbConstant.COUNT_VAR + " FROM ";
 
 	private final String AFTER_VARIABLE_SELECT = " FROM ";
+	
+	private final String AFTER_VARIABLE_COUNT = ") as " + DbConstant.COUNT_VAR + AFTER_VARIABLE_SELECT;
 
-	protected JdbcTemplate jdbcTemplate = new JdbcTemplate();
+	@Autowired
+	protected JdbcTemplate jdbcTemplate;
 
 	protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -114,7 +117,8 @@ public abstract class DAO<T extends ModelClass> {
 
 		List<T> result = new ArrayList<>();
 		try {
-			result = jdbcTemplate.query(query, getRowMapper());
+			
+			result = search == null ? jdbcTemplate.query(query, getRowMapper()) : jdbcTemplate.query(query, getRowMapper(), search + '%', search + '%');
 			result.removeIf(x -> x == null);
 		} catch (DataAccessException e) {
 			logger.error(Main.getErrorMessage(null, e.getMessage()));
@@ -124,11 +128,23 @@ public abstract class DAO<T extends ModelClass> {
 		return result;
 	}
 
+	public Optional<T> getById(long id) throws FailedDAOOperationException {
+		Entry<String, Field> primaryKey = getKey(getModelClassFullName(), x -> x.primaryKey());
+		Map<String, String> conditions = new HashMap<>();
+		conditions.put(primaryKey.getKey(), "" + id);
+
+		List<T> result = getWithConditions(conditions);
+
+		return result.size() == 0 ? Optional.empty() : Optional.ofNullable(result.get(0));
+	}
+
 	public long getCount(String search) throws FailedDAOOperationException {
 		Map<String, Field> foreignFields = new HashMap<>();
 
 		String query = countQuery();
 		String foreignTableName = null;
+		
+		
 		if (hasKey(getModelClassFullName(), x -> x.foreignKey())) {
 			String fieldTypeName = getForeignFieldTypeName();
 			foreignTableName = getTable(fieldTypeName);				
@@ -138,7 +154,7 @@ public abstract class DAO<T extends ModelClass> {
 					getKey(getModelClassFullName(), x -> x.foreignKey()).getKey());
 			query = addLeftJoin(query, foreignTableName, constraints);
 		}
-
+		
 		int nbToSearch = 0;
 		if (search != null) {
 			SimpleEntry<Integer, String> nbToSearchAndQuery = getSearchQuery(query, foreignFields);
@@ -148,7 +164,7 @@ public abstract class DAO<T extends ModelClass> {
 
 		int result = -1;
 		try {
-			result = jdbcTemplate.queryForObject(query, getRowMapperCount());
+			result = search == null ? jdbcTemplate.queryForObject(query, getRowMapperCount()) : jdbcTemplate.queryForObject(query, getRowMapperCount(), search + '%', search + '%');
 		} catch (DataAccessException e) {
 			logger.error(Main.getErrorMessage(null, e.getMessage()));
 			throw new FailedDAOOperationException();
@@ -214,17 +230,14 @@ public abstract class DAO<T extends ModelClass> {
 	}
 
 	protected String addLeftJoinWithFields(String query, String[] names, String table, Map<String, String> jointureCriterias) {
-		String afterVariables = query.contains(AFTER_VARIABLE_COUNT) ? AFTER_VARIABLE_COUNT : AFTER_VARIABLE_SELECT;
 
-		afterVariables = afterVariables.replace(")", "\\)");
-
-		String[] query2 = query.split(afterVariables, 2);
-		query = query2[0] + ", " + String.join(", ", names) + afterVariables + query2[1];
+		String[] query2 = query.split(AFTER_VARIABLE_SELECT, 2);
+		query = query2[0] + ", " + String.join(", ", names) + AFTER_VARIABLE_SELECT + query2[1];
 		query = query.replace("\\", "");
 		query = addLeftJoin(query, table, jointureCriterias);
 		return query;
 	}
-
+	
 	protected String addSearch(String query, String[] keySet) {
 		//		SEARCH("SELECT computer.id, computer.name, introduced, discontinued, company_id, company.name FROM computer LEFT JOIN company ON company_id = company.id"
 		//	            + " WHERE (computer.name LIKE ? OR company.name LIKE ?) LIMIT ? OFFSET ?;")
@@ -238,7 +251,7 @@ public abstract class DAO<T extends ModelClass> {
 
 		return query;
 	}
-	
+
 	protected void addSearchToStatement(String searchWith, int nbToSearch, PreparedStatement preparedStatement) {
 
 		for (int i = 1; i <= nbToSearch; ++i) {
@@ -307,7 +320,7 @@ public abstract class DAO<T extends ModelClass> {
 			logger.error(Main.getErrorMessage("maybe theres no implementation for type " + type.getName(), null));
 		}
 	}
-
+	
 	@SuppressWarnings("unchecked")
 	@Nullable
 	protected T buildItem(String className, ResultSet resultSet) {
@@ -343,11 +356,16 @@ public abstract class DAO<T extends ModelClass> {
 		}
 		return result;
 	}
-	
+
 	protected String countQuery() {
-		String query = "SELECT count(" + getKey(getModelClassFullName(), x -> x.primaryKey()).getKey();
-		query += AFTER_VARIABLE_COUNT + getTable(getModelClassFullName());
-		return query;
+		StringBuilder stringBuilder = new StringBuilder();
+		
+		stringBuilder.append("SELECT count(");
+		stringBuilder.append(getKey(getModelClassFullName(), x -> x.primaryKey()).getKey()); 
+		stringBuilder.append(AFTER_VARIABLE_COUNT);
+		stringBuilder.append(getTable(getModelClassFullName()));
+		
+		return stringBuilder.toString();
 	}
 
 	protected void deleteByPrimaryKey(Object primaryKeyValue) throws FailedDAOOperationException {
@@ -366,10 +384,15 @@ public abstract class DAO<T extends ModelClass> {
 		executeQuery(query, fieldsClassValues, keyOrder);
 	}
 
-	protected void executeQuery(String query, LinkedHashMap<String, SimpleEntry<Field, Object>> fieldsClassValues, HashMap<String, Integer> keyOrder) {
+	protected void executeQuery(String query, LinkedHashMap<String, SimpleEntry<Field, Object>> fieldsClassValues, HashMap<String, Integer> keyOrder) throws FailedDAOOperationException {
 		List<Object> values = new ArrayList<>(keyOrder.size());
 		List<Class<?>> types = new ArrayList<>(keyOrder.size());
-
+		
+		for (int i = 0; i < keyOrder.size(); ++i) {
+			values.add(null);
+			types.add(null);
+		}
+		
 		for (Entry<String, SimpleEntry<Field, Object>> fieldClassValue : fieldsClassValues.entrySet()) {
 			Object value = fieldClassValue.getValue().getValue();
 
@@ -389,26 +412,17 @@ public abstract class DAO<T extends ModelClass> {
 				}
 			}
 
-			int order = keyOrder.get(fieldClassValue.getKey());
+			int order = keyOrder.get(fieldClassValue.getKey()) - 1;
 			values.set(order, value);
 			types.set(order, type);
 		}
 
 		try {
-			jdbcTemplate.update(query, values, types);	
+			jdbcTemplate.update(query, values.toArray(new Object[values.size()]));	
 		} catch (DataAccessException e) {
 			logger.error(Main.getErrorMessage(null, e.getMessage()));
+			throw new FailedDAOOperationException();
 		}
-	}
-
-	public Optional<T> getById(long id) throws FailedDAOOperationException {
-		Entry<String, Field> primaryKey = getKey(getModelClassFullName(), x -> x.primaryKey());
-		Map<String, String> conditions = new HashMap<>();
-		conditions.put(primaryKey.getKey(), "" + id);
-
-		List<T> result = getWithConditions(conditions);
-
-		return result.size() == 0 ? Optional.empty() : Optional.ofNullable(result.get(0));
 	}
 
 	protected Object getFieldValue(Entry<String, Field> sqlEntry, ResultSet resultSet) {

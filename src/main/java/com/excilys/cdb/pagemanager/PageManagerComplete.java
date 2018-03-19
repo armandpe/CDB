@@ -44,6 +44,7 @@ public class PageManagerComplete<T extends ModelClass> extends PageManagerAbstra
 		this.toSearch = toSearch;
 	}
 	
+	@SuppressWarnings("unchecked")
 	protected boolean getItems() throws FailedDAOOperationException {
 		setMax();
 		pageData.clear();
