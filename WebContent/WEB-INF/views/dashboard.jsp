@@ -1,5 +1,5 @@
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<%@ taglib prefix="custom" uri="/WEB-INF/pagination.tld"%>
+k<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="custom" uri="/WEB-INF/cdb.tld"%>
 
 <!DOCTYPE html>
 <html>
@@ -58,10 +58,10 @@
 									class="fa fa-trash-o fa-lg"></i>
 							</a>
 						</span></th>
-						<th> <a href="dashboard?orderby=name">Computer name</a></th>
-						<th> <a href="dashboard?orderby=introduced">Introduced date</a></th>
-						<th> <a href="dashboard?orderby=discontinued">Discontinued date</a></th>
-						<th> <a href="dashboard?orderby=company">Company</a></th>
+						<th> <a href="dashboard?orderby=name&order=1&limit=${limit}&search=${search}&page=${page}">Computer name</a></th>
+						<th> <a href="dashboard?orderby=introduced&order=1&limit=${limit}&search=${search}&page=${page}">Introduced date</a></th>
+						<th> <a href="dashboard?orderby=discontinued&order=1&limit=${limit}&search=${search}&page=${page}">Discontinued date</a></th>
+						<th> <a href="dashboard?orderby=company&order=1&limit=${limit}&search=${search}&page=${page}">Company</a></th>
 					</tr>
 				</thead>
 				<!-- Browse attribute computers -->
@@ -84,17 +84,26 @@
 	<footer class="navbar-fixed-bottom">
 		<div class="container text-center">
 			<ul class="pagination">
-				<custom:pagination nbPage="${pageData.maxPage}"
-					currentPage="${pageData.currentPage}" />
+				<custom:pagination 
+					maxPage="${pageData.maxPage}"
+					currentPage="${pageData.currentPage}" 
+					limit="${limit}"
+					orderBy="${orderby}"
+					search="${search}"
+					/>
 			</ul>
-
+			
+			<custom:link order="${order}" limit="10" search="${search}" page="${page}" variableName="hrefLimit10" orderBy="${orderby}"/>
+			<custom:link order="${order}" limit="50" search="${search}" page="${page}" variableName="hrefLimit50" orderBy="${orderby}"/>
+			<custom:link order="${order}" limit="100" search="${search}" page="${page}" variableName="hrefLimit100" orderBy="${orderby}"/>
+			
 			<div class="btn-group btn-group-sm pull-right" role="group">
 				<input type="button" class="btn btn-default"
-					onclick="location.href='dashboard?limit=10'" value="10" /> <input
+					onclick="location.href='${hrefLimit10}'" value="10" /> <input
 					type="button" class="btn btn-default"
-					onclick="location.href='dashboard?limit=50'" value="50" /> <input
+					onclick="location.href='${hrefLimit50}'" value="50" /> <input
 					type="button" class="btn btn-default"
-					onclick="location.href='dashboard?limit=100'" value="100" />
+					onclick="location.href='${hrefLimit100}'" value="100" />
 			</div>
 		</div>
 	</footer>

@@ -23,6 +23,7 @@ public final class Servlet {
 	public static final String PAGE = "page";
 	public static final String ORDER_BY = "orderby";
 	public static final String DELETE_SELECTION = "selection";
+	public static final String ORDER_BY_CHANGED = "orderchanged";
 	
 	//Request attributes
 	public static final String PAGE_DATA = "pageData";
@@ -31,8 +32,20 @@ public final class Servlet {
 	//Request both
 	public static final String SEARCH = "search";
 	
+	public static final String ORDER_BY_ASC = "ASC";
+	
 	public static final String ORDER_BY_NAME = "name";
 	public static final String ORDER_BY_INTRODUCED = "introduced";
 	public static final String ORDER_BY_DISCONTINUED = "discontinued";
 	public static final String ORDER_BY_COMPANY_NAME = "company";
+	
+	public static final long DEFAULT_LIMIT_VALUE = 10;
+	public static final String DEFAULT_LIMIT = String.valueOf(DEFAULT_LIMIT_VALUE);
+	public static final String DEFAULT_SEARCH = "";
+	public static final long DEFAULT_PAGE_VALUE = 1;
+	public static final String DEFAULT_PAGE = String.valueOf(DEFAULT_PAGE_VALUE);
+	public static final String DEFAULT_ORDER_BY = ORDER_BY_NAME;
+	public static final String DEFAULT_ORDER = ORDER_BY_ASC;
+	
+	
 }

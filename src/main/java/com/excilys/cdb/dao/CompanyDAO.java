@@ -42,7 +42,5 @@ public class CompanyDAO extends DAO<Company> {
 		
 		return modelClassFullName;
 	}
-	
-
 
 }

@@ -20,7 +20,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.context.WebApplicationContext;
@@ -42,16 +41,11 @@ import com.google.gson.Gson;
 @Controller
 @WebServlet("/" + NAME_DASHBOARD)
 public class Dashboard extends HttpServlet {
+
 	@Autowired
 	private ComputerService computerService;
 
-	protected List<String> errors = new ArrayList<>();
-
 	protected Logger logger = LoggerFactory.getLogger(this.getClass());
-	protected PageData<ComputerDTO> pageData = new PageData<>();
-	@Autowired
-	@Qualifier("computerPageManager")
-	protected PageManagerComplete<Computer> pageManager;
 
 	@Override
 	public void init(ServletConfig config) throws ServletException {
@@ -69,6 +63,15 @@ public class Dashboard extends HttpServlet {
 		String searchString = request.getParameter(Servlet.SEARCH);
 		String pageString = request.getParameter(Servlet.PAGE);
 		String orderByString = request.getParameter(Servlet.ORDER_BY);
+		boolean orderByChanged = Servlet.ORDER_BY_ASC.equals(request.getParameter(Servlet.ORDER_BY_CHANGED));
+		
+		limitString = limitString != null ? limitString : Servlet.DEFAULT_LIMIT;
+		searchString = searchString != null ? searchString : Servlet.DEFAULT_SEARCH;
+		pageString = pageString != null ? pageString : Servlet.DEFAULT_PAGE;
+		orderByString = orderByString != null ? orderByString : Servlet.DEFAULT_ORDER_BY;
+
+		PageData<ComputerDTO> pageData = new PageData<>();
+		PageManagerComplete<Computer> pageManager = new PageManagerComplete<>(computerService);
 
 		List<Function<Long, Boolean>> limitTests = new ArrayList<>();
 		limitTests.add(limit -> (limit > 0));
@@ -103,32 +106,30 @@ public class Dashboard extends HttpServlet {
 		}	
 
 		try {
-			pageData.getDataList().clear();
+			
+			long limit = Long.parseLong(limitString);
+			long page = Long.parseLong(pageString);
+			
+			pageManager.setLimit(Long.parseLong(limitString));
 
-			if (limitString != null) {
-				pageManager.setLimit(Long.parseLong(limitString));
-			}
-			if (searchString != null) {
-				pageManager.setToSearch(searchString.equals("") ? null : searchString);				
-			}
-			if (orderByString != null) {
-				switch (orderByString) {
-				case Servlet.ORDER_BY_NAME :
-					pageManager.setOrderBy(ComputerOrderBy.NAME);
-					break;
-				case Servlet.ORDER_BY_COMPANY_NAME :
-					pageManager.setOrderBy(ComputerOrderBy.COMPANY_NAME);
-					break;
-				case Servlet.ORDER_BY_DISCONTINUED :
-					pageManager.setOrderBy(ComputerOrderBy.DISCONTINUED);
-					break;
-				case Servlet.ORDER_BY_INTRODUCED :
-					pageManager.setOrderBy(ComputerOrderBy.INTRODUCED);
-					break;
-				}
+			pageManager.setToSearch(searchString.equals("") ? null : searchString);	
+
+			switch (orderByString) {
+			case Servlet.ORDER_BY_NAME :
+				pageManager.setOrderBy(ComputerOrderBy.NAME, orderByChanged);
+				break;
+			case Servlet.ORDER_BY_COMPANY_NAME :
+				pageManager.setOrderBy(ComputerOrderBy.COMPANY_NAME, orderByChanged);
+				break;
+			case Servlet.ORDER_BY_DISCONTINUED :
+				pageManager.setOrderBy(ComputerOrderBy.DISCONTINUED, orderByChanged);
+				break;
+			case Servlet.ORDER_BY_INTRODUCED :
+				pageManager.setOrderBy(ComputerOrderBy.INTRODUCED, orderByChanged);
+				break;
 			}
 
-			pageManager.gotTo(pageString == null ? pageManager.getPage() : Long.parseLong(pageString));
+			pageManager.gotTo(page);
 			pageManager.getPageData().stream().map(ComputerMapper::toDTO).forEach(pageData.getDataList()::add);
 
 			pageData.setCurrentPage(pageManager.getPage());
@@ -136,9 +137,12 @@ public class Dashboard extends HttpServlet {
 			pageData.setCount(pageManager.getMax());
 
 			request.setAttribute(Servlet.PAGE_DATA, pageData);
-			request.setAttribute(Servlet.ERRORS, new Gson().toJson(errors));
+			request.setAttribute(Servlet.ERRORS, new Gson().toJson(new String[0]));
 			request.setAttribute(Servlet.SEARCH, pageManager.getToSearch());
-			errors.clear();
+			request.setAttribute(Servlet.ORDER_BY, orderByString);
+			request.setAttribute(Servlet.LIMIT, limit);
+			request.setAttribute(Servlet.PAGE, page);
+			
 			this.getServletContext().getRequestDispatcher(PATH_DASHBOARD).forward(request, response);
 
 		} catch (FailedDAOOperationException e) {
@@ -149,7 +153,7 @@ public class Dashboard extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		String selection = (String) request.getParameter(Servlet.DELETE_SELECTION);
-		errors.clear();
+		List<String> errors = new ArrayList<>();
 
 		if (selection != null) {
 			String[] toDeleteList = selection.split(",");

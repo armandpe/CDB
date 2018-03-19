@@ -32,8 +32,8 @@ public class PageManagerComplete<T extends ModelClass> extends PageManagerAbstra
 		this.asc = ascd;
 	}
 
-	public void setOrderBy(ComputerOrderBy orderBy) {
-		if (orderBy == this.orderBy) {
+	public void setOrderBy(ComputerOrderBy orderBy, boolean change) {
+		if (orderBy == this.orderBy && change) {
 			asc = !asc;
 		}
 		
