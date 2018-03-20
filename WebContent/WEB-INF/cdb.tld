@@ -4,43 +4,6 @@
 	<short-name>cdb</short-name>
 
 	<tag>
-		<name>pagination</name>
-		<tag-class>com.excilys.cdb.web.servlet.tag.PaginationTag</tag-class>
-		<body-content>empty</body-content>
-
-		<attribute>
-			<name>currentPage</name>
-			<required>true</required>
-			<type>Integer</type>
-			<rtexprvalue>true</rtexprvalue>
-		</attribute>
-		<attribute>
-			<name>maxPage</name>
-			<required>true</required>
-			<type>Integer</type>
-			<rtexprvalue>true</rtexprvalue>
-		</attribute>
-		<attribute>
-			<name>orderBy</name>
-			<required>true</required>
-			<type>String</type>
-			<rtexprvalue>true</rtexprvalue>
-		</attribute>
-		<attribute>
-			<name>search</name>
-			<required>true</required>
-			<type>String</type>
-			<rtexprvalue>true</rtexprvalue>
-		</attribute>
-		<attribute>
-			<name>limit</name>
-			<required>true</required>
-			<type>Integer</type>
-			<rtexprvalue>true</rtexprvalue>
-		</attribute>
-	</tag>
-
-	<tag>
 		<name>link</name>
 		<tag-class>com.excilys.cdb.web.servlet.tag.LinkTag</tag-class>
 		<body-content>empty</body-content>
@@ -82,4 +45,43 @@
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
 	</tag>
+
+	<tag>
+		<name>pagination</name>
+		<tag-class>com.excilys.cdb.web.servlet.tag.PaginationTag</tag-class>
+		<body-content>empty</body-content>
+
+		<attribute>
+			<name>currentPage</name>
+			<required>true</required>
+			<type>Integer</type>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>maxPage</name>
+			<required>true</required>
+			<type>Integer</type>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>orderBy</name>
+			<required>true</required>
+			<type>String</type>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>search</name>
+			<required>true</required>
+			<type>String</type>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>limit</name>
+			<required>true</required>
+			<type>Integer</type>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+	</tag>
+
+
 </taglib>

@@ -6,6 +6,9 @@ import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.SimpleTagSupport;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.excilys.cdb.constant.Servlet;
 
 public class LinkTag extends SimpleTagSupport {
@@ -17,6 +20,8 @@ public class LinkTag extends SimpleTagSupport {
 	private String search;
 	private String variableName;
 
+	protected Logger logger = LoggerFactory.getLogger(this.getClass());
+	
 	public LinkTag() {
 		this(Servlet.DEFAULT_PAGE_VALUE, Servlet.DEFAULT_ORDER_BY, 
 				Servlet.DEFAULT_SEARCH, Servlet.DEFAULT_LIMIT_VALUE, 
@@ -35,19 +40,21 @@ public class LinkTag extends SimpleTagSupport {
 	public void doTag() throws JspException, IOException {
 		JspWriter out = getJspContext().getOut();
 
-		String setVar = "<c:set var=";
+		String setVar = "<%! String ";
 		setVar += variableName;
-		setVar += " value=";
+		setVar += " = \"";
 		setVar += getHref();
-		setVar += "/>";
+		setVar += "\"; %>";
 
+		logger.error(setVar);
+		
 		out.print(setVar);
 	}
 
 	public String getHref() {
 		StringBuilder href = new StringBuilder();
 
-		href.append("href=dashboard?");
+		href.append("dashboard?");
 
 		href.append("orderby=");
 		href.append(orderBy);

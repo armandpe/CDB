@@ -23,7 +23,7 @@ public final class Servlet {
 	public static final String PAGE = "page";
 	public static final String ORDER_BY = "orderby";
 	public static final String DELETE_SELECTION = "selection";
-	public static final String ORDER_BY_CHANGED = "orderchanged";
+	public static final String ORDER = "order";
 	
 	//Request attributes
 	public static final String PAGE_DATA = "pageData";
@@ -32,7 +32,8 @@ public final class Servlet {
 	//Request both
 	public static final String SEARCH = "search";
 	
-	public static final String ORDER_BY_ASC = "ASC";
+	public static final String ORDER_BY_ASC = "asc";
+	public static final String ORDER_BY_DESC = "desc";
 	
 	public static final String ORDER_BY_NAME = "name";
 	public static final String ORDER_BY_INTRODUCED = "introduced";

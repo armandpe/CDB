@@ -1,4 +1,5 @@
-k<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib prefix="custom" uri="/WEB-INF/cdb.tld"%>
 
 <!DOCTYPE html>
@@ -13,6 +14,15 @@ k<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <link href="css/main.css" rel="stylesheet" media="screen">
 </head>
 <body onload='$.fn.alert(${errors});'>
+	<c:choose>
+		<c:when test="${order == 'asc'}">
+			<c:set var="opposite" value="desc" />
+		</c:when>
+		<c:otherwise>
+			<c:set var="opposite" value="asc" />
+		</c:otherwise>
+	</c:choose>
+
 	<header class="navbar navbar-inverse navbar-fixed-top">
 		<div class="container">
 			<a class="navbar-brand" href="dashboard"> Application - Computer
@@ -58,10 +68,20 @@ k<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 									class="fa fa-trash-o fa-lg"></i>
 							</a>
 						</span></th>
-						<th> <a href="dashboard?orderby=name&order=1&limit=${limit}&search=${search}&page=${page}">Computer name</a></th>
-						<th> <a href="dashboard?orderby=introduced&order=1&limit=${limit}&search=${search}&page=${page}">Introduced date</a></th>
-						<th> <a href="dashboard?orderby=discontinued&order=1&limit=${limit}&search=${search}&page=${page}">Discontinued date</a></th>
-						<th> <a href="dashboard?orderby=company&order=1&limit=${limit}&search=${search}&page=${page}">Company</a></th>
+
+
+
+						<th><a
+							href="dashboard?orderby=name&order=${opposite}&limit=${limit}&search=${search}&page=${pageData.currentPage}">Computer
+								name</a></th>
+						<th><a
+							href="dashboard?orderby=introduced&order=${opposite}&limit=${limit}&search=${search}&page=${pageData.currentPage}">Introduced
+								date</a></th>
+						<th><a
+							href="dashboard?orderby=discontinued&order=${opposite}&limit=${limit}&search=${search}&page=${pageData.currentPage}">Discontinued
+								date</a></th>
+						<th><a
+							href="dashboard?orderby=company&order=${opposite}&limit=${limit}&search=${search}&page=${pageData.currentPage}">Company</a></th>
 					</tr>
 				</thead>
 				<!-- Browse attribute computers -->
@@ -84,26 +104,17 @@ k<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 	<footer class="navbar-fixed-bottom">
 		<div class="container text-center">
 			<ul class="pagination">
-				<custom:pagination 
-					maxPage="${pageData.maxPage}"
-					currentPage="${pageData.currentPage}" 
-					limit="${limit}"
-					orderBy="${orderby}"
-					search="${search}"
-					/>
+				<custom:pagination maxPage="${pageData.maxPage}"
+					currentPage="${pageData.currentPage}" limit="${limit}"
+					orderBy="${orderby}" search="${search}" />
 			</ul>
-			
-			<custom:link order="${order}" limit="10" search="${search}" page="${page}" variableName="hrefLimit10" orderBy="${orderby}"/>
-			<custom:link order="${order}" limit="50" search="${search}" page="${page}" variableName="hrefLimit50" orderBy="${orderby}"/>
-			<custom:link order="${order}" limit="100" search="${search}" page="${page}" variableName="hrefLimit100" orderBy="${orderby}"/>
-			
+			<c:set var="limitArray" value="${fn:split('10,20,50,100', ',')}" />
 			<div class="btn-group btn-group-sm pull-right" role="group">
-				<input type="button" class="btn btn-default"
-					onclick="location.href='${hrefLimit10}'" value="10" /> <input
-					type="button" class="btn btn-default"
-					onclick="location.href='${hrefLimit50}'" value="50" /> <input
-					type="button" class="btn btn-default"
-					onclick="location.href='${hrefLimit100}'" value="100" />
+				<c:forEach items="${limitArray}" var="limitVal">
+					<input type="button" class="btn btn-default"
+						onclick="location.href='dashboard?orderby=${orderby}&order=${order}&limit=${limitVal}&search=${search}&page=${pageData.currentPage}'"
+						value="${limitVal}" />
+				</c:forEach>
 			</div>
 		</div>
 	</footer>

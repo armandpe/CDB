@@ -63,7 +63,7 @@ public class Dashboard extends HttpServlet {
 		String searchString = request.getParameter(Servlet.SEARCH);
 		String pageString = request.getParameter(Servlet.PAGE);
 		String orderByString = request.getParameter(Servlet.ORDER_BY);
-		boolean orderByChanged = Servlet.ORDER_BY_ASC.equals(request.getParameter(Servlet.ORDER_BY_CHANGED));
+		boolean orderByChanged = !Servlet.ORDER_BY_DESC.equals(request.getParameter(Servlet.ORDER));
 		
 		limitString = limitString != null ? limitString : Servlet.DEFAULT_LIMIT;
 		searchString = searchString != null ? searchString : Servlet.DEFAULT_SEARCH;
@@ -141,7 +141,7 @@ public class Dashboard extends HttpServlet {
 			request.setAttribute(Servlet.SEARCH, pageManager.getToSearch());
 			request.setAttribute(Servlet.ORDER_BY, orderByString);
 			request.setAttribute(Servlet.LIMIT, limit);
-			request.setAttribute(Servlet.PAGE, page);
+			request.setAttribute(Servlet.ORDER, orderByChanged ? Servlet.ORDER_BY_ASC : Servlet.ORDER_BY_DESC);
 			
 			this.getServletContext().getRequestDispatcher(PATH_DASHBOARD).forward(request, response);
 

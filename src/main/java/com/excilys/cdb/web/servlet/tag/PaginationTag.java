@@ -6,6 +6,9 @@ import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.SimpleTagSupport;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class PaginationTag extends SimpleTagSupport {
 
 	private long currentPage;
@@ -15,6 +18,8 @@ public class PaginationTag extends SimpleTagSupport {
 	private long limit;
 	private String order;
 
+	protected Logger logger = LoggerFactory.getLogger(this.getClass());
+	
 	public String getOrder() {
 		return order;
 	}
@@ -109,6 +114,7 @@ public class PaginationTag extends SimpleTagSupport {
 		StringBuilder stringBuilder = new StringBuilder("<li><a ");
 		if (!disabled) {
 			LinkTag linkTag = new LinkTag(page, orderBy, search, limit, order);
+			stringBuilder.append("href=");
 			stringBuilder.append(linkTag.getHref());
 		}
 		stringBuilder.append("> ");

@@ -383,7 +383,7 @@ public abstract class DAO<T extends ModelClass> {
 
 		executeQuery(query, fieldsClassValues, keyOrder);
 	}
-
+	
 	protected void executeQuery(String query, LinkedHashMap<String, SimpleEntry<Field, Object>> fieldsClassValues, HashMap<String, Integer> keyOrder) throws FailedDAOOperationException {
 		List<Object> values = new ArrayList<>(keyOrder.size());
 		List<Class<?>> types = new ArrayList<>(keyOrder.size());
@@ -409,6 +409,8 @@ public abstract class DAO<T extends ModelClass> {
 			if (value != null && value.getClass() == Optional.class) {
 				if (((Optional<?>) value).isPresent()) {
 					value = ((Optional<?>) value).get();
+				} else {
+					value = null;
 				}
 			}
 
@@ -418,6 +420,10 @@ public abstract class DAO<T extends ModelClass> {
 		}
 
 		try {
+			logger.error(query);
+			logger.error(values.toString());
+			logger.error(types.toString());
+			
 			jdbcTemplate.update(query, values.toArray(new Object[values.size()]));	
 		} catch (DataAccessException e) {
 			logger.error(Main.getErrorMessage(null, e.getMessage()));

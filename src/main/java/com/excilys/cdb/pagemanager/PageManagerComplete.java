@@ -7,13 +7,19 @@ import com.excilys.cdb.service.ComputerOrderBy;
 import com.excilys.cdb.service.Service;
 
 public class PageManagerComplete<T extends ModelClass> extends PageManagerAbstract<T> {
-	
+
 	protected boolean asc = true;
 	protected ComputerOrderBy orderBy = ComputerOrderBy.NAME;
 	protected String toSearch = null;
-	
+
 	public PageManagerComplete(Service<T, ?> service) {
 		this.service = service;
+
+		try {
+			setMax();
+		} catch (FailedDAOOperationException e) {
+			logger.error(Main.getErrorMessage(null, e.getMessage()));
+		}
 	}
 
 	public ComputerOrderBy getOrderBy() {
@@ -32,18 +38,15 @@ public class PageManagerComplete<T extends ModelClass> extends PageManagerAbstra
 		this.asc = ascd;
 	}
 
-	public void setOrderBy(ComputerOrderBy orderBy, boolean change) {
-		if (orderBy == this.orderBy && change) {
-			asc = !asc;
-		}
-		
+	public void setOrderBy(ComputerOrderBy orderBy, boolean asc) {
+		this.asc = asc;
 		this.orderBy = orderBy;
 	}
 
 	public void setToSearch(String toSearch) {
 		this.toSearch = toSearch;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	protected boolean getItems() throws FailedDAOOperationException {
 		setMax();
@@ -55,7 +58,7 @@ public class PageManagerComplete<T extends ModelClass> extends PageManagerAbstra
 		}
 		return true;
 	}
-	
+
 	@Override
 	protected void setMax() throws FailedDAOOperationException {
 		this.max = service.getCount(toSearch);
