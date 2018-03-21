@@ -9,11 +9,60 @@ public class PageData<T> {
 	private long count;
 	private long currentPage;
 	private long maxPage;
+	private String errors;
+	private String search;
+	private String orderby;
+	private long limit;
+	private String order;
 	
 	public List<T> getDataList() {
 		return dataList;
 	}
 	
+	public String getErrors() {
+		return errors;
+	}
+
+	public void setErrors(String errors) {
+		this.errors = errors;
+	}
+
+	public String getSearch() {
+		return search;
+	}
+
+	public void setSearch(String search) {
+		this.search = search;
+	}
+
+	public String getOrderby() {
+		return orderby;
+	}
+
+	public void setOrderby(String orderby) {
+		this.orderby = orderby;
+	}
+
+	public long getLimit() {
+		return limit;
+	}
+
+	public void setLimit(long limit) {
+		this.limit = limit;
+	}
+
+	public String getOrder() {
+		return order;
+	}
+
+	public void setOrder(String order) {
+		this.order = order;
+	}
+
+	public void setDataList(List<T> dataList) {
+		this.dataList = dataList;
+	}
+
 	public long getCount() {
 		return count;
 	}

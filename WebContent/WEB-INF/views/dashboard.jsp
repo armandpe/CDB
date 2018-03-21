@@ -13,9 +13,9 @@
 <link href="css/font-awesome.css" rel="stylesheet" media="screen">
 <link href="css/main.css" rel="stylesheet" media="screen">
 </head>
-<body onload='$.fn.alert(${errors});'>
+<body onload='$.fn.alert(${pageData.errors});'>
 	<c:choose>
-		<c:when test="${order == 'asc'}">
+		<c:when test="${pageData.order == 'asc'}">
 			<c:set var="opposite" value="desc" />
 		</c:when>
 		<c:otherwise>
@@ -24,16 +24,16 @@
 	</c:choose>
 
 	<c:choose>
-		<c:when test="${orderby == 'name'}">
+		<c:when test="${pageData.orderby == 'name'}">
 			<c:set var="orderName" value="${opposite}" />
 		</c:when>
-		<c:when test="${orderby == 'introduced'}">
+		<c:when test="${pageData.orderby == 'introduced'}">
 			<c:set var="orderIntroduced" value="${opposite}" />
 		</c:when>
-		<c:when test="${orderby == 'company'}">
+		<c:when test="${pageData.orderby == 'company'}">
 			<c:set var="orderCompany" value="${opposite}" />
 		</c:when>
-		<c:when test="${orderby == 'discontinued'}">
+		<c:when test="${pageData.orderby == 'discontinued'}">
 			<c:set var="orderDiscontinued" value="${opposite}" />
 		</c:when>
 	</c:choose>
@@ -84,16 +84,16 @@
 							</a>
 						</span></th>
 						<th><a
-							href="dashboard?orderby=name&order=${orderName}&limit=${limit}&search=${search}&page=${pageData.currentPage}">Computer
+							href="dashboard?orderby=name&order=${orderName}&limit=${pageData.limit}&search=${pageData.search}&page=${pageData.currentPage}">Computer
 								name</a></th>
 						<th><a
-							href="dashboard?orderby=introduced&order=${orderIntroduced}&limit=${limit}&search=${search}&page=${pageData.currentPage}">Introduced
+							href="dashboard?orderby=introduced&order=${orderIntroduced}&limit=${pageData.limit}&search=${pageData.search}&page=${pageData.currentPage}">Introduced
 								date</a></th>
 						<th><a
-							href="dashboard?orderby=discontinued&order=${orderDiscontinued}&limit=${limit}&search=${search}&page=${pageData.currentPage}">Discontinued
+							href="dashboard?orderby=discontinued&order=${orderDiscontinued}&limit=${pageData.limit}&search=${pageData.search}&page=${pageData.currentPage}">Discontinued
 								date</a></th>
 						<th><a
-							href="dashboard?orderby=company&order=${orderCompany}&limit=${limit}&search=${search}&page=${pageData.currentPage}">Company</a></th>
+							href="dashboard?orderby=company&order=${orderCompany}&limit=${pageData.limit}&search=${pageData.search}&page=${pageData.currentPage}">Company</a></th>
 					</tr>
 				</thead>
 				<!-- Browse attribute computers -->
@@ -117,14 +117,14 @@
 		<div class="container text-center">
 			<ul class="pagination">
 				<custom:pagination maxPage="${pageData.maxPage}"
-					currentPage="${pageData.currentPage}" limit="${limit}"
-					orderBy="${orderby}" search="${search}" />
+					currentPage="${pageData.currentPage}" limit="${pageData.limit}"
+					orderBy="${pageData.orderby}" search="${pageData.search}" />
 			</ul>
 			<c:set var="limitArray" value="${fn:split('10,20,50,100', ',')}" />
 			<div class="btn-group btn-group-sm pull-right" role="group">
 				<c:forEach items="${limitArray}" var="limitVal">
 					<input type="button" class="btn btn-default"
-						onclick="location.href='dashboard?orderby=${orderby}&order=${order}&limit=${limitVal}&search=${search}&page=${pageData.currentPage}'"
+						onclick="location.href='dashboard?orderby=${pageData.orderby}&order=${pageData.order}&limit=${limitVal}&search=${pageData.search}&page=${pageData.currentPage}'"
 						value="${limitVal}" />
 				</c:forEach>
 			</div>

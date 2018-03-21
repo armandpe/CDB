@@ -179,13 +179,11 @@ public class ComputerController {
 			
 			setPageManagerDataDashboard(pageManager, limit, page, searchString, orderByString, orderByChanged);
 			pageManager.getPageData().stream().map(ComputerMapper::toDTO).forEach(pageData.getDataList()::add);
-			
-			pageData.setCurrentPage(pageManager.getPage());
-			pageData.setMaxPage(pageManager.getMaxPage());
-			pageData.setCount(pageManager.getMax());
 
-			setModelDataDashboard(model, pageData, new Gson().toJson(new String[0]), pageManager.getToSearch(), orderByString, 
-					limit, orderByChanged ? Servlet.ORDER_BY_ASC : Servlet.ORDER_BY_DESC);
+			setPageDataDashboard(pageData, pageManager, new Gson().toJson(new String[0]), 
+					orderByString, limit, orderByChanged ? Servlet.ORDER_BY_ASC : Servlet.ORDER_BY_DESC);
+			
+			model.addAttribute(Servlet.PAGE_DATA, pageData);
 			
 		} catch (FailedDAOOperationException e) {
 			logger.error(e.getMessage());
@@ -221,7 +219,7 @@ public class ComputerController {
 			model.addAttribute(Servlet.ERRORS, new Gson().toJson(errors));
 			return "redirect:" + Servlet.NAME_404;
 		}
-
+			
 		if (!gottenComputer.isPresent()) {
 			String[] error = {"Cannot find target computer"};
 			model.addAttribute(Servlet.ERRORS, new Gson().toJson(error));
@@ -239,13 +237,15 @@ public class ComputerController {
 		}
 	}
 	
-	public void setModelDataDashboard(Model model, PageData<?> pageData, String errorsJson, String search, String orderBy, long limit, String order) {
-		model.addAttribute(Servlet.PAGE_DATA, pageData);
-		model.addAttribute(Servlet.ERRORS, errorsJson);
-		model.addAttribute(Servlet.SEARCH, search);
-		model.addAttribute(Servlet.ORDER_BY, orderBy);
-		model.addAttribute(Servlet.LIMIT, limit);
-		model.addAttribute(Servlet.ORDER, order);
+	public void setPageDataDashboard(PageData<?> pageData, PageManagerComplete<?> pageManager, String errorsJson, String orderBy, long limit, String order) {
+		pageData.setErrors(errorsJson);
+		pageData.setOrder(order);
+		pageData.setOrderby(orderBy);
+		pageData.setLimit(limit);
+		pageData.setSearch(pageManager.getToSearch());
+		pageData.setCurrentPage(pageManager.getPage());
+		pageData.setMaxPage(pageManager.getMaxPage());
+		pageData.setCount(pageManager.getMax());
 	}
 
 	public void setPageManagerDataDashboard(PageManagerComplete<Computer> pageManager, long limit, long page, String searchString, String orderByString, boolean orderByChanged) {
