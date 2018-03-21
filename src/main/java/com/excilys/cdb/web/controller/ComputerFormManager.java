@@ -1,15 +1,15 @@
-package com.excilys.cdb.web.servlet;
+package com.excilys.cdb.web.controller;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.ui.Model;
 
+import com.excilys.cdb.constant.Servlet;
 import com.excilys.cdb.dao.FailedDAOOperationException;
 import com.excilys.cdb.model.Computer;
 import com.excilys.cdb.service.CompanyService;
@@ -24,24 +24,27 @@ import com.excilys.cdb.web.dto.ComputerMapper;
 @Component
 public class ComputerFormManager {
 
-	@Autowired
 	private ComputerValidator computerValidator;
+	
 	protected Logger logger = LoggerFactory.getLogger(this.getClass());
-	protected List<CompanyDTO> companyList = new ArrayList<>();	
+	
+	public ComputerFormManager(ComputerValidator computerValidator) {
+		this.computerValidator = computerValidator;
+	}
 	
 	@Autowired
 	protected CompanyService companyService;;
 
-	public List<String> setRequestCompanies(HttpServletRequest request) {
+	public List<String> setRequestCompanies(Model model) {
+		
+		List<CompanyDTO> companyList = new ArrayList<>();	
 		List<String> errors = new ArrayList<>();
-		companyList.clear();
-		errors.clear();
 		try {
 			companyService.getAll(0, companyService.getCount()).forEach(company -> companyList.add(CompanyMapper.toDTO(company)));
 		} catch (FailedDAOOperationException e) {
 			errors.add(e.getMessage());
 		}
-		request.setAttribute("companyList", companyList);
+		model.addAttribute(Servlet.COMPANY_LIST, companyList);
 		return errors;
 	}
 
@@ -62,7 +65,6 @@ public class ComputerFormManager {
 		}
 		
 		computerValidator.getExceptions().forEach(exception -> errors.add(exception.getMessage()));
-		
 		return errors;
 	}
 

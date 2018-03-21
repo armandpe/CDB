@@ -1,4 +1,4 @@
-package com.excilys.cdb.web.spring;
+package com.excilys.cdb.web.spring.configuration;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;

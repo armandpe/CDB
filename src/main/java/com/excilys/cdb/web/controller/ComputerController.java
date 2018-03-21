@@ -1,30 +1,24 @@
-package com.excilys.cdb.web.servlet;
+package com.excilys.cdb.web.controller;
 
 import static com.excilys.cdb.constant.Servlet.NAME_DASHBOARD;
-import static com.excilys.cdb.constant.Servlet.PATH_403;
-import static com.excilys.cdb.constant.Servlet.PATH_DASHBOARD;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import com.excilys.cdb.Main;
 import com.excilys.cdb.constant.Servlet;
 import com.excilys.cdb.dao.FailedDAOOperationException;
 import com.excilys.cdb.model.Computer;
@@ -37,50 +31,47 @@ import com.excilys.cdb.web.dto.ComputerDTO;
 import com.excilys.cdb.web.dto.ComputerMapper;
 import com.google.gson.Gson;
 
-@SuppressWarnings("serial")
 @Controller
-@WebServlet("/" + NAME_DASHBOARD)
-public class Dashboard extends HttpServlet {
+public class ComputerController {
 
-	@Autowired
+	private ComputerFormManager computerFormManager;
+	
 	private ComputerService computerService;
 
-	protected Logger logger = LoggerFactory.getLogger(this.getClass());
+	private Logger logger = LoggerFactory.getLogger(this.getClass());
+	
+	public ComputerController(ComputerService computerService, ComputerFormManager computerFormManager) {
+		this.computerService = computerService;
+		this.computerFormManager = computerFormManager;
+	}
+	
+	@PostMapping("/" + Servlet.NAME_ADD)
+	public String addComputer(@RequestParam(value = Servlet.COMPUTER_NAME, required = false) String computerName,
+			@RequestParam(value = Servlet.INTRODUCED, required = false) String introduced,
+			@RequestParam(value = Servlet.DISCONTINUED, required = false) String discontinued,
+			@RequestParam(value = Servlet.COMPANY_ID, required = false) String companyId,
+			Model model)
+			throws ServletException, IOException {
+		
+		List<String> errors = computerFormManager.processInput(computerName, introduced, discontinued, companyId, computer -> computerService.create(computer));
+		model.addAttribute(Servlet.ERRORS, new Gson().toJson(errors));
 
-	@Override
-	public void init(ServletConfig config) throws ServletException {
-		super.init(config);
-		ServletContext servletContext = config.getServletContext();
-		WebApplicationContext webApplicationContext = WebApplicationContextUtils.getWebApplicationContext(servletContext);
-		AutowireCapableBeanFactory autowireCapableBeanFactory = webApplicationContext.getAutowireCapableBeanFactory();
-		autowireCapableBeanFactory.autowireBean(this);
+		if (errors.size() > 0) {
+			computerFormManager.setRequestCompanies(model);
+			return Servlet.NAME_ADD;
+		} else {
+			return "redirect:" + NAME_DASHBOARD;
+		}
 	}
 
-	protected void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-
-		String limitString = request.getParameter(Servlet.LIMIT);
-		String searchString = request.getParameter(Servlet.SEARCH);
-		String pageString = request.getParameter(Servlet.PAGE);
-		String orderByString = request.getParameter(Servlet.ORDER_BY);
-		boolean orderByChanged = !Servlet.ORDER_BY_DESC.equals(request.getParameter(Servlet.ORDER));
-		
-		limitString = limitString != null ? limitString : Servlet.DEFAULT_LIMIT;
-		searchString = searchString != null ? searchString : Servlet.DEFAULT_SEARCH;
-		pageString = pageString != null ? pageString : Servlet.DEFAULT_PAGE;
-		orderByString = orderByString != null ? orderByString : Servlet.DEFAULT_ORDER_BY;
-
-		PageData<ComputerDTO> pageData = new PageData<>();
-		PageManagerComplete<Computer> pageManager = new PageManagerComplete<>(computerService);
-
+	public void controlInput(String limitString, String pageString, String orderByString) throws InvalidInputException {
 		List<Function<Long, Boolean>> limitTests = new ArrayList<>();
 		limitTests.add(limit -> (limit > 0));
 		try {
 			InputValidator.isCorrectString(limitString, toParse -> Long.parseLong(toParse), true, false, limitTests);
 		} catch (InvalidInputException | NumberFormatException e) {
 			logger.info(e.getClass().getName() + " : Incorrect limit value " + e.getMessage());
-			this.getServletContext().getRequestDispatcher(PATH_403).forward(request, response);	
-			return;
+			throw new InvalidInputException("Invalid limit");
 		}
 
 		List<Function<Long, Boolean>> pageTests = new ArrayList<>();
@@ -88,8 +79,7 @@ public class Dashboard extends HttpServlet {
 			InputValidator.isCorrectString(pageString, toParse -> Long.parseLong(toParse), true, false, pageTests);
 		} catch (InvalidInputException | NumberFormatException e) {
 			logger.info(e.getClass().getName() + " : Incorrect page value " + e.getMessage());
-			this.getServletContext().getRequestDispatcher(PATH_403).forward(request, response);	
-			return;
+			throw new InvalidInputException("Invalid page");
 		}	
 
 		List<Function<String, Boolean>> orderByTest = new ArrayList<>();
@@ -101,58 +91,13 @@ public class Dashboard extends HttpServlet {
 			InputValidator.isCorrectString(orderByString, x -> x, true, false, orderByTest);
 		} catch (InvalidInputException | NumberFormatException e) {
 			logger.info(e.getClass().getName() + " : Incorrect orderby value " + orderByString + e.getMessage());
-			this.getServletContext().getRequestDispatcher(PATH_403).forward(request, response);	
-			return;
+			throw new InvalidInputException("Invalid orderby value");
 		}	
-
-		try {
-			
-			long limit = Long.parseLong(limitString);
-			long page = Long.parseLong(pageString);
-			
-			pageManager.setLimit(Long.parseLong(limitString));
-
-			pageManager.setToSearch(searchString.equals("") ? null : searchString);	
-
-			switch (orderByString) {
-			case Servlet.ORDER_BY_NAME :
-				pageManager.setOrderBy(ComputerOrderBy.NAME, orderByChanged);
-				break;
-			case Servlet.ORDER_BY_COMPANY_NAME :
-				pageManager.setOrderBy(ComputerOrderBy.COMPANY_NAME, orderByChanged);
-				break;
-			case Servlet.ORDER_BY_DISCONTINUED :
-				pageManager.setOrderBy(ComputerOrderBy.DISCONTINUED, orderByChanged);
-				break;
-			case Servlet.ORDER_BY_INTRODUCED :
-				pageManager.setOrderBy(ComputerOrderBy.INTRODUCED, orderByChanged);
-				break;
-			}
-
-			pageManager.gotTo(page);
-			pageManager.getPageData().stream().map(ComputerMapper::toDTO).forEach(pageData.getDataList()::add);
-
-			pageData.setCurrentPage(pageManager.getPage());
-			pageData.setMaxPage(pageManager.getMaxPage());
-			pageData.setCount(pageManager.getMax());
-
-			request.setAttribute(Servlet.PAGE_DATA, pageData);
-			request.setAttribute(Servlet.ERRORS, new Gson().toJson(new String[0]));
-			request.setAttribute(Servlet.SEARCH, pageManager.getToSearch());
-			request.setAttribute(Servlet.ORDER_BY, orderByString);
-			request.setAttribute(Servlet.LIMIT, limit);
-			request.setAttribute(Servlet.ORDER, orderByChanged ? Servlet.ORDER_BY_ASC : Servlet.ORDER_BY_DESC);
-			
-			this.getServletContext().getRequestDispatcher(PATH_DASHBOARD).forward(request, response);
-
-		} catch (FailedDAOOperationException e) {
-			logger.error(e.getMessage());
-		}
 	}
-
-	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+	
+	@PostMapping("/" + Servlet.NAME_DASHBOARD)
+	public String deleteComputers(@RequestParam(value = Servlet.DELETE_SELECTION, required = false) String selection, Model model)
 			throws ServletException, IOException {
-		String selection = (String) request.getParameter(Servlet.DELETE_SELECTION);
 		List<String> errors = new ArrayList<>();
 
 		if (selection != null) {
@@ -164,13 +109,163 @@ public class Dashboard extends HttpServlet {
 					computerService.delete(id);
 				} catch (FailedDAOOperationException e) {
 					logger.info(e.getMessage());
-					errors.clear();
 					errors.add(e.getMessage());
-					doGet(request, response);
-					return;
+					model.addAttribute(Servlet.ERRORS, new Gson().toJson(errors));
+					return NAME_DASHBOARD;
 				}
 			}
 		}
-		response.sendRedirect(NAME_DASHBOARD);
+		return "redirect:" + NAME_DASHBOARD;
+	}
+	
+	@PostMapping("/" + Servlet.NAME_EDIT)
+	public String editComputer(@RequestParam(value = Servlet.COMPUTER_NAME, required = true) String computerName,
+			@RequestParam(value = Servlet.INTRODUCED, required = true) String introduced,
+			@RequestParam(value = Servlet.DISCONTINUED, required = true) String discontinued,
+			@RequestParam(value = Servlet.COMPANY_ID, required = false) String companyId,
+			@RequestParam(value = Servlet.ID, required = true) String idString,
+			Model model)
+			throws ServletException, IOException {
+
+		List<String> errors = computerFormManager.processInput(idString, computerName, introduced, discontinued, companyId,
+				computer -> computerService.update(computer));
+
+		if (errors.size() > 0) {
+			logger.info(errors.toString());
+			computerFormManager.setRequestCompanies(model);
+			
+			return getEditComputer(idString, errors, model);
+		}
+		
+		return "redirect:" + NAME_DASHBOARD;
+
+	}
+	
+	@GetMapping("/" + Servlet.NAME_ADD)
+	public String getAddComputer(Model model) throws ServletException, IOException {		
+
+		List<String> errors = computerFormManager.setRequestCompanies(model);
+		model.addAttribute(Servlet.ERRORS, new Gson().toJson(errors));
+		return Servlet.NAME_ADD;
+	}
+
+	@GetMapping("/" + Servlet.NAME_DASHBOARD)
+	public String getDashboard(@RequestParam(value = Servlet.LIMIT, required = false) String limitString,
+			@RequestParam(value = Servlet.SEARCH, required = false) String searchString,
+			@RequestParam(value = Servlet.PAGE, required = false) String pageString,
+			@RequestParam(value = Servlet.ORDER_BY, required = false) String orderByString,
+			@RequestParam(value = Servlet.ORDER, required = false) String orderByChangedString,
+			Model model)
+			throws ServletException, IOException {
+
+		boolean orderByChanged = !Servlet.ORDER_BY_DESC.equals(orderByChangedString);
+		limitString = limitString != null ? limitString : Servlet.DEFAULT_LIMIT;
+		searchString = searchString != null ? searchString : Servlet.DEFAULT_SEARCH;
+		pageString = pageString != null ? pageString : Servlet.DEFAULT_PAGE;
+		orderByString = orderByString != null ? orderByString : Servlet.DEFAULT_ORDER_BY;
+
+		PageData<ComputerDTO> pageData = new PageData<>();
+		PageManagerComplete<Computer> pageManager = new PageManagerComplete<>(computerService);
+
+		try {
+			controlInput(limitString, pageString, orderByString);
+		} catch (InvalidInputException e1) {
+			return "redirect:" + Servlet.NAME_404;
+		}
+
+		try {
+			long limit = Long.parseLong(limitString);
+			long page = Long.parseLong(pageString);
+			
+			setPageManagerDataDashboard(pageManager, limit, page, searchString, orderByString, orderByChanged);
+			pageManager.getPageData().stream().map(ComputerMapper::toDTO).forEach(pageData.getDataList()::add);
+			
+			pageData.setCurrentPage(pageManager.getPage());
+			pageData.setMaxPage(pageManager.getMaxPage());
+			pageData.setCount(pageManager.getMax());
+
+			setModelDataDashboard(model, pageData, new Gson().toJson(new String[0]), pageManager.getToSearch(), orderByString, 
+					limit, orderByChanged ? Servlet.ORDER_BY_ASC : Servlet.ORDER_BY_DESC);
+			
+		} catch (FailedDAOOperationException e) {
+			logger.error(e.getMessage());
+			String[] error = {e.getMessage()};
+			model.addAttribute(Servlet.ERRORS, new Gson().toJson(error));
+		}
+		return Servlet.NAME_DASHBOARD;
+	}
+	
+	@GetMapping("/" + Servlet.NAME_EDIT)
+	public String getEditComputer(@RequestParam(value = Servlet.ID, required = true) String idString,
+			@RequestParam(value = Servlet.ERRORS, required = false) List<String> errors,
+			Model model)
+			throws ServletException, IOException {
+		long id = 0;
+		try {
+			id = Long.parseLong(idString);
+		} catch (NumberFormatException e) {
+			logger.error(Main.getErrorMessage("Couldn't parse " + idString, e.getMessage()));
+			String[] error = {"Invalid computer id"};
+			model.addAttribute(Servlet.ERRORS, new Gson().toJson(error));
+			return "redirect:" + Servlet.NAME_404;
+		}
+		
+		Optional<Computer> gottenComputer = Optional.empty();
+		errors = errors == null ? new ArrayList<>() : errors;
+		
+		try {
+			gottenComputer = computerService.getById(id);
+		} catch (FailedDAOOperationException e) {
+			errors.add(e.getMessage());
+			logger.info(e.getMessage());
+			model.addAttribute(Servlet.ERRORS, new Gson().toJson(errors));
+			return "redirect:" + Servlet.NAME_404;
+		}
+
+		if (!gottenComputer.isPresent()) {
+			String[] error = {"Cannot find target computer"};
+			model.addAttribute(Servlet.ERRORS, new Gson().toJson(error));
+			return "redirect:" + Servlet.NAME_404;
+		} else {
+			ComputerDTO computerDTO = ComputerMapper.toDTO(gottenComputer.get());
+			
+			model.addAttribute("computer", computerDTO);
+
+			errors.addAll(computerFormManager.setRequestCompanies(model));
+			
+			model.addAttribute("errors", new Gson().toJson(errors));
+			
+			return Servlet.NAME_EDIT;
+		}
+	}
+	
+	public void setModelDataDashboard(Model model, PageData<?> pageData, String errorsJson, String search, String orderBy, long limit, String order) {
+		model.addAttribute(Servlet.PAGE_DATA, pageData);
+		model.addAttribute(Servlet.ERRORS, errorsJson);
+		model.addAttribute(Servlet.SEARCH, search);
+		model.addAttribute(Servlet.ORDER_BY, orderBy);
+		model.addAttribute(Servlet.LIMIT, limit);
+		model.addAttribute(Servlet.ORDER, order);
+	}
+
+	public void setPageManagerDataDashboard(PageManagerComplete<Computer> pageManager, long limit, long page, String searchString, String orderByString, boolean orderByChanged) {
+		pageManager.setLimit(limit);
+		pageManager.setToSearch(searchString.equals("") ? null : searchString);	
+
+		switch (orderByString) {
+		case Servlet.ORDER_BY_NAME :
+			pageManager.setOrderBy(ComputerOrderBy.NAME, orderByChanged);
+			break;
+		case Servlet.ORDER_BY_COMPANY_NAME :
+			pageManager.setOrderBy(ComputerOrderBy.COMPANY_NAME, orderByChanged);
+			break;
+		case Servlet.ORDER_BY_DISCONTINUED :
+			pageManager.setOrderBy(ComputerOrderBy.DISCONTINUED, orderByChanged);
+			break;
+		case Servlet.ORDER_BY_INTRODUCED :
+			pageManager.setOrderBy(ComputerOrderBy.INTRODUCED, orderByChanged);
+			break;
+		}
+		pageManager.gotTo(page);
 	}
 }

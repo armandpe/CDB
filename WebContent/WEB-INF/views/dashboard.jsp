@@ -23,6 +23,21 @@
 		</c:otherwise>
 	</c:choose>
 
+	<c:choose>
+		<c:when test="${orderby == 'name'}">
+			<c:set var="orderName" value="${opposite}" />
+		</c:when>
+		<c:when test="${orderby == 'introduced'}">
+			<c:set var="orderIntroduced" value="${opposite}" />
+		</c:when>
+		<c:when test="${orderby == 'company'}">
+			<c:set var="orderCompany" value="${opposite}" />
+		</c:when>
+		<c:when test="${orderby == 'discontinued'}">
+			<c:set var="orderDiscontinued" value="${opposite}" />
+		</c:when>
+	</c:choose>
+
 	<header class="navbar navbar-inverse navbar-fixed-top">
 		<div class="container">
 			<a class="navbar-brand" href="dashboard"> Application - Computer
@@ -68,20 +83,17 @@
 									class="fa fa-trash-o fa-lg"></i>
 							</a>
 						</span></th>
-
-
-
 						<th><a
-							href="dashboard?orderby=name&order=${opposite}&limit=${limit}&search=${search}&page=${pageData.currentPage}">Computer
+							href="dashboard?orderby=name&order=${orderName}&limit=${limit}&search=${search}&page=${pageData.currentPage}">Computer
 								name</a></th>
 						<th><a
-							href="dashboard?orderby=introduced&order=${opposite}&limit=${limit}&search=${search}&page=${pageData.currentPage}">Introduced
+							href="dashboard?orderby=introduced&order=${orderIntroduced}&limit=${limit}&search=${search}&page=${pageData.currentPage}">Introduced
 								date</a></th>
 						<th><a
-							href="dashboard?orderby=discontinued&order=${opposite}&limit=${limit}&search=${search}&page=${pageData.currentPage}">Discontinued
+							href="dashboard?orderby=discontinued&order=${orderDiscontinued}&limit=${limit}&search=${search}&page=${pageData.currentPage}">Discontinued
 								date</a></th>
 						<th><a
-							href="dashboard?orderby=company&order=${opposite}&limit=${limit}&search=${search}&page=${pageData.currentPage}">Company</a></th>
+							href="dashboard?orderby=company&order=${orderCompany}&limit=${limit}&search=${search}&page=${pageData.currentPage}">Company</a></th>
 					</tr>
 				</thead>
 				<!-- Browse attribute computers -->

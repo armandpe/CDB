@@ -1,4 +1,4 @@
-package com.excilys.cdb.web.servlet.tag;
+package com.excilys.cdb.web.tag;
 
 import java.io.IOException;
 

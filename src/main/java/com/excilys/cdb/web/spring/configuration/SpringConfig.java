@@ -1,4 +1,4 @@
-package com.excilys.cdb.web.spring;
+package com.excilys.cdb.web.spring.configuration;
 
 import javax.sql.DataSource;
 

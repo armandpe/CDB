@@ -419,11 +419,7 @@ public abstract class DAO<T extends ModelClass> {
 			types.set(order, type);
 		}
 
-		try {
-			logger.error(query);
-			logger.error(values.toString());
-			logger.error(types.toString());
-			
+		try {			
 			jdbcTemplate.update(query, values.toArray(new Object[values.size()]));	
 		} catch (DataAccessException e) {
 			logger.error(Main.getErrorMessage(null, e.getMessage()));

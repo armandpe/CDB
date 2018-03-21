@@ -52,7 +52,7 @@ public class ComputerMapper {
 		dto.setName(name);
 		dto.setIntroduced(introduced);
 		dto.setDiscontinued(discontinued);
-		dto.setCompanyId(Long.parseLong(companyId));
+		dto.setCompanyId(companyId == null ? 0 : Long.parseLong(companyId));
 		dto.setId(0);
 
 		return dto;

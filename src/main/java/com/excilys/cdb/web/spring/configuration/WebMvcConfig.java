@@ -1,4 +1,4 @@
-package com.excilys.cdb.web.spring;
+package com.excilys.cdb.web.spring.configuration;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;

@@ -24,6 +24,14 @@ public final class Servlet {
 	public static final String ORDER_BY = "orderby";
 	public static final String DELETE_SELECTION = "selection";
 	public static final String ORDER = "order";
+	public static final String COMPANY_LIST = "companyList";
+	public static final String COMPUTER_NAME = "computerName";
+	public static final String INTRODUCED = "introduced";
+	public static final String DISCONTINUED = "discontinued";
+	public static final String COMPANY_ID = "company_id";
+	public static final String ID = "id";
+	public static final String COMPUTER = "computer";
+
 	
 	//Request attributes
 	public static final String PAGE_DATA = "pageData";

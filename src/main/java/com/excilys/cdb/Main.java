@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import com.excilys.cdb.ihm.CLI;
-import com.excilys.cdb.web.spring.SpringConfig;
+import com.excilys.cdb.web.spring.configuration.SpringConfig;
 
 
 public class Main {
