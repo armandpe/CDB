@@ -98,7 +98,7 @@ public class ComputerValidator {
 
 	public void checkCompanyId(String companyId) throws InvalidIdException {
 		if (companyId == null) {
-			throw new InvalidIdException("Null company id");
+			return;
 		}
 
 		long id;
