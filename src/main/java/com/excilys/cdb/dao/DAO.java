@@ -106,10 +106,8 @@ public abstract class DAO<T extends ModelClass> {
 			query = getForeignKeyQuery(query, foreignFields);
 		}
 
-		int nbToSearch = 0;
 		if (search != null) {
 			SimpleEntry<Integer, String> nbToSearchAndQuery = getSearchQuery(query, foreignFields);
-			nbToSearch = nbToSearchAndQuery.getKey();
 			query = nbToSearchAndQuery.getValue();
 		}
 		query += " ORDER BY " + orderByVar + (asc ? " ASC" : " DESC");
@@ -155,10 +153,8 @@ public abstract class DAO<T extends ModelClass> {
 			query = addLeftJoin(query, foreignTableName, constraints);
 		}
 		
-		int nbToSearch = 0;
 		if (search != null) {
 			SimpleEntry<Integer, String> nbToSearchAndQuery = getSearchQuery(query, foreignFields);
-			nbToSearch = nbToSearchAndQuery.getKey();
 			query = nbToSearchAndQuery.getValue();
 		}
 
