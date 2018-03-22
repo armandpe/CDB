@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
 
@@ -24,28 +23,20 @@ import com.excilys.cdb.web.dto.ComputerMapper;
 @Component
 public class ComputerFormManager {
 
+	private CompanyService companyService;
+	
 	private ComputerValidator computerValidator;
 	
-	protected Logger logger = LoggerFactory.getLogger(this.getClass());
+	private Logger logger = LoggerFactory.getLogger(this.getClass());
 	
-	public ComputerFormManager(ComputerValidator computerValidator) {
+	private ComputerFormManager(ComputerValidator computerValidator, CompanyService companyService) {
 		this.computerValidator = computerValidator;
-	}
-	
-	@Autowired
-	protected CompanyService companyService;;
+		this.companyService = companyService;
+	};
 
-	public List<String> setRequestCompanies(Model model) {
-		
-		List<CompanyDTO> companyList = new ArrayList<>();	
-		List<String> errors = new ArrayList<>();
-		try {
-			companyService.getAll(0, companyService.getCount()).forEach(company -> companyList.add(CompanyMapper.toDTO(company)));
-		} catch (FailedDAOOperationException e) {
-			errors.add(e.getMessage());
-		}
-		model.addAttribute(Servlet.COMPANY_LIST, companyList);
-		return errors;
+	public List<String> processInput(String computerName, String introduced, String discontinued, 
+			String companyId, ConsumerException<Computer, FailedDAOOperationException> processComputer) {
+		return processInput("0", computerName, introduced, discontinued, companyId, processComputer);
 	}
 
 	public List<String> processInput(String id, String computerName, String introduced, String discontinued, 
@@ -68,9 +59,17 @@ public class ComputerFormManager {
 		return errors;
 	}
 
-	public List<String> processInput(String computerName, String introduced, String discontinued, 
-			String companyId, ConsumerException<Computer, FailedDAOOperationException> processComputer) {
-		return processInput("0", computerName, introduced, discontinued, companyId, processComputer);
+	public List<String> setRequestCompanies(Model model) {
+		
+		List<CompanyDTO> companyList = new ArrayList<>();	
+		List<String> errors = new ArrayList<>();
+		try {
+			companyService.getAll(0, companyService.getCount()).forEach(company -> companyList.add(CompanyMapper.toDTO(company)));
+		} catch (FailedDAOOperationException e) {
+			errors.add(e.getMessage());
+		}
+		model.addAttribute(Servlet.COMPANY_LIST, companyList);
+		return errors;
 	}
 
 }

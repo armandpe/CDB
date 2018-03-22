@@ -22,7 +22,6 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.excilys.cdb.Main;
@@ -43,11 +42,14 @@ public class CLI {
 	
 	private ArrayList<Service<?, ?>> services = new ArrayList<>();
 	
-	@Autowired
-	private ComputerService computerService; 
+	private final ComputerService computerService; 
 
-	@Autowired
-	private CompanyService companyService;
+	private final CompanyService companyService;
+	
+	public CLI(ComputerService computerService, CompanyService companyService) {
+		this.companyService = companyService;
+		this.computerService = computerService;
+	}
 	
 	public void start() {
 		

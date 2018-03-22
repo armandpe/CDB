@@ -26,7 +26,6 @@ import java.util.function.Function;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -89,10 +88,13 @@ public abstract class DAO<T extends ModelClass> {
 	
 	private final String AFTER_VARIABLE_COUNT = ") as " + DbConstant.COUNT_VAR + AFTER_VARIABLE_SELECT;
 
-	@Autowired
-	protected JdbcTemplate jdbcTemplate;
+	protected final JdbcTemplate jdbcTemplate;
 
 	protected final Logger logger = LoggerFactory.getLogger(this.getClass());
+	
+	protected DAO(JdbcTemplate jdbcTemplate) {
+		this.jdbcTemplate = jdbcTemplate;
+	}
 
 	public String arrayToString(String[] array) {
 		return String.join(", ", array);

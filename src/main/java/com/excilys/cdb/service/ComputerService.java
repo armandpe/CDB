@@ -1,7 +1,5 @@
 package com.excilys.cdb.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
 import com.excilys.cdb.ParamDescription;
 import com.excilys.cdb.dao.ComputerDAO;
 import com.excilys.cdb.dao.DAO;
@@ -12,8 +10,11 @@ import com.excilys.cdb.model.Computer;
 @ServiceClass(name = "computers")
 public class ComputerService extends Service<Computer, ComputerDAO> {
 
-	@Autowired
-	ComputerDAO computerDAO;
+	private final ComputerDAO computerDAO;
+
+	private ComputerService(ComputerDAO computerDAO) { 
+		this.computerDAO = computerDAO;
+	}
 	
 	@ServiceMethod(name = "Add a new computer")
 	public void create(@ParamDescription(name = "computer to add (id is automatically set)") Computer computer) throws FailedDAOOperationException {

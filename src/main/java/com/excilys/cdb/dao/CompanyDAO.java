@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import com.excilys.cdb.model.Company;
@@ -15,10 +15,14 @@ import com.excilys.cdb.model.Computer;
 @Repository
 public class CompanyDAO extends DAO<Company> {
 	
-	@Autowired
-	private ComputerDAO computerDAO;
+	private final ComputerDAO computerDAO;
 	
-	private String modelClassFullName = null;
+	private final String modelClassFullName = Company.class.getName();
+	
+	private CompanyDAO(JdbcTemplate jdbcTemplate, ComputerDAO computerDAO) {
+		super(jdbcTemplate);
+		this.computerDAO = computerDAO;
+	}
 	
 	public void delete(long id) throws FailedDAOOperationException {
 		Entry<String, Field> primaryKey = getKey(getModelClassFullName(), x -> x.primaryKey());
@@ -36,10 +40,6 @@ public class CompanyDAO extends DAO<Company> {
 	
 	@Override
 	public String getModelClassFullName() {
-		if (modelClassFullName == null) {
-			modelClassFullName = Company.class.getName();
-		}
-		
 		return modelClassFullName;
 	}
 

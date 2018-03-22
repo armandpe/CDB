@@ -12,6 +12,7 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import com.excilys.cdb.Main;
@@ -21,6 +22,12 @@ import com.excilys.cdb.model.SQLInfo;
 @Repository
 public class ComputerDAO extends DAO<Computer> {
 
+	private final String modelClassFullName = Computer.class.getName();
+	
+	private ComputerDAO(JdbcTemplate jdbcTemplate) {
+		super(jdbcTemplate);
+	}
+	
 	public void create(Computer computer) throws FailedDAOOperationException {
 		Map<String, Field> mapperSQLFields = getMapperSQLFields(getModelClassFullName());
 		Set<String> keys = mapperSQLFields.keySet();
@@ -41,7 +48,7 @@ public class ComputerDAO extends DAO<Computer> {
 
 	@Override
 	public String getModelClassFullName() {
-		return Computer.class.getName();
+		return modelClassFullName;
 	}
 
 	public void update(Computer computer) throws FailedDAOOperationException {

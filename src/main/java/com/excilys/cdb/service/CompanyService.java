@@ -1,7 +1,5 @@
 package com.excilys.cdb.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
 import com.excilys.cdb.ParamDescription;
 import com.excilys.cdb.dao.CompanyDAO;
 import com.excilys.cdb.dao.DAO;
@@ -12,8 +10,11 @@ import com.excilys.cdb.model.Company;
 @ServiceClass(name = "companies")
 public class CompanyService extends Service<Company, CompanyDAO> {
 	
-	@Autowired
-	private CompanyDAO companyDAO;
+	private final CompanyDAO companyDAO;
+	
+	private CompanyService(CompanyDAO computerDAO) { 
+		this.companyDAO = computerDAO;
+	}
 	
 	@Override
 	public String getDaoClassFullName() {

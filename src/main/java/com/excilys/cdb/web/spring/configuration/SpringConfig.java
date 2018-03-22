@@ -2,7 +2,6 @@ package com.excilys.cdb.web.spring.configuration;
 
 import javax.sql.DataSource;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.PropertySource;
@@ -20,9 +19,12 @@ import com.excilys.cdb.service.ComputerService;
 @PropertySource(value = "classpath:connection.properties")
 public class SpringConfig {
 
-	@Autowired
 	private Environment environment;
 
+	private SpringConfig(Environment environment) {
+		this.environment = environment;
+	}
+	
 	@Bean
 	public DataSource dataSource() {
 		DriverManagerDataSource dataSource = new DriverManagerDataSource();

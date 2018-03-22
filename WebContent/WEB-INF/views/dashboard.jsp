@@ -14,7 +14,6 @@
 <link href="css/main.css" rel="stylesheet" media="screen">
 </head>
 <body onload='$.fn.alert(${errors});'>
-	<p>a ${errors} a</p>
 	<c:choose>
 		<c:when test="${pageData.order == 'asc'}">
 			<c:set var="opposite" value="desc" />
