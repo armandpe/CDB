@@ -8,7 +8,7 @@
 	<link href="css/font-awesome.css" rel="stylesheet" media="screen">
 	<link href="css/main.css" rel="stylesheet" media="screen">
 </head>
-<body>
+<body onload='$.fn.alert(${errors});'>
 	<header class="navbar navbar-inverse navbar-fixed-top">
 		<div class="container">
 			<a class="navbar-brand" href="dashboard.html"> Application - Computer Database </a>
@@ -28,6 +28,7 @@
 	<script src="js/jquery.min.js"></script>
 	<script src="js/bootstrap.min.js"></script>
 	<script src="js/dashboard.js"></script>
+	<script src="js/errors.js"></script>
 
 </body>
 </html>

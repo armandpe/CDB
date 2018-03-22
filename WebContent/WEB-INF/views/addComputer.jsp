@@ -66,5 +66,6 @@
 	<script src=" js/jquery.min.js"></script>
 	<script src="js/bootstrap.min.js"></script>
 	<script src="js/add.js"></script>
+	<script src="js/errors.js"></script>
 </body>
 </html>

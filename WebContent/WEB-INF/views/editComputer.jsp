@@ -58,8 +58,9 @@
 							</div>
 						</fieldset>
 						<div class="actions pull-right">
-							<input type="submit" value="Edit" class="btn btn-primary" id="editButton">
-							or <a href="dashboard" class="btn btn-default">Cancel</a>
+							<input type="submit" value="Edit" class="btn btn-primary"
+								id="editButton"> or <a href="dashboard"
+								class="btn btn-default">Cancel</a>
 						</div>
 					</form>
 				</div>
@@ -69,5 +70,6 @@
 	<script src=" js/jquery.min.js"></script>
 	<script src="js/bootstrap.min.js"></script>
 	<script src="js/edit.js"></script>
+	<script src="js/errors.js"></script>
 </body>
 </html>

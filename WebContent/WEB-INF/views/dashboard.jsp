@@ -13,7 +13,8 @@
 <link href="css/font-awesome.css" rel="stylesheet" media="screen">
 <link href="css/main.css" rel="stylesheet" media="screen">
 </head>
-<body onload='$.fn.alert(${pageData.errors});'>
+<body onload='$.fn.alert(${errors});'>
+	<p>a ${errors} a</p>
 	<c:choose>
 		<c:when test="${pageData.order == 'asc'}">
 			<c:set var="opposite" value="desc" />
@@ -133,5 +134,6 @@
 	<script src="js/jquery.min.js"></script>
 	<script src="js/bootstrap.min.js"></script>
 	<script src="js/dashboard.js"></script>
+	<script src="js/errors.js"></script>
 </body>
 </html>

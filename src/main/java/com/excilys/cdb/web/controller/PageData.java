@@ -9,7 +9,6 @@ public class PageData<T> {
 	private long count;
 	private long currentPage;
 	private long maxPage;
-	private String errors;
 	private String search;
 	private String orderby;
 	private long limit;
@@ -19,14 +18,6 @@ public class PageData<T> {
 		return dataList;
 	}
 	
-	public String getErrors() {
-		return errors;
-	}
-
-	public void setErrors(String errors) {
-		this.errors = errors;
-	}
-
 	public String getSearch() {
 		return search;
 	}

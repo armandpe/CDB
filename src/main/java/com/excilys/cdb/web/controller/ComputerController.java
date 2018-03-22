@@ -17,6 +17,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.excilys.cdb.Main;
 import com.excilys.cdb.constant.Servlet;
@@ -50,16 +51,17 @@ public class ComputerController {
 			@RequestParam(value = Servlet.INTRODUCED, required = false) String introduced,
 			@RequestParam(value = Servlet.DISCONTINUED, required = false) String discontinued,
 			@RequestParam(value = Servlet.COMPANY_ID, required = false) String companyId,
-			Model model)
+			Model model, RedirectAttributes redirectAttributes)
 			throws ServletException, IOException {
 		
 		List<String> errors = computerFormManager.processInput(computerName, introduced, discontinued, companyId, computer -> computerService.create(computer));
-		model.addAttribute(Servlet.ERRORS, new Gson().toJson(errors));
-
+		
 		if (errors.size() > 0) {
 			computerFormManager.setRequestCompanies(model);
+			model.addAttribute(Servlet.ERRORS, new Gson().toJson(errors));
 			return Servlet.NAME_ADD;
 		} else {
+			redirectAttributes.addAttribute(Servlet.ERRORS, new Gson().toJson(errors));
 			return "redirect:" + NAME_DASHBOARD;
 		}
 	}
@@ -124,7 +126,7 @@ public class ComputerController {
 			@RequestParam(value = Servlet.DISCONTINUED, required = true) String discontinued,
 			@RequestParam(value = Servlet.COMPANY_ID, required = false) String companyId,
 			@RequestParam(value = Servlet.ID, required = true) String idString,
-			Model model)
+			Model model, RedirectAttributes redirectAttributes)
 			throws ServletException, IOException {
 
 		List<String> errors = computerFormManager.processInput(idString, computerName, introduced, discontinued, companyId,
@@ -133,17 +135,15 @@ public class ComputerController {
 		if (errors.size() > 0) {
 			logger.info(errors.toString());
 			computerFormManager.setRequestCompanies(model);
-			
-			return getEditComputer(idString, errors, model);
+			return getEditComputer(idString, errors, model, redirectAttributes);
 		}
 		
 		return "redirect:" + NAME_DASHBOARD;
-
 	}
 	
 	@GetMapping("/" + Servlet.NAME_ADD)
 	public String getAddComputer(Model model) throws ServletException, IOException {		
-
+		
 		List<String> errors = computerFormManager.setRequestCompanies(model);
 		model.addAttribute(Servlet.ERRORS, new Gson().toJson(errors));
 		return Servlet.NAME_ADD;
@@ -180,31 +180,34 @@ public class ComputerController {
 			setPageManagerDataDashboard(pageManager, limit, page, searchString, orderByString, orderByChanged);
 			pageManager.getPageData().stream().map(ComputerMapper::toDTO).forEach(pageData.getDataList()::add);
 
-			setPageDataDashboard(pageData, pageManager, new Gson().toJson(new String[0]), 
-					orderByString, limit, orderByChanged ? Servlet.ORDER_BY_ASC : Servlet.ORDER_BY_DESC);
+			String orderValue = orderByChanged ? Servlet.ORDER_BY_ASC : Servlet.ORDER_BY_DESC;
 			
-			model.addAttribute(Servlet.PAGE_DATA, pageData);
+			setPageDataDashboard(pageData, pageManager, orderByString, limit, orderValue);
 			
 		} catch (FailedDAOOperationException e) {
 			logger.error(e.getMessage());
-			String[] error = {e.getMessage()};
-			model.addAttribute(Servlet.ERRORS, new Gson().toJson(error));
+			List<String> errors = new ArrayList<>();
+			errors.add(e.getMessage());
+			model.addAttribute(Servlet.ERRORS, new Gson().toJson(errors));
 		}
+		
+		model.addAttribute(Servlet.PAGE_DATA, pageData);
+		
 		return Servlet.NAME_DASHBOARD;
 	}
 	
 	@GetMapping("/" + Servlet.NAME_EDIT)
 	public String getEditComputer(@RequestParam(value = Servlet.ID, required = true) String idString,
 			@RequestParam(value = Servlet.ERRORS, required = false) List<String> errors,
-			Model model)
+			Model model, RedirectAttributes redirectAttributes)
 			throws ServletException, IOException {
 		long id = 0;
 		try {
 			id = Long.parseLong(idString);
 		} catch (NumberFormatException e) {
 			logger.error(Main.getErrorMessage("Couldn't parse " + idString, e.getMessage()));
-			String[] error = {"Invalid computer id"};
-			model.addAttribute(Servlet.ERRORS, new Gson().toJson(error));
+			errors.add("Invalid computer id");
+			redirectAttributes.addFlashAttribute(Servlet.ERRORS, new Gson().toJson(errors));
 			return "redirect:" + Servlet.NAME_404;
 		}
 		
@@ -216,14 +219,14 @@ public class ComputerController {
 		} catch (FailedDAOOperationException e) {
 			errors.add(e.getMessage());
 			logger.info(e.getMessage());
-			model.addAttribute(Servlet.ERRORS, new Gson().toJson(errors));
-			return "redirect:" + Servlet.NAME_404;
+			redirectAttributes.addFlashAttribute(Servlet.ERRORS, new Gson().toJson(errors));
+			return "redirect:" + Servlet.NAME_DASHBOARD;
 		}
 			
 		if (!gottenComputer.isPresent()) {
-			String[] error = {"Cannot find target computer"};
-			model.addAttribute(Servlet.ERRORS, new Gson().toJson(error));
-			return "redirect:" + Servlet.NAME_404;
+			errors.add("Cannot find target computer");
+			redirectAttributes.addFlashAttribute(Servlet.ERRORS, new Gson().toJson(errors));
+			return "redirect:" + Servlet.NAME_DASHBOARD;
 		} else {
 			ComputerDTO computerDTO = ComputerMapper.toDTO(gottenComputer.get());
 			
@@ -237,8 +240,7 @@ public class ComputerController {
 		}
 	}
 	
-	public void setPageDataDashboard(PageData<?> pageData, PageManagerComplete<?> pageManager, String errorsJson, String orderBy, long limit, String order) {
-		pageData.setErrors(errorsJson);
+	public void setPageDataDashboard(PageData<?> pageData, PageManagerComplete<?> pageManager, String orderBy, long limit, String order) {
 		pageData.setOrder(order);
 		pageData.setOrderby(orderBy);
 		pageData.setLimit(limit);
