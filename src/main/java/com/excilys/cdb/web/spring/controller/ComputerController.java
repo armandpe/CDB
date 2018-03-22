@@ -1,4 +1,4 @@
-package com.excilys.cdb.web.controller;
+package com.excilys.cdb.web.spring.controller;
 
 import static com.excilys.cdb.constant.Servlet.NAME_DASHBOARD;
 
