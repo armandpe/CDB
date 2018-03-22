@@ -1,4 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 
 <!DOCTYPE html>
 <html>
@@ -23,34 +24,35 @@
 			<div class="row">
 				<div class="col-xs-8 col-xs-offset-2 box">
 					<h1>Add Computer</h1>
-					<form action="addComputer" method="POST">
+					<form:form action="addComputer" method="POST" modelAttribute="computerDTO">
 						<fieldset>
 							<div class="form-group">
-								<label for="computerName">Computer name</label> <input
+								<label for="computerName">Computer name</label> 
+								<form:input
 									type="text" class="form-control" id="computerName"
-									placeholder="Computer name" name="computerName"
-									required="required">
+									placeholder="Computer name" path="name" name="computerName"
+									required="required"/>
 							</div>
 							<div class="form-group">
-								<label for="introduced">Introduced date</label> <input
+								<label for="introduced">Introduced date</label> <form:input
 									type="date" class="form-control" id="introduced"
 									placeholder="Introduced date" min="1970-01-01"
-									name="introduced">
+									name="introduced" path="introduced"/>
 							</div>
 							<div class="form-group">
-								<label for="discontinued">Discontinued date</label> <input
+								<label for="discontinued">Discontinued date</label> <form:input
 									type="date" class="form-control" id="discontinued"
 									placeholder="Discontinued date" min="1970-01-01"
-									name="discontinued">
+									name="discontinued" path="discontinued"/>
 							</div>
 							<div class="form-group">
-								<label for="companyId">Company</label> <select
-									class="form-control" id="companyId" name="companyId">
+								<label for="companyId">Company</label> <form:select
+									class="form-control" id="companyId" name="companyId" path="companyId">
 									<option value=0>None</option>
 									<c:forEach items="${companyList}" var="company">
 										<option value="${company.id}">${company.name}</option>
 									</c:forEach>
-								</select>
+								</form:select>
 							</div>
 						</fieldset>
 						<div class="actions pull-right">
@@ -58,7 +60,7 @@
 								id="addButton"> or <a href="dashboard"
 								class="btn btn-default">Cancel</a>
 						</div>
-					</form>
+					</form:form>
 				</div>
 			</div>
 		</div>

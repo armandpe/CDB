@@ -1,4 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 
 <!DOCTYPE html>
 <html>
@@ -22,39 +23,43 @@
 			<div class="row">
 				<div class="col-xs-8 col-xs-offset-2 box">
 					<div class="label label-default pull-right">id:
-						${computer.id}</div>
+						${computerDTO.id}</div>
 					<h1>Edit Computer</h1>
-					<form action="editComputer" method="POST">
-						<input type="hidden" value="${computer.id}" id="id" name="id" />
+					<form:form action="editComputer" method="POST" modelAttribute="computerDTO">
+						<input type="hidden" value="${computerDTO.id}" id="id" name="id" />
 						<!-- TODO: Change this value with the computer id -->
 						<fieldset>
 							<div class="form-group">
-								<label for="computerName">Computer name</label> <input
+								<label for="computerName">Computer name</label> 
+								<form:input
 									type="text" class="form-control" id="computerName"
-									name="computerName" placeholder="Computer name"
-									value="${computer.name}">
+									name="computerName" path="name" placeholder="Computer name"
+									value="${computerDTO.name}"/>
 							</div>
 							<div class="form-group">
-								<label for="introduced">Introduced date</label> <input
+								<label for="introduced">Introduced date</label> 
+								<form:input
 									type="date" class="form-control" id="introduced"
-									name="introduced" placeholder="Introduced date"
-									value="${computer.introduced}">
+									name="introduced" path="introduced" placeholder="Introduced date"
+									value="${computerDTO.introduced}"/>
 							</div>
 							<div class="form-group">
-								<label for="discontinued">Discontinued date</label> <input
+								<label for="discontinued">Discontinued date</label> 
+								<form:input
 									type="date" class="form-control" id="discontinued"
-									name="discontinued" placeholder="Discontinued date"
-									value="${computer.discontinued}">
+									name="discontinued" path="discontinued" placeholder="Discontinued date"
+									value="${computerDTO.discontinued}"/>
 							</div>
 							<div class="form-group">
-								<label for="companyId">Company</label> <select
-									class="form-control" id="companyId" name="companyId">
+								<label for="companyId">Company</label> 
+								<form:select
+									class="form-control" id="companyId" path="companyId" name="companyId">
 									<option value=0>None</option>
 									<c:forEach items="${companyList}" var="company">
-										<option value="${company.id}"
+										<option value="${companyDTO.id}"
 											${company.id == computer.companyId ? 'selected="selected"' : ''}>${company.name}</option>
 									</c:forEach>
-								</select>
+								</form:select>
 							</div>
 						</fieldset>
 						<div class="actions pull-right">
@@ -62,7 +67,7 @@
 								id="editButton"> or <a href="dashboard"
 								class="btn btn-default">Cancel</a>
 						</div>
-					</form>
+					</form:form>
 				</div>
 			</div>
 		</div>

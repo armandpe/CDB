@@ -24,9 +24,7 @@ import com.excilys.cdb.web.dto.ComputerMapper;
 public class ComputerFormManager {
 
 	private CompanyService companyService;
-	
 	private ComputerValidator computerValidator;
-	
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 	
 	private ComputerFormManager(ComputerValidator computerValidator, CompanyService companyService) {
@@ -35,12 +33,12 @@ public class ComputerFormManager {
 	};
 
 	public List<String> processInput(String computerName, String introduced, String discontinued, 
-			String companyId, ConsumerException<Computer, FailedDAOOperationException> processComputer) {
-		return processInput("0", computerName, introduced, discontinued, companyId, processComputer);
+			long companyId, ConsumerException<Computer, FailedDAOOperationException> processComputer) {
+		return processInput(0, computerName, introduced, discontinued, companyId, processComputer);
 	}
 
-	public List<String> processInput(String id, String computerName, String introduced, String discontinued, 
-			String companyId, ConsumerException<Computer, FailedDAOOperationException> processComputer) {
+	public List<String> processInput(long id, String computerName, String introduced, String discontinued, 
+			long companyId, ConsumerException<Computer, FailedDAOOperationException> processComputer) {
 
 		List<String> errors = new ArrayList<>();
 		

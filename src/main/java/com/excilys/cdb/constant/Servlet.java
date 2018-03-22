@@ -30,7 +30,7 @@ public final class Servlet {
 	public static final String DISCONTINUED = "discontinued";
 	public static final String COMPANY_ID = "company_id";
 	public static final String ID = "id";
-	public static final String COMPUTER = "computer";
+	public static final String COMPUTER_DTO = "computerDTO";
 
 	
 	//Request attributes

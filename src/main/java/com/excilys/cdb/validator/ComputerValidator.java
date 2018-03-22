@@ -24,7 +24,7 @@ public class ComputerValidator {
 		this.computerService = computerService;
 	}
 	
-	public void check(String computerName, String introduced, String discontinued, String companyId)
+	public void check(String computerName, String introduced, String discontinued, long companyId)
 			throws InvalidInputException {
 
 		exceptions.clear();
@@ -66,7 +66,7 @@ public class ComputerValidator {
 		}
 	}
 	
-	public void check(String id, String computerName, String introduced, String discontinued, String companyId)
+	public void check(long id, String computerName, String introduced, String discontinued, long companyId)
 			throws InvalidInputException {
 		
 		checkId(id);
@@ -74,17 +74,7 @@ public class ComputerValidator {
 		check(computerName, introduced, discontinued, companyId);
 	}
 
-	private void checkId(String idString) throws InvalidIdException {
-		if (idString == null) {
-			throw new InvalidIdException("Null id");
-		}
-
-		long id;
-		try {
-			id = Long.parseLong(idString);
-		} catch (NumberFormatException e) {
-			throw new InvalidIdException("Couldn't parse the id");
-		}
+	private void checkId(long id) throws InvalidIdException {
 		
 		if (id < 0 && id != 0) {
 			try {
@@ -98,21 +88,11 @@ public class ComputerValidator {
 		
 	}
 
-	public void checkCompanyId(String companyId) throws InvalidIdException {
-		if (companyId == null) {
-			return;
-		}
+	public void checkCompanyId(long companyId) throws InvalidIdException {
 
-		long id;
-		try {
-			id = Long.parseLong(companyId);
-		} catch (NumberFormatException e) {
-			throw new InvalidIdException("Couldn't parse the company id");
-		}
-
-		if (id < 0 && id != 0) {
+		if (companyId < 0 && companyId != 0) {
 			try {
-				if (!computerService.getById(id).isPresent()) {
+				if (!computerService.getById(companyId).isPresent()) {
 					throw new InvalidIdException("Incorrect id value");
 				}
 			} catch (FailedDAOOperationException e) {

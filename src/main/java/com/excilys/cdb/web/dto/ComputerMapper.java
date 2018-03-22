@@ -46,21 +46,18 @@ public class ComputerMapper {
 
 		return dto;
 	}
+ 
+	public static ComputerDTO toDTO(String name, String introduced, String discontinued, long companyId) {
+		return toDTO(0, name, introduced, discontinued, companyId);
+	}
 
-	public static ComputerDTO toDTO(String name, String introduced, String discontinued, String companyId) {
+	public static ComputerDTO toDTO(long id, String name, String introduced, String discontinued, long companyId) {
 		ComputerDTO dto = new ComputerDTO();
 		dto.setName(name);
 		dto.setIntroduced(introduced);
 		dto.setDiscontinued(discontinued);
-		dto.setCompanyId(companyId == null ? 0 : Long.parseLong(companyId));
-		dto.setId(0);
-
-		return dto;
-	}
-
-	public static ComputerDTO toDTO(String id, String name, String introduced, String discontinued, String companyId) {
-		ComputerDTO dto = toDTO(name, introduced, discontinued, companyId);
-		dto.setId(Long.parseLong(id));
+		dto.setCompanyId(companyId);
+		dto.setId(id);
 		return dto;
 	}
 

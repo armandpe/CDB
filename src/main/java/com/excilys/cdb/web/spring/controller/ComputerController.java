@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -36,9 +37,7 @@ import com.google.gson.Gson;
 public class ComputerController {
 
 	private ComputerFormManager computerFormManager;
-	
 	private ComputerService computerService;
-
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 	
 	public ComputerController(ComputerService computerService, ComputerFormManager computerFormManager) {
@@ -47,14 +46,11 @@ public class ComputerController {
 	}
 	
 	@PostMapping("/" + Servlet.NAME_ADD)
-	public String addComputer(@RequestParam(value = Servlet.COMPUTER_NAME, required = false) String computerName,
-			@RequestParam(value = Servlet.INTRODUCED, required = false) String introduced,
-			@RequestParam(value = Servlet.DISCONTINUED, required = false) String discontinued,
-			@RequestParam(value = Servlet.COMPANY_ID, required = false) String companyId,
+	public String addComputer(@ModelAttribute(Servlet.COMPUTER_DTO) ComputerDTO computerDTO,
 			Model model, RedirectAttributes redirectAttributes)
 			throws ServletException, IOException {
 		
-		List<String> errors = computerFormManager.processInput(computerName, introduced, discontinued, companyId, computer -> computerService.create(computer));
+		List<String> errors = computerFormManager.processInput(computerDTO.getName(), computerDTO.getIntroduced(), computerDTO.getDiscontinued(), computerDTO.getCompanyId(), computer -> computerService.create(computer));
 		
 		if (errors.size() > 0) {
 			computerFormManager.setRequestCompanies(model);
@@ -121,21 +117,17 @@ public class ComputerController {
 	}
 	
 	@PostMapping("/" + Servlet.NAME_EDIT)
-	public String editComputer(@RequestParam(value = Servlet.COMPUTER_NAME, required = true) String computerName,
-			@RequestParam(value = Servlet.INTRODUCED, required = true) String introduced,
-			@RequestParam(value = Servlet.DISCONTINUED, required = true) String discontinued,
-			@RequestParam(value = Servlet.COMPANY_ID, required = false) String companyId,
-			@RequestParam(value = Servlet.ID, required = true) String idString,
+	public String editComputer(@ModelAttribute(Servlet.COMPUTER_DTO) ComputerDTO computerDTO,
 			Model model, RedirectAttributes redirectAttributes)
 			throws ServletException, IOException {
 
-		List<String> errors = computerFormManager.processInput(idString, computerName, introduced, discontinued, companyId,
+		List<String> errors = computerFormManager.processInput(computerDTO.getId(), computerDTO.getName(), computerDTO.getIntroduced(), computerDTO.getDiscontinued(), computerDTO.getCompanyId(),
 				computer -> computerService.update(computer));
 
 		if (errors.size() > 0) {
 			logger.info(errors.toString());
 			computerFormManager.setRequestCompanies(model);
-			return getEditComputer(idString, errors, model, redirectAttributes);
+			return getEditComputer(Long.toString(computerDTO.getId()), errors, model, redirectAttributes);
 		}
 		
 		return "redirect:" + NAME_DASHBOARD;
@@ -146,6 +138,7 @@ public class ComputerController {
 		
 		List<String> errors = computerFormManager.setRequestCompanies(model);
 		model.addAttribute(Servlet.ERRORS, new Gson().toJson(errors));
+		model.addAttribute(Servlet.COMPUTER_DTO, new ComputerDTO());
 		return Servlet.NAME_ADD;
 	}
 
@@ -163,7 +156,6 @@ public class ComputerController {
 		searchString = searchString != null ? searchString : Servlet.DEFAULT_SEARCH;
 		pageString = pageString != null ? pageString : Servlet.DEFAULT_PAGE;
 		orderByString = orderByString != null ? orderByString : Servlet.DEFAULT_ORDER_BY;
-
 		PageData<ComputerDTO> pageData = new PageData<>();
 		PageManagerComplete<Computer> pageManager = new PageManagerComplete<>(computerService);
 
@@ -179,9 +171,7 @@ public class ComputerController {
 			
 			setPageManagerDataDashboard(pageManager, limit, page, searchString, orderByString, orderByChanged);
 			pageManager.getPageData().stream().map(ComputerMapper::toDTO).forEach(pageData.getDataList()::add);
-
 			String orderValue = orderByChanged ? Servlet.ORDER_BY_ASC : Servlet.ORDER_BY_DESC;
-			
 			setPageDataDashboard(pageData, pageManager, orderByString, limit, orderValue);
 			
 		} catch (FailedDAOOperationException e) {
@@ -190,9 +180,7 @@ public class ComputerController {
 			errors.add(e.getMessage());
 			model.addAttribute(Servlet.ERRORS, new Gson().toJson(errors));
 		}
-		
 		model.addAttribute(Servlet.PAGE_DATA, pageData);
-		
 		return Servlet.NAME_DASHBOARD;
 	}
 	
@@ -229,12 +217,9 @@ public class ComputerController {
 			return "redirect:" + Servlet.NAME_DASHBOARD;
 		} else {
 			ComputerDTO computerDTO = ComputerMapper.toDTO(gottenComputer.get());
-			
-			model.addAttribute("computer", computerDTO);
-
+			model.addAttribute(Servlet.COMPUTER_DTO, computerDTO);
 			errors.addAll(computerFormManager.setRequestCompanies(model));
-			
-			model.addAttribute("errors", new Gson().toJson(errors));
+			model.addAttribute(Servlet.ERRORS, new Gson().toJson(errors));
 			
 			return Servlet.NAME_EDIT;
 		}
