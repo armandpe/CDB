@@ -15,7 +15,7 @@ import com.excilys.cdb.pagemanager.PageManagerComplete;
 import com.excilys.cdb.service.CompanyService;
 import com.excilys.cdb.service.ComputerService;
 
-@ComponentScan("com.excilys.cdb") 
+@ComponentScan(basePackages = { "com.excilys.cdb.dao", "com.excilys.cdb.service", "com.excilys.cdb.web", "com.excilys.cdb.validator" }) 
 @PropertySource(value = "classpath:connection.properties")
 public class SpringConfig {
 
