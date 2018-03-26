@@ -70,7 +70,7 @@ public abstract class Service<T extends ModelClass, U extends DAO<T>> {
 		try {
 			return dao.getById(id);
 		} catch (FailedDAOOperationException e) {
-			e.setMessage(getDaoClassFullName() + " : Get all method failed ");
+			e.setMessage(getDaoClassFullName() + " : Get by id method failed ");
 			throw e;
 		}
 	}

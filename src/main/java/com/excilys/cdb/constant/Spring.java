@@ -1,6 +1,6 @@
 package com.excilys.cdb.constant;
 
-public final class Servlet {
+public final class Spring {
 	public static final String PATH = "/WEB-INF/views/";
 	public static final String EXTENSION = ".jsp";
 

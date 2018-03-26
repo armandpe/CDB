@@ -3,89 +3,47 @@ package com.excilys.cdb.validator;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.validation.Errors;
+import org.springframework.validation.Validator;
 
 import com.excilys.cdb.constant.DateConstant;
 import com.excilys.cdb.dao.FailedDAOOperationException;
 import com.excilys.cdb.service.ComputerService;
+import com.excilys.cdb.web.dto.ComputerDTO;
+import com.excilys.cdb.web.spring.controller.PageData;
 
 @Component
-public class ComputerValidator {
+public class ComputerValidator implements Validator {
 
-	private List<InvalidInputException> exceptions = new ArrayList<>();
-	
+	@SuppressWarnings("unused")
+	private Logger logger = LoggerFactory.getLogger(this.getClass());
+
 	private ComputerService computerService;
 
 	public ComputerValidator(ComputerService computerService) {
 		this.computerService = computerService;
 	}
-	
-	public void check(String computerName, String introduced, String discontinued, long companyId)
-			throws InvalidInputException {
 
-		exceptions.clear();
+	private void checkId(long id, Errors errors) throws InvalidIdException {
 
-		try {
-			checkName(computerName);
-		} catch (InvalidNameException e) {
-			exceptions.add(e);
-		}
-
-		LocalDate introducedDate = null;
-		try {
-			introducedDate = checkDate(introduced);
-		} catch (InvalidDateException e) {
-			exceptions.add(e);
-		}
-		LocalDate discontinuedDate = null;
-		try {
-			discontinuedDate = checkDate(discontinued);
-		} catch (InvalidDateException e) {
-			exceptions.add(e);
-		}
-
-		try {
-			if (introducedDate != null && discontinuedDate != null && introducedDate.compareTo(discontinuedDate) > 0) {
-				throw new InvalidDateException("Discontinued date is prior to introduced date");
-			}
-		} catch (InvalidDateException e) {
-			exceptions.add(e);
-		}
-		try {
-			checkCompanyId(companyId);
-		} catch (InvalidIdException e) {
-			exceptions.add(e);
-		}
-
-		if (!exceptions.isEmpty()) {
-			throw new InvalidInputException("Some input were invalid : " + exceptions.toString());
-		}
-	}
-	
-	public void check(long id, String computerName, String introduced, String discontinued, long companyId)
-			throws InvalidInputException {
-		
-		checkId(id);
-		
-		check(computerName, introduced, discontinued, companyId);
-	}
-
-	private void checkId(long id) throws InvalidIdException {
-		
 		if (id < 0 && id != 0) {
 			try {
 				if (!computerService.getById(id).isPresent()) {
-					throw new InvalidIdException("Incorrect id value");
+					errors.reject("Cannot find requested computer");
 				}
 			} catch (FailedDAOOperationException e) {
-				throw new InvalidIdException("Incorrect id value");
+				errors.reject("Invalid computer id");
 			}
+		} else if (id < 0) {
+			errors.reject("Invalid computer id");
 		}
-		
 	}
 
 	public void checkCompanyId(long companyId) throws InvalidIdException {
@@ -101,8 +59,6 @@ public class ComputerValidator {
 		}
 	}
 
-	
-	
 	public LocalDate checkDate(String date) throws InvalidDateException {
 
 		if (date == null) {
@@ -134,11 +90,62 @@ public class ComputerValidator {
 			throw new InvalidNameException("Null name");
 		} else if (computerName.trim() == null || computerName.trim() == "") {
 			throw new InvalidNameException("Empty name");
+		} else {
+			Pattern regex = Pattern.compile("[$,:;=?@#|'<>.^*()%!-]");
+			Matcher matcher = regex.matcher(computerName);
+			if (matcher.find()) {
+				throw new InvalidNameException("The name contains some special characters");
+			}
 		}
 	}
 
-	public List<InvalidInputException> getExceptions() {
-		return exceptions;
+	@Override
+	public boolean supports(Class<?> type) {
+		return ComputerDTO.class.equals(type) || PageData.class.equals(type);
+	}
+
+	@Override
+	public void validate(Object object, Errors errors) {
+		if (object instanceof PageData) {
+			return;
+		}
+		
+		ComputerDTO computerDTO = (ComputerDTO) object;
+
+		try {
+			checkId(computerDTO.getId(), errors);
+		} catch (InvalidIdException e) {
+			errors.reject(e.getMessage());
+		}
+
+		try {
+			checkName(computerDTO.getName());
+		} catch (InvalidNameException e) {
+			errors.reject(e.getMessage());
+		}
+
+		LocalDate introducedDate = null;
+		try {
+			introducedDate = checkDate(computerDTO.getIntroduced());
+		} catch (InvalidDateException e) {
+			errors.reject(e.getMessage());
+		}
+		LocalDate discontinuedDate = null;
+		try {
+			discontinuedDate = checkDate(computerDTO.getDiscontinued());
+		} catch (InvalidDateException e) {
+			errors.reject(e.getMessage());
+		}
+
+		if (introducedDate != null && discontinuedDate != null && introducedDate.compareTo(discontinuedDate) > 0) {
+			errors.reject("Discontinued date is prior to introduced date");
+		}
+
+		try {
+			checkCompanyId(computerDTO.getCompanyId());
+		} catch (InvalidIdException e) {
+			errors.reject(e.getMessage());
+		}
 	}
 
 }

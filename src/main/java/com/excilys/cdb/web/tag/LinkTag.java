@@ -9,7 +9,7 @@ import javax.servlet.jsp.tagext.SimpleTagSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.excilys.cdb.constant.Servlet;
+import com.excilys.cdb.constant.Spring;
 
 public class LinkTag extends SimpleTagSupport {
 
@@ -23,9 +23,9 @@ public class LinkTag extends SimpleTagSupport {
 	protected Logger logger = LoggerFactory.getLogger(this.getClass());
 	
 	public LinkTag() {
-		this(Servlet.DEFAULT_PAGE_VALUE, Servlet.DEFAULT_ORDER_BY, 
-				Servlet.DEFAULT_SEARCH, Servlet.DEFAULT_LIMIT_VALUE, 
-				Servlet.DEFAULT_ORDER);
+		this(Spring.DEFAULT_PAGE_VALUE, Spring.DEFAULT_ORDER_BY, 
+				Spring.DEFAULT_SEARCH, Spring.DEFAULT_LIMIT_VALUE, 
+				Spring.DEFAULT_ORDER);
 	}
 
 	public LinkTag(long page, String orderBy, String search, long limit, String order) {
