@@ -1,13 +1,15 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib prefix="custom" uri="/WEB-INF/cdb.tld"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 
 <!DOCTYPE html>
 <html>
 <head>
 <title>Computer Database</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <!-- Bootstrap -->
 <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
 <link href="css/font-awesome.css" rel="stylesheet" media="screen">
@@ -42,11 +44,23 @@
 		<div class="container">
 			<a class="navbar-brand" href="dashboard"> Application - Computer
 				Database </a>
+			<div class="pull-right">
+				<a href="?langue=fr"><img src="img/fr.png" height="24"
+					width="24" /></a> <a href="?langue=en"><img src="img/en.png"
+					alt="EN"></a>
+			</div>
 		</div>
 	</header>
 	<section id="main">
 		<div class="container">
-			<h1 id="homeTitle">${pageData.count} computers found</h1>
+			<h1 id="homeTitle">${pageData.count}
+				<spring:message code="computersFound" />
+			</h1>
+			<img src="img/fr.png" height="24" width="24" />
+			<img src="../img/fr.png" height="24" width="24"/>
+			<img src="resources/img/fr.png" height="24" width="24"/>
+			
+			
 			<div id="actions" class="form-horizontal">
 				<div class="pull-left">
 					<form id="searchForm" action="#" method="GET" class="form-inline">

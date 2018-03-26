@@ -16,6 +16,9 @@
 		<div class="container">
 			<a class="navbar-brand" href="dashboard"> Application - Computer
 				Database </a>
+			<div class="pull-right">
+				<a href="?langue=fr">FR</a> <a href="?langue=en">EN</a>
+			</div>
 		</div>
 	</header>
 	<section id="main">
@@ -25,35 +28,34 @@
 					<div class="label label-default pull-right">id:
 						${computerDTO.id}</div>
 					<h1>Edit Computer</h1>
-					<form:form action="editComputer" method="POST" modelAttribute="computerDTO">
+					<form:form action="editComputer" method="POST"
+						modelAttribute="computerDTO">
 						<input type="hidden" value="${computerDTO.id}" id="id" name="id" />
 						<!-- TODO: Change this value with the computer id -->
 						<fieldset>
 							<div class="form-group">
-								<label for="computerName">Computer name</label> 
-								<form:input
-									type="text" class="form-control" id="computerName"
+								<label for="computerName">Computer name</label>
+								<form:input type="text" class="form-control" id="computerName"
 									name="computerName" path="name" placeholder="Computer name"
-									value="${computerDTO.name}"/>
+									value="${computerDTO.name}" />
 							</div>
 							<div class="form-group">
-								<label for="introduced">Introduced date</label> 
-								<form:input
-									type="date" class="form-control" id="introduced"
-									name="introduced" path="introduced" placeholder="Introduced date"
-									value="${computerDTO.introduced}"/>
+								<label for="introduced">Introduced date</label>
+								<form:input type="date" class="form-control" id="introduced"
+									name="introduced" path="introduced"
+									placeholder="Introduced date" value="${computerDTO.introduced}" />
 							</div>
 							<div class="form-group">
-								<label for="discontinued">Discontinued date</label> 
-								<form:input
-									type="date" class="form-control" id="discontinued"
-									name="discontinued" path="discontinued" placeholder="Discontinued date"
-									value="${computerDTO.discontinued}"/>
+								<label for="discontinued">Discontinued date</label>
+								<form:input type="date" class="form-control" id="discontinued"
+									name="discontinued" path="discontinued"
+									placeholder="Discontinued date"
+									value="${computerDTO.discontinued}" />
 							</div>
 							<div class="form-group">
-								<label for="companyId">Company</label> 
-								<form:select
-									class="form-control" id="companyId" path="companyId" name="companyId">
+								<label for="companyId">Company</label>
+								<form:select class="form-control" id="companyId"
+									path="companyId" name="companyId">
 									<option value=0>None</option>
 									<c:forEach items="${companyList}" var="company">
 										<option value="${companyDTO.id}"

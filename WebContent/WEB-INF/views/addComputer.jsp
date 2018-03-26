@@ -17,37 +17,42 @@
 		<div class="container">
 			<a class="navbar-brand" href="dashboard"> Application - Computer
 				Database </a>
+			<div class="pull-right">
+				<a href="?langue=fr">FR</a> <a href="?langue=en">EN</a>
+			</div>
 		</div>
+
 	</header>
 	<section id="main">
 		<div class="container">
 			<div class="row">
 				<div class="col-xs-8 col-xs-offset-2 box">
 					<h1>Add Computer</h1>
-					<form:form action="addComputer" method="POST" modelAttribute="computerDTO">
+					<form:form action="addComputer" method="POST"
+						modelAttribute="computerDTO">
 						<fieldset>
 							<div class="form-group">
-								<label for="computerName">Computer name</label> 
-								<form:input
-									type="text" class="form-control" id="computerName"
+								<label for="computerName">Computer name</label>
+								<form:input type="text" class="form-control" id="computerName"
 									placeholder="Computer name" path="name" name="computerName"
-									required="required"/>
+									required="required" />
 							</div>
 							<div class="form-group">
-								<label for="introduced">Introduced date</label> <form:input
-									type="date" class="form-control" id="introduced"
+								<label for="introduced">Introduced date</label>
+								<form:input type="date" class="form-control" id="introduced"
 									placeholder="Introduced date" min="1970-01-01"
-									name="introduced" path="introduced"/>
+									name="introduced" path="introduced" />
 							</div>
 							<div class="form-group">
-								<label for="discontinued">Discontinued date</label> <form:input
-									type="date" class="form-control" id="discontinued"
+								<label for="discontinued">Discontinued date</label>
+								<form:input type="date" class="form-control" id="discontinued"
 									placeholder="Discontinued date" min="1970-01-01"
-									name="discontinued" path="discontinued"/>
+									name="discontinued" path="discontinued" />
 							</div>
 							<div class="form-group">
-								<label for="companyId">Company</label> <form:select
-									class="form-control" id="companyId" name="companyId" path="companyId">
+								<label for="companyId">Company</label>
+								<form:select class="form-control" id="companyId"
+									name="companyId" path="companyId">
 									<option value=0>None</option>
 									<c:forEach items="${companyList}" var="company">
 										<option value="${company.id}">${company.name}</option>
