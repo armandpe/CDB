@@ -3,12 +3,17 @@ package com.excilys.cdb.model;
 import java.time.LocalDate;
 import java.util.Optional;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.excilys.cdb.ParamDescription;
 
 @SQLTable(name = "computer")
+@Entity
 public class Computer implements ModelClass {
 	
 	public static class ComputerBuilder {
@@ -55,22 +60,27 @@ public class Computer implements ModelClass {
 
 	static final Logger LOGGER = LoggerFactory.getLogger(Computer.class);
 
+    @Column
 	@SQLInfo(name = "company_id", foreignKey = true)
 	private Optional<Company> company;
 
+    @Column
 	@SQLInfo(name = "discontinued")
 	private Optional<LocalDate> discontinued;
 
+	@Id
 	@SQLInfo(name = "id", primaryKey = true)
 	private long id;
 
+    @Column
 	@SQLInfo(name = "introduced")
 	private Optional<LocalDate> introduced;
 
+    @Column
 	@SQLInfo(name = "name", searchable = true)
 	private String name;
 
-	public Computer(@ParamDescription(name = "computer id") long id, 
+	private Computer(@ParamDescription(name = "computer id") long id, 
 					@ParamDescription(name = "computer name") String name, 
 					@ParamDescription(name = "date of introdution", optional = true) Optional<LocalDate> introduced, 
 					@ParamDescription(name = "date of discontinuation", optional = true) Optional<LocalDate> discontinued, 
@@ -80,17 +90,7 @@ public class Computer implements ModelClass {
 		this.introduced = introduced;
 		this.discontinued = discontinued;
 		this.company = company;
-		
-		if (this.introduced.isPresent() && this.discontinued.isPresent() && introduced.get().compareTo(discontinued.get()) > 0) {
-			throw new IllegalArgumentException("Introduced date superior to discontinued date");
-		}
-		if ((introduced.isPresent() && introduced.get().getYear() < 1970) || (discontinued.isPresent() && discontinued.get().getYear() < 1970)) {
-			throw new IllegalArgumentException("A date was inferior to 1970 - not managed by the database");
-		}
 	}
-
-	@SuppressWarnings("unused")
-	private Computer() { }
 
 	@Override
 	public boolean equals(Object obj) {

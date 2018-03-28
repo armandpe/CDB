@@ -1,46 +1,51 @@
 package com.excilys.cdb.dao;
 
-import java.lang.reflect.Field;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
+import java.util.Optional;
 
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
 import com.excilys.cdb.model.Company;
-import com.excilys.cdb.model.Computer;
+import com.excilys.cdb.pagemanager.PageManagerLimit;
 
 @Repository
-public class CompanyDAO extends DAO<Company> {
+public class CompanyDAO implements ICompanyDAO {
+	
+	protected Logger logger = LoggerFactory.getLogger(PageManagerLimit.class);
 	
 	private final ComputerDAO computerDAO;
 	
-	private final String modelClassFullName = Company.class.getName();
-	
-	private CompanyDAO(JdbcTemplate jdbcTemplate, ComputerDAO computerDAO) {
-		super(jdbcTemplate);
+	private CompanyDAO(ComputerDAO computerDAO) {
 		this.computerDAO = computerDAO;
 	}
-	
-	public void delete(long id) throws FailedDAOOperationException {
-		Entry<String, Field> primaryKey = getKey(getModelClassFullName(), x -> x.primaryKey());
-		Map<String, Object> conditions = new HashMap<>();
-		conditions.put(primaryKey.getKey(), id);
-		
-		List<Computer> computers = computerDAO.getByCompanyId(id);
-		
-		for (long computerId : computers.stream().mapToLong(computer -> computer.getId()).toArray()) {
-			computerDAO.deleteByPrimaryKey(computerId);
-		}
-		
-		deleteByPrimaryKey(id);
-	}
-	
+
 	@Override
-	public String getModelClassFullName() {
-		return modelClassFullName;
+	public List<Company> getAll(long offset, long limit, String search, String orderByVar, boolean asc)
+			throws FailedDAOOperationException {
+		// TODO Auto-generated method stub
+		return null;
 	}
+
+	@Override
+	public Optional<Company> getById(long id) throws FailedDAOOperationException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public long getCount(String search) throws FailedDAOOperationException {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void deleteById(long id) throws FailedDAOOperationException {
+		// TODO Auto-generated method stub
+		
+	}
+	
+
 
 }

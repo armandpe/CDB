@@ -6,7 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.excilys.cdb.dao.FailedDAOOperationException;
-import com.excilys.cdb.ihm.UserChoice;
 import com.excilys.cdb.model.ModelClass;
 import com.excilys.cdb.service.Service;
 
@@ -21,7 +20,6 @@ public abstract class PageManagerAbstract<T extends ModelClass> {
 	protected ArrayList<T> pageData = new ArrayList<>();
 	protected Service<?, ?> service;
 	
-	@UserChoice(name = "Get first page")
 	public void first() {
 		offset = 0;
 	}
@@ -58,13 +56,11 @@ public abstract class PageManagerAbstract<T extends ModelClass> {
 		offset = (page - 1) * limit;
 	}
 
-	@UserChoice(name = "Get last page")
 	public boolean last() {
 		offset = (maxPage - 1) * limit;
 		return true;
 	}
 
-	@UserChoice(name = "Get next page")
 	public boolean next() {
 		if (!(offset + limit > max - 1)) {
 			offset += limit;
@@ -73,7 +69,6 @@ public abstract class PageManagerAbstract<T extends ModelClass> {
 		return false;
 	}
 
-	@UserChoice(name = "Get previous page")
 	public boolean previous() {
 		if (offset - limit < 0) {
 			return false;
