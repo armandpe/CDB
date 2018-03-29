@@ -2,10 +2,6 @@ package com.excilys.cdb;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-
-import com.excilys.cdb.ihm.CLI;
-import com.excilys.cdb.web.spring.configuration.SpringConfig;
 
 
 public class Main {
@@ -42,11 +38,6 @@ public class Main {
 	}
 
 	public static void main(String[] args) {
-		CLI cli;
-		try (AnnotationConfigApplicationContext vApplicationContext = new AnnotationConfigApplicationContext(SpringConfig.class)) {
-			cli = vApplicationContext.getBean(CLI.class);
-		}
-		cli.start();	
 	}
 	
 	private static String getCallerCallerClassName() { 

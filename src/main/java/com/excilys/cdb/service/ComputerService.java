@@ -1,6 +1,5 @@
 package com.excilys.cdb.service;
 
-import com.excilys.cdb.ParamDescription;
 import com.excilys.cdb.dao.ComputerDAO;
 import com.excilys.cdb.dao.DAO;
 import com.excilys.cdb.dao.FailedDAOOperationException;
@@ -17,7 +16,7 @@ public class ComputerService extends Service<Computer, ComputerDAO> {
 	}
 	
 	@ServiceMethod(name = "Add a new computer")
-	public void create(@ParamDescription(name = "computer to add (id is automatically set)") Computer computer) throws FailedDAOOperationException {
+	public void create(Computer computer) throws FailedDAOOperationException {
 		computer.setId(0);
 		try {
 			computerDAO.create(computer);
@@ -28,9 +27,9 @@ public class ComputerService extends Service<Computer, ComputerDAO> {
 	}
 
 	@ServiceMethod(name = "Remove a computer (based on id)")
-	public void delete(@ParamDescription(name = "id of the computer ") long id) throws FailedDAOOperationException {
+	public void delete(long id) throws FailedDAOOperationException {
 		try {
-			computerDAO.delete(id);
+			computerDAO.deleteById(id);
 		} catch (FailedDAOOperationException e) {
 			e.setMessage(getDaoClassFullName() + " : delete computer failed ");
 			throw e;
@@ -43,7 +42,7 @@ public class ComputerService extends Service<Computer, ComputerDAO> {
 	}
 
 	@ServiceMethod(name = "Update a computer")
-	public void update(@ParamDescription(name = "computer to update") Computer computer) throws FailedDAOOperationException {
+	public void update(Computer computer) throws FailedDAOOperationException {
 		try {
 			computerDAO.update(computer);
 		} catch (FailedDAOOperationException e) {

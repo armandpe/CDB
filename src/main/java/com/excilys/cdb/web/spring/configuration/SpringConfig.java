@@ -1,55 +1,180 @@
 package com.excilys.cdb.web.spring.configuration;
 
+import java.net.URL;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Properties;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.SharedCacheMode;
+import javax.persistence.ValidationMode;
+import javax.persistence.spi.ClassTransformer;
+import javax.persistence.spi.PersistenceUnitInfo;
+import javax.persistence.spi.PersistenceUnitTransactionType;
 import javax.sql.DataSource;
 
+import org.hibernate.jpa.HibernatePersistenceProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.orm.jpa.JpaTransactionManager;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import com.excilys.cdb.model.Company;
 import com.excilys.cdb.model.Computer;
-import com.excilys.cdb.pagemanager.PageManagerComplete;
-import com.excilys.cdb.service.CompanyService;
-import com.excilys.cdb.service.ComputerService;
 
-@ComponentScan(basePackages = { "com.excilys.cdb.dao", "com.excilys.cdb.service", "com.excilys.cdb.web", "com.excilys.cdb.validator" }) 
+@ComponentScan(basePackages = { "com.excilys.cdb" }) 
 @PropertySource(value = "classpath:connection.properties")
+@EnableTransactionManagement
 public class SpringConfig {
 
 	private Environment environment;
+	
+	private Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	private SpringConfig(Environment environment) {
 		this.environment = environment;
 	}
 	
+//	@Bean
+//	public DataSource dataSource() {
+//		DriverManagerDataSource dataSource = new DriverManagerDataSource();
+//		dataSource.setDriverClassName(environment.getRequiredProperty("driver"));
+//		dataSource.setUrl(environment.getRequiredProperty("url"));
+//		dataSource.setUsername(environment.getRequiredProperty("login"));
+//		dataSource.setPassword(environment.getRequiredProperty("password"));
+//		return dataSource;
+//	}
+//
+//	@Bean
+//	public JdbcTemplate jdbcTemplate(DataSource dataSource) {
+//		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+//		jdbcTemplate.setResultsMapCaseInsensitive(true);
+//		return jdbcTemplate;
+//	}
+
+	@Bean EntityManagerFactory entityManagerFactory() {
+		Properties props = new Properties();
+		props.put("hibernate.connection.driver_class", environment.getRequiredProperty("driver"));
+		props.put("hibernate.connection.url", environment.getRequiredProperty("url"));
+		props.put("hibernate.connection.username", environment.getRequiredProperty("login"));
+		props.put("hibernate.connection.password", environment.getRequiredProperty("password"));
+		
+		PersistenceUnitInfo persistenceUnitInfo = new PersistenceUnitInfo() {
+
+			@Override
+			public void addTransformer(ClassTransformer arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public ClassLoader getNewTempClassLoader() {
+				// TODO Auto-generated method stub
+				return null;
+			}
+			
+			@Override
+			public Properties getProperties() {
+				return props;
+			}
+
+			@Override
+			public List<String> getManagedClassNames() {
+				return Arrays.asList(Company.class.getName(), Computer.class.getName());
+			}
+
+			@Override
+			public String getPersistenceUnitName() {
+				return "TestUnit";
+			}
+
+			@Override
+			public String getPersistenceProviderClassName() {
+				return HibernatePersistenceProvider.class.getName();
+			}
+
+			@Override
+			public PersistenceUnitTransactionType getTransactionType() {
+				return null;
+			}
+
+			@Override
+			public DataSource getJtaDataSource() {
+				return null;
+			}
+
+			@Override
+			public DataSource getNonJtaDataSource() {
+				return null;
+			}
+
+			@Override
+			public List<String> getMappingFileNames() {
+				return null;
+			}
+
+			@Override
+			public List<URL> getJarFileUrls() {
+				return null;
+			}
+
+			@Override
+			public URL getPersistenceUnitRootUrl() {
+				return null;
+			}
+
+			@Override
+			public boolean excludeUnlistedClasses() {
+				return false;
+			}
+
+			@Override
+			public SharedCacheMode getSharedCacheMode() {
+				return null;
+			}
+
+			@Override
+			public ValidationMode getValidationMode() {
+				return null;
+			}
+
+			@Override
+			public String getPersistenceXMLSchemaVersion() {
+				return null;
+			}
+
+			@Override
+			public ClassLoader getClassLoader() {
+				return null;
+			}
+		};
+
+		HibernatePersistenceProvider hibernatePersistenceProvider = new HibernatePersistenceProvider();
+
+		EntityManagerFactory entityManagerFactory = hibernatePersistenceProvider
+				.createContainerEntityManagerFactory(persistenceUnitInfo, Collections.EMPTY_MAP);
+		
+		return entityManagerFactory;
+	}
+	
 	@Bean
-	public DataSource dataSource() {
-		DriverManagerDataSource dataSource = new DriverManagerDataSource();
-		dataSource.setDriverClassName(environment.getRequiredProperty("driver"));
-		dataSource.setUrl(environment.getRequiredProperty("url"));
-		dataSource.setUsername(environment.getRequiredProperty("login"));
-		dataSource.setPassword(environment.getRequiredProperty("password"));
-		return dataSource;
+	public EntityManager entityManager() {
+		return entityManagerFactory().createEntityManager();
 	}
-
-	@Bean(name = "companyPageManager")
-	public PageManagerComplete<Company> getCompanyPageManager(CompanyService service) {
-		return new PageManagerComplete<>(service);
-	}
-
-	@Bean(name = "computerPageManager")
-	public PageManagerComplete<Computer> getComputerPageManager(ComputerService service) {
-		return new PageManagerComplete<>(service);
-	}
-
-	@Bean
-	public JdbcTemplate jdbcTemplate(DataSource dataSource) {
-		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-		jdbcTemplate.setResultsMapCaseInsensitive(true);
-		return jdbcTemplate;
-	}
-
+	
+	   @Bean
+	   public PlatformTransactionManager transactionManager() {
+	      JpaTransactionManager transactionManager
+	        = new JpaTransactionManager();
+	      transactionManager.setEntityManagerFactory(
+	        entityManagerFactory());
+	      return transactionManager;
+	   }
 }

@@ -1,30 +1,30 @@
 package com.excilys.cdb.model;
 
 import java.time.LocalDate;
-import java.util.Optional;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.excilys.cdb.ParamDescription;
-
-@SQLTable(name = "computer")
 @Entity
+@Table(name = "computer")
 public class Computer implements ModelClass {
 	
 	public static class ComputerBuilder {
 		
-		private Optional<Company> company = Optional.empty();
+		private Company company;
 
-		private Optional<LocalDate> discontinued = Optional.empty();
+		private LocalDate discontinued;
 
 		private long id = 0;
 
-		private Optional<LocalDate> introduced = Optional.empty();
+		private LocalDate introduced;
 
 		private String name = "Unnamed";
 		
@@ -33,12 +33,12 @@ public class Computer implements ModelClass {
 		}
 		
 		public ComputerBuilder withCompany(Company company) {
-			this.company = Optional.ofNullable(company);
+			this.company = company;
 			return this;
 		}
 		
 		public ComputerBuilder withDiscontinued(LocalDate discontinued) {
-			this.discontinued = Optional.ofNullable(discontinued);
+			this.discontinued = discontinued;
 			return this;
 		}
 		
@@ -48,7 +48,7 @@ public class Computer implements ModelClass {
 		}
 		
 		public ComputerBuilder withIntroduced(LocalDate introduced) {
-			this.introduced = Optional.ofNullable(introduced);
+			this.introduced = introduced;
 			return this;
 		} 
 		
@@ -60,31 +60,26 @@ public class Computer implements ModelClass {
 
 	static final Logger LOGGER = LoggerFactory.getLogger(Computer.class);
 
-    @Column
-	@SQLInfo(name = "company_id", foreignKey = true)
-	private Optional<Company> company;
+	@ManyToOne()
+    @JoinColumn(name = "company_id")
+    private Company company;
 
-    @Column
-	@SQLInfo(name = "discontinued")
-	private Optional<LocalDate> discontinued;
+    @Column(name = "discontinued")
+	private LocalDate discontinued;
 
 	@Id
-	@SQLInfo(name = "id", primaryKey = true)
+	@Column(name = "id")
 	private long id;
 
-    @Column
-	@SQLInfo(name = "introduced")
-	private Optional<LocalDate> introduced;
+    @Column(name = "introduced")
+	private LocalDate introduced;
 
-    @Column
-	@SQLInfo(name = "name", searchable = true)
+    @Column(name = "name")
 	private String name;
 
-	private Computer(@ParamDescription(name = "computer id") long id, 
-					@ParamDescription(name = "computer name") String name, 
-					@ParamDescription(name = "date of introdution", optional = true) Optional<LocalDate> introduced, 
-					@ParamDescription(name = "date of discontinuation", optional = true) Optional<LocalDate> discontinued, 
-					@ParamDescription(name = "company", optional = true) Optional<Company> company) {
+    private Computer() { }
+    
+	private Computer(long id, String name,  LocalDate introduced,  LocalDate discontinued, Company company) {
 		this.id = id;
 		this.name = name;
 		this.introduced = introduced;
@@ -111,11 +106,11 @@ public class Computer implements ModelClass {
 		return true;
 	}
 	
-	public Optional<Company> getCompany() {
+	public Company getCompany() {
 		return company;
 	}
 
-	public Optional<LocalDate> getDiscontinued() {
+	public LocalDate getDiscontinued() {
 		return discontinued;
 	}
 
@@ -123,7 +118,7 @@ public class Computer implements ModelClass {
 		return id;
 	}
 
-	public Optional<LocalDate> getIntroduced() {
+	public LocalDate getIntroduced() {
 		return introduced;
 	}
 
@@ -139,11 +134,11 @@ public class Computer implements ModelClass {
 		return result;
 	}
 
-	public void setCompany(Optional<Company> company) {
+	public void setCompany(Company company) {
 		this.company = company;
 	}
 
-	public void setDiscontinued(Optional<LocalDate> discontinued) {
+	public void setDiscontinued(LocalDate discontinued) {
 		this.discontinued = discontinued;
 	}
 
@@ -151,7 +146,7 @@ public class Computer implements ModelClass {
 		this.id = id;
 	}
 
-	public void setIntroduced(Optional<LocalDate> localDate) {
+	public void setIntroduced(LocalDate localDate) {
 		this.introduced = localDate;
 	}
 
@@ -159,13 +154,4 @@ public class Computer implements ModelClass {
 		this.name = name;
 	}
 
-	@Override
-	public String toString() {
-		return "Computer [id=" + id + 
-				", name=" + name + 
-				(introduced.isPresent() ? ", introduced=" + introduced.get() : "") + 
-				(discontinued.isPresent() ? ", discontinued=" + discontinued.get() : "") + 
-				(company.isPresent() ? ", company=" + company.get() : "") + 
-				"]\n";
-	}
 }

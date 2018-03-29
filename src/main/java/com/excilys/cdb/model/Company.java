@@ -2,19 +2,22 @@ package com.excilys.cdb.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
-@SQLTable(name = "company")
 @Entity
+@Table(name = "company")
 public class Company implements ModelClass {
 	
-	@SQLInfo(name = "id", primaryKey = true)
-	@Column
+	@Id
+	@Column(name = "id")
 	private Long id;
 
-	@SQLInfo(name = "name", searchable = true)
-	@Column
+	@Column(name = "name")
 	private String name;
 
+	public Company() { } 
+	
 	public Company(long id, String name) {
 		this.id = id;
 		this.name = name;

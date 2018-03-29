@@ -6,7 +6,6 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.excilys.cdb.ParamDescription;
 import com.excilys.cdb.dao.DAO;
 import com.excilys.cdb.dao.FailedDAOOperationException;
 import com.excilys.cdb.model.ModelClass;
@@ -65,7 +64,7 @@ public abstract class Service<T extends ModelClass, U extends DAO<T>> {
 	}
 
 	@ServiceMethod(name = "Get an element (by id)")
-	public Optional<T> getById(@ParamDescription(name = "element id") long id) throws FailedDAOOperationException {
+	public Optional<T> getById(long id) throws FailedDAOOperationException {
 		DAO<T> dao = getDAO();
 		try {
 			return dao.getById(id);
