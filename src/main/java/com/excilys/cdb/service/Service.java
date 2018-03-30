@@ -14,7 +14,6 @@ public abstract class Service<T extends ModelClass, U extends DAO<T>> {
 
 	final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-	@ServiceMethod(name = "Get the list of all elements", forUser = false, fullName = "com.excilys.cdb.Service.getAll")
 	public List<T> getAll(long offset, long limit) throws FailedDAOOperationException {
 		DAO<T> dao = getDAO();
 		try {
@@ -63,7 +62,6 @@ public abstract class Service<T extends ModelClass, U extends DAO<T>> {
 		}
 	}
 
-	@ServiceMethod(name = "Get an element (by id)")
 	public Optional<T> getById(long id) throws FailedDAOOperationException {
 		DAO<T> dao = getDAO();
 		try {
@@ -88,7 +86,7 @@ public abstract class Service<T extends ModelClass, U extends DAO<T>> {
 		}
 	}
 
-	public abstract String getDaoClassFullName();
-
 	public abstract DAO<T> getDAO();
+
+	public abstract String getDaoClassFullName();
 }

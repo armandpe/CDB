@@ -31,33 +31,33 @@ import com.excilys.cdb.model.Computer;
 
 @ComponentScan(basePackages = { "com.excilys.cdb" }) 
 @PropertySource(value = "classpath:connection.properties")
-@EnableTransactionManagement
+@EnableTransactionManagement(proxyTargetClass = true)
 public class SpringConfig {
 
 	private Environment environment;
-	
+
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	private SpringConfig(Environment environment) {
 		this.environment = environment;
 	}
-	
-//	@Bean
-//	public DataSource dataSource() {
-//		DriverManagerDataSource dataSource = new DriverManagerDataSource();
-//		dataSource.setDriverClassName(environment.getRequiredProperty("driver"));
-//		dataSource.setUrl(environment.getRequiredProperty("url"));
-//		dataSource.setUsername(environment.getRequiredProperty("login"));
-//		dataSource.setPassword(environment.getRequiredProperty("password"));
-//		return dataSource;
-//	}
-//
-//	@Bean
-//	public JdbcTemplate jdbcTemplate(DataSource dataSource) {
-//		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-//		jdbcTemplate.setResultsMapCaseInsensitive(true);
-//		return jdbcTemplate;
-//	}
+
+	//	@Bean
+	//	public DataSource dataSource() {
+	//		DriverManagerDataSource dataSource = new DriverManagerDataSource();
+	//		dataSource.setDriverClassName(environment.getRequiredProperty("driver"));
+	//		dataSource.setUrl(environment.getRequiredProperty("url"));
+	//		dataSource.setUsername(environment.getRequiredProperty("login"));
+	//		dataSource.setPassword(environment.getRequiredProperty("password"));
+	//		return dataSource;
+	//	}
+	//
+	//	@Bean
+	//	public JdbcTemplate jdbcTemplate(DataSource dataSource) {
+	//		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+	//		jdbcTemplate.setResultsMapCaseInsensitive(true);
+	//		return jdbcTemplate;
+	//	}
 
 	@Bean EntityManagerFactory entityManagerFactory() {
 		Properties props = new Properties();
@@ -65,21 +65,21 @@ public class SpringConfig {
 		props.put("hibernate.connection.url", environment.getRequiredProperty("url"));
 		props.put("hibernate.connection.username", environment.getRequiredProperty("login"));
 		props.put("hibernate.connection.password", environment.getRequiredProperty("password"));
-		
+
 		PersistenceUnitInfo persistenceUnitInfo = new PersistenceUnitInfo() {
 
 			@Override
 			public void addTransformer(ClassTransformer arg0) {
 				// TODO Auto-generated method stub
-				
+
 			}
-			
+
 			@Override
 			public ClassLoader getNewTempClassLoader() {
 				// TODO Auto-generated method stub
 				return null;
 			}
-			
+
 			@Override
 			public Properties getProperties() {
 				return props;
@@ -160,21 +160,19 @@ public class SpringConfig {
 
 		EntityManagerFactory entityManagerFactory = hibernatePersistenceProvider
 				.createContainerEntityManagerFactory(persistenceUnitInfo, Collections.EMPTY_MAP);
-		
+
 		return entityManagerFactory;
 	}
-	
+
 	@Bean
 	public EntityManager entityManager() {
 		return entityManagerFactory().createEntityManager();
 	}
-	
-	   @Bean
-	   public PlatformTransactionManager transactionManager() {
-	      JpaTransactionManager transactionManager
-	        = new JpaTransactionManager();
-	      transactionManager.setEntityManagerFactory(
-	        entityManagerFactory());
-	      return transactionManager;
-	   }
+
+	@Bean
+	public PlatformTransactionManager transactionManager() {
+		JpaTransactionManager transactionManager
+		= new JpaTransactionManager(entityManagerFactory());
+		return transactionManager;
+	}
 }

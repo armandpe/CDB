@@ -3,19 +3,18 @@ package com.excilys.cdb.service;
 import com.excilys.cdb.dao.ComputerDAO;
 import com.excilys.cdb.dao.DAO;
 import com.excilys.cdb.dao.FailedDAOOperationException;
+import com.excilys.cdb.dao.IComputerDAO;
 import com.excilys.cdb.model.Computer;
 
 @org.springframework.stereotype.Service
-@ServiceClass(name = "computers")
 public class ComputerService extends Service<Computer, ComputerDAO> {
 
-	private final ComputerDAO computerDAO;
+	private final IComputerDAO computerDAO;
 
-	private ComputerService(ComputerDAO computerDAO) { 
+	private ComputerService(IComputerDAO computerDAO) { 
 		this.computerDAO = computerDAO;
 	}
 	
-	@ServiceMethod(name = "Add a new computer")
 	public void create(Computer computer) throws FailedDAOOperationException {
 		computer.setId(0);
 		try {
@@ -26,7 +25,6 @@ public class ComputerService extends Service<Computer, ComputerDAO> {
 		}
 	}
 
-	@ServiceMethod(name = "Remove a computer (based on id)")
 	public void delete(long id) throws FailedDAOOperationException {
 		try {
 			computerDAO.deleteById(id);
@@ -41,7 +39,6 @@ public class ComputerService extends Service<Computer, ComputerDAO> {
 		return computerDAO.getClass().getName();
 	}
 
-	@ServiceMethod(name = "Update a computer")
 	public void update(Computer computer) throws FailedDAOOperationException {
 		try {
 			computerDAO.update(computer);

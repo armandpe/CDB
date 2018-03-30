@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,32 +24,40 @@ public class CompanyDAO implements ICompanyDAO {
 	
 	private QCompany qCompany = QCompany.company;
 
-	private EntityManager entityManager;
+	private EntityManagerFactory entityManagerFactory;
 	
-	private CompanyDAO(ComputerDAO computerDAO, EntityManager entityManager) {
+	public CompanyDAO(ComputerDAO computerDAO, EntityManagerFactory entityManagerFactory) {
 		this.computerDAO = computerDAO;
-		this.entityManager = entityManager;
-	}
-
-	@Override
-	public List<Company> getAll(long offset, long limit, String search, String orderByVar, boolean asc) {
-		return new JPAQuery<Void>(entityManager).select(qCompany).from(qCompany).fetch();
+		this.entityManagerFactory = entityManagerFactory;
 	}
 
 	@Override
 	public Optional<Company> getById(long id) throws FailedDAOOperationException {
-		return Optional.ofNullable(new JPAQuery<Void>(entityManager).select(qCompany).from(qCompany).where(qCompany.id.eq(id)).fetchOne());
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+		Optional<Company> result = Optional.ofNullable(new JPAQuery<Void>(entityManager).select(qCompany).from(qCompany).where(qCompany.id.eq(id)).fetchOne());
+		entityManager.close();
+		return result;
 	}
 
 	@Override
 	public long getCount(String search) throws FailedDAOOperationException {
-		return new JPAQuery<Void>(entityManager).select(qCompany).from(qCompany).fetchCount();
-
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+		long result = new JPAQuery<Void>(entityManager).select(qCompany).from(qCompany).fetchCount();
+		entityManager.close();
+		return result;
 	}
 
 	@Override
 	public void deleteById(long id) throws FailedDAOOperationException {
 		throw new FailedDAOOperationException();
+	}
+
+	@Override
+	public List<Company> getAll() throws FailedDAOOperationException {
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+		List<Company> result = new JPAQuery<Void>(entityManager).select(qCompany).from(qCompany).fetch();
+		entityManager.close();
+		return result;
 	}
 	
 

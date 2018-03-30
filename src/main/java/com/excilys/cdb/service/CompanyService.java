@@ -3,15 +3,15 @@ package com.excilys.cdb.service;
 import com.excilys.cdb.dao.CompanyDAO;
 import com.excilys.cdb.dao.DAO;
 import com.excilys.cdb.dao.FailedDAOOperationException;
+import com.excilys.cdb.dao.ICompanyDAO;
 import com.excilys.cdb.model.Company;
 
 @org.springframework.stereotype.Service
-@ServiceClass(name = "companies")
 public class CompanyService extends Service<Company, CompanyDAO> {
 	
-	private final CompanyDAO companyDAO;
+	private final ICompanyDAO companyDAO;
 	
-	private CompanyService(CompanyDAO computerDAO) { 
+	private CompanyService(ICompanyDAO computerDAO) { 
 		this.companyDAO = computerDAO;
 	}
 	
@@ -20,7 +20,6 @@ public class CompanyService extends Service<Company, CompanyDAO> {
 		return companyDAO.getClass().getName();
 	}
 	
-	@ServiceMethod(name = "Remove a company (based on id)")
 	public void delete(long id) throws FailedDAOOperationException {
 		try {
 			companyDAO.deleteById(id);
