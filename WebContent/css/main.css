@@ -14,7 +14,7 @@ footer {
 }
 
 footer .pagination {
-    margin:10px 0px;
+    margin:10px 0;
 }
 
 footer .btn-group {
@@ -22,8 +22,8 @@ footer .btn-group {
 }
 
 input[type='checkbox'] {
-    margin: 0px;
-    padding:0px;
+    margin: 0;
+    padding:0;
     border-radius: 5px;
     white-space: nowrap;
 }

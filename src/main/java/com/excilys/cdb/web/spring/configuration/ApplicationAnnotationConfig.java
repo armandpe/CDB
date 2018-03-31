@@ -1,6 +1,7 @@
 package com.excilys.cdb.web.spring.configuration;
 
 import org.springframework.context.annotation.Configuration;
+import org.springframework.lang.NonNullApi;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 
 @Configuration
@@ -17,7 +18,7 @@ public class ApplicationAnnotationConfig extends AbstractAnnotationConfigDispatc
     }
 
     @Override
-    protected String[] getServletMappings() {
+    final protected String[] getServletMappings() {
         return new String[] {"/"};
     }
 }

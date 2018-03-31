@@ -63,10 +63,7 @@ public class ComputerMapper {
 
 
 	private static boolean isNullOrEmpty(String s) {
-		if (s == null || s.equals("")) {
-			return true;
-		}
-		return false;
+		return s == null || s.equals("");
 	}
 
 }

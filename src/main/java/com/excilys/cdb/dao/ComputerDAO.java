@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.excilys.cdb.model.Computer;
 import com.excilys.cdb.model.QComputer;
-import com.excilys.cdb.pagemanager.PageManagerLimit;
 import com.excilys.cdb.service.ComputerOrderBy;
 import com.querydsl.jpa.impl.JPADeleteClause;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -23,7 +22,7 @@ import com.querydsl.jpa.impl.JPAUpdateClause;
 @Repository
 public class ComputerDAO implements IComputerDAO {
 
-	private final Logger logger = LoggerFactory.getLogger(PageManagerLimit.class);
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	private EntityManagerFactory entityManagerFactory;
 

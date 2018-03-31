@@ -52,26 +52,19 @@ public class LinkTag extends SimpleTagSupport {
 	}
 
 	public String getHref() {
-		StringBuilder href = new StringBuilder();
 
-		href.append("dashboard?");
-
-		href.append("orderby=");
-		href.append(orderBy);
-
-		href.append("&order=");
-		href.append(order);
-
-		href.append("&limit=");
-		href.append(limit);
-
-		href.append("&search=");
-		href.append(search);
-
-		href.append("&page=");
-		href.append(page);
-
-		return href.toString();
+        String href = "dashboard?" +
+                "orderby=" +
+                orderBy +
+                "&order=" +
+                order +
+                "&limit=" +
+                limit +
+                "&search=" +
+                search +
+                "&page=" +
+                page;
+        return href;
 	}
 
 	public long getLimit() {

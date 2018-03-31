@@ -13,6 +13,7 @@ import javax.servlet.ServletException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -70,7 +71,7 @@ public class ComputerController {
 		if (result.hasErrors()) {
 			logger.info(result.getAllErrors().toString());
 			setRequestCompanies(model);
-			List<String> errors = Arrays.asList(result.getAllErrors().stream().map(x -> x.getCode()).toArray(String[]::new));
+			List<String> errors = Arrays.asList(result.getAllErrors().stream().map(DefaultMessageSourceResolvable::getCode).toArray(String[]::new));
 			model.addAttribute(Spring.ERRORS, new Gson().toJson(errors));
 			return Spring.NAME_ADD;
 		} else {
@@ -84,7 +85,7 @@ public class ComputerController {
 				
 			}
 
-			redirectAttributes.addAttribute(Spring.ERRORS, new Gson().toJson(new ArrayList<String>()));
+			redirectAttributes.addAttribute(Spring.ERRORS, new Gson().toJson(errors));
 			return "redirect:" + NAME_DASHBOARD;
 		}
 	}
@@ -131,7 +132,7 @@ public class ComputerController {
 			for (String toDelete : toDeleteList) {
 				long id = Long.parseLong(toDelete);
 				try {
-					computerService.delete(id);
+					computerService.deleteById(id);
 				} catch (FailedDAOOperationException e) {
 					logger.info(e.getMessage());
 					errors.add(e.getMessage());
@@ -189,7 +190,7 @@ public class ComputerController {
 		pageString = pageString != null ? pageString : Spring.DEFAULT_PAGE;
 		orderByString = orderByString != null ? orderByString : Spring.DEFAULT_ORDER_BY;
 		PageData<ComputerDTO> pageData = new PageData<>();
-		PageManagerComplete<Computer> pageManager = new PageManagerComplete<>(computerService);
+		PageManagerComplete pageManager = new PageManagerComplete(computerService);
 
 		try {
 			controlInput(limitString, pageString, orderByString);
@@ -257,7 +258,7 @@ public class ComputerController {
 		}
 	}
 	
-	public void setPageDataDashboard(PageData<?> pageData, PageManagerComplete<?> pageManager, String orderBy, long limit, String order) {
+	public void setPageDataDashboard(PageData<?> pageData, PageManagerComplete pageManager, String orderBy, long limit, String order) {
 		pageData.setOrder(order);
 		pageData.setOrderby(orderBy);
 		pageData.setLimit(limit);
@@ -272,7 +273,7 @@ public class ComputerController {
 		List<CompanyDTO> companyList = new ArrayList<>();	
 		List<String> errors = new ArrayList<>();
 		try {
-			companyService.getAll(0, companyService.getCount()).forEach(company -> companyList.add(CompanyMapper.toDTO(company)));
+			companyService.getAll().forEach(company -> companyList.add(CompanyMapper.toDTO(company)));
 		} catch (FailedDAOOperationException e) {
 			errors.add(e.getMessage());
 		}
@@ -280,7 +281,7 @@ public class ComputerController {
 		return errors;
 	}
 	
- 	public void setPageManagerDataDashboard(PageManagerComplete<Computer> pageManager, long limit, long page, String searchString, String orderByString, boolean orderByChanged) {
+ 	public void setPageManagerDataDashboard(PageManagerComplete pageManager, long limit, long page, String searchString, String orderByString, boolean orderByChanged) {
 		pageManager.setLimit(limit);
 		pageManager.setToSearch(searchString.equals("") ? null : searchString);	
 

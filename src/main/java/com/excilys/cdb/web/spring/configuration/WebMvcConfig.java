@@ -25,11 +25,6 @@ public class WebMvcConfig implements WebMvcConfigurer  {
 		configurer.enable();
 	}
 
-	/**
-	 * Provide a view resolver to map views to the correct template files.
-	 *
-	 * @return
-	 */
 	@Bean
 	public ViewResolver getViewResolver() {
 		InternalResourceViewResolver viewResolver = new InternalResourceViewResolver();

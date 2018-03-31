@@ -42,24 +42,8 @@ public class SpringConfig {
 		this.environment = environment;
 	}
 
-	//	@Bean
-	//	public DataSource dataSource() {
-	//		DriverManagerDataSource dataSource = new DriverManagerDataSource();
-	//		dataSource.setDriverClassName(environment.getRequiredProperty("driver"));
-	//		dataSource.setUrl(environment.getRequiredProperty("url"));
-	//		dataSource.setUsername(environment.getRequiredProperty("login"));
-	//		dataSource.setPassword(environment.getRequiredProperty("password"));
-	//		return dataSource;
-	//	}
-	//
-	//	@Bean
-	//	public JdbcTemplate jdbcTemplate(DataSource dataSource) {
-	//		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-	//		jdbcTemplate.setResultsMapCaseInsensitive(true);
-	//		return jdbcTemplate;
-	//	}
-
-	@Bean EntityManagerFactory entityManagerFactory() {
+	@Bean
+    EntityManagerFactory entityManagerFactory() {
 		Properties props = new Properties();
 		props.put("hibernate.connection.driver_class", environment.getRequiredProperty("driver"));
 		props.put("hibernate.connection.url", environment.getRequiredProperty("url"));
@@ -158,10 +142,8 @@ public class SpringConfig {
 
 		HibernatePersistenceProvider hibernatePersistenceProvider = new HibernatePersistenceProvider();
 
-		EntityManagerFactory entityManagerFactory = hibernatePersistenceProvider
-				.createContainerEntityManagerFactory(persistenceUnitInfo, Collections.EMPTY_MAP);
-
-		return entityManagerFactory;
+        return hibernatePersistenceProvider
+                .createContainerEntityManagerFactory(persistenceUnitInfo, Collections.EMPTY_MAP);
 	}
 
 	@Bean
@@ -171,8 +153,6 @@ public class SpringConfig {
 
 	@Bean
 	public PlatformTransactionManager transactionManager() {
-		JpaTransactionManager transactionManager
-		= new JpaTransactionManager(entityManagerFactory());
-		return transactionManager;
+        return new JpaTransactionManager(entityManagerFactory());
 	}
 }

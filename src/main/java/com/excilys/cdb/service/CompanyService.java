@@ -1,17 +1,22 @@
 package com.excilys.cdb.service;
 
-import com.excilys.cdb.dao.CompanyDAO;
-import com.excilys.cdb.dao.DAO;
 import com.excilys.cdb.dao.FailedDAOOperationException;
 import com.excilys.cdb.dao.ICompanyDAO;
 import com.excilys.cdb.model.Company;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.List;
+import java.util.Optional;
 
 @org.springframework.stereotype.Service
-public class CompanyService extends Service<Company, CompanyDAO> {
+public class CompanyService implements ICompanyService {
 	
 	private final ICompanyDAO companyDAO;
-	
-	private CompanyService(ICompanyDAO computerDAO) { 
+
+    final Logger logger = LoggerFactory.getLogger(this.getClass());
+
+    private CompanyService(ICompanyDAO computerDAO) {
 		this.companyDAO = computerDAO;
 	}
 	
@@ -19,19 +24,34 @@ public class CompanyService extends Service<Company, CompanyDAO> {
 	public String getDaoClassFullName() {
 		return companyDAO.getClass().getName();
 	}
-	
-	public void delete(long id) throws FailedDAOOperationException {
+
+	@Override
+	public List<Company> getAll() throws FailedDAOOperationException {
 		try {
-			companyDAO.deleteById(id);
+			return companyDAO.getAll();
 		} catch (FailedDAOOperationException e) {
-			e.setMessage(getDaoClassFullName() + " : delete company failed ");
+			e.setMessage(getDaoClassFullName() + " : Get all method failed ");
 			throw e;
 		}
 	}
 
-	@Override
-	public DAO<Company> getDAO() {
-		return companyDAO;
-	}
-	
+    @Override
+    public Optional<Company> getById(long id) throws FailedDAOOperationException {
+        try {
+            return companyDAO.getById(id);
+        } catch (FailedDAOOperationException e) {
+            e.setMessage(getDaoClassFullName() + " : Get by id method failed ");
+            throw e;
+        }
+    }
+
+    @Override
+    public long getCount() throws FailedDAOOperationException {
+        try {
+            return companyDAO.getCount();
+        } catch (FailedDAOOperationException e) {
+            e.setMessage(getDaoClassFullName() + " : Get by id method failed ");
+            throw e;
+        }
+    }
 }

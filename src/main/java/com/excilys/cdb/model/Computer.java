@@ -100,11 +100,7 @@ public class Computer implements ModelClass {
 			return false;
 		}
 		Computer other = (Computer) obj;
-		if (id != other.id || !(other.company.equals(company)) || !other.discontinued.equals(discontinued) || !other.introduced.equals(introduced) || !other.name.equals(name)) {
-			return false;
-		}
-				
-		return true;
+		return id == other.id && other.company.equals(company) && other.discontinued.equals(discontinued) && other.introduced.equals(introduced) && other.name.equals(name);
 	}
 	
 	public Company getCompany() {

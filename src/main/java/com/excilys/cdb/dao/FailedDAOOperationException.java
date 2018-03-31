@@ -15,7 +15,7 @@ public class FailedDAOOperationException extends Exception {
 
 	@Override
 	public String getMessage() {
-		return className + message == null ? "" : " - " + message;
+		return className + ((message == null) ? "" : " - " + message);
 	}
 
 }

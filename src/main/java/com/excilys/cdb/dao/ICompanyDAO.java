@@ -6,4 +6,6 @@ import com.excilys.cdb.model.Company;
 
 public interface ICompanyDAO extends DAO<Company> {
 	List<Company> getAll() throws FailedDAOOperationException;
+
+	long getCount() throws FailedDAOOperationException;
 }

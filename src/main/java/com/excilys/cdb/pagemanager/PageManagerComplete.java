@@ -2,17 +2,16 @@ package com.excilys.cdb.pagemanager;
 
 import com.excilys.cdb.Main;
 import com.excilys.cdb.dao.FailedDAOOperationException;
-import com.excilys.cdb.model.ModelClass;
 import com.excilys.cdb.service.ComputerOrderBy;
-import com.excilys.cdb.service.Service;
+import com.excilys.cdb.service.IComputerService;
 
-public class PageManagerComplete<T extends ModelClass> extends PageManagerAbstract<T> {
+public class PageManagerComplete extends PageManagerAbstract {
 
 	protected boolean asc = true;
 	protected ComputerOrderBy orderBy = ComputerOrderBy.NAME;
 	protected String toSearch = null;
 
-	public PageManagerComplete(Service<T, ?> service) {
+	public PageManagerComplete(IComputerService service) {
 		this.service = service;
 
 		try {
@@ -52,7 +51,7 @@ public class PageManagerComplete<T extends ModelClass> extends PageManagerAbstra
 		setMax();
 		pageData.clear();
 		try {
-			service.getAll(offset, limit, toSearch, orderBy, asc).forEach(x -> pageData.add((T) x));
+			pageData.addAll(service.getAll(offset, limit, toSearch, orderBy, asc));
 		} catch (FailedDAOOperationException e) {
 			logger.error(Main.getErrorMessage(null, e.getMessage()));
 		}

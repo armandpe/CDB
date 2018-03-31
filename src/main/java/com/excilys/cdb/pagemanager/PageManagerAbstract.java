@@ -2,23 +2,23 @@ package com.excilys.cdb.pagemanager;
 
 import java.util.ArrayList;
 
+import com.excilys.cdb.model.Computer;
+import com.excilys.cdb.service.IComputerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.excilys.cdb.dao.FailedDAOOperationException;
-import com.excilys.cdb.model.ModelClass;
-import com.excilys.cdb.service.Service;
 
-public abstract class PageManagerAbstract<T extends ModelClass> {
+public abstract class PageManagerAbstract {
 	
 	protected long limit = 10;
 
-	protected Logger logger = LoggerFactory.getLogger(PageManagerLimit.class);
+	protected Logger logger = LoggerFactory.getLogger(this.getClass());
 	protected long max;
 	protected long maxPage;
 	protected long offset = 0;
-	protected ArrayList<T> pageData = new ArrayList<>();
-	protected Service<?, ?> service;
+	protected ArrayList<Computer> pageData = new ArrayList<>();
+	protected IComputerService service;
 	
 	public void first() {
 		offset = 0;
@@ -44,7 +44,7 @@ public abstract class PageManagerAbstract<T extends ModelClass> {
 		return (offset / limit) + 1;
 	}
 
-	public ArrayList<T> getPageData() throws FailedDAOOperationException {
+	public ArrayList<Computer> getPageData() throws FailedDAOOperationException {
 		getItems();
 		return pageData;
 	}

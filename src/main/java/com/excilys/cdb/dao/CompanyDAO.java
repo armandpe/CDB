@@ -12,22 +12,19 @@ import org.springframework.stereotype.Repository;
 
 import com.excilys.cdb.model.Company;
 import com.excilys.cdb.model.QCompany;
-import com.excilys.cdb.pagemanager.PageManagerLimit;
 import com.querydsl.jpa.impl.JPAQuery;
 
 @Repository
 public class CompanyDAO implements ICompanyDAO {
 	
-	protected final Logger logger = LoggerFactory.getLogger(PageManagerLimit.class);
-	
-	private final ComputerDAO computerDAO;
-	
-	private QCompany qCompany = QCompany.company;
+	protected final Logger logger = LoggerFactory.getLogger(this.getClass());
+
+    private QCompany qCompany = QCompany.company;
 
 	private EntityManagerFactory entityManagerFactory;
 	
 	public CompanyDAO(ComputerDAO computerDAO, EntityManagerFactory entityManagerFactory) {
-		this.computerDAO = computerDAO;
+        ComputerDAO computerDAO1 = computerDAO;
 		this.entityManagerFactory = entityManagerFactory;
 	}
 
@@ -40,16 +37,11 @@ public class CompanyDAO implements ICompanyDAO {
 	}
 
 	@Override
-	public long getCount(String search) throws FailedDAOOperationException {
+	public long getCount() throws FailedDAOOperationException {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		long result = new JPAQuery<Void>(entityManager).select(qCompany).from(qCompany).fetchCount();
 		entityManager.close();
 		return result;
-	}
-
-	@Override
-	public void deleteById(long id) throws FailedDAOOperationException {
-		throw new FailedDAOOperationException();
 	}
 
 	@Override
@@ -59,7 +51,5 @@ public class CompanyDAO implements ICompanyDAO {
 		entityManager.close();
 		return result;
 	}
-	
-
 
 }

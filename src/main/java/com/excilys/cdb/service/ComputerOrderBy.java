@@ -4,5 +4,5 @@ public enum ComputerOrderBy {
 	NAME,
 	INTRODUCED,
 	DISCONTINUED,
-	COMPANY_NAME;
+	COMPANY_NAME
 }

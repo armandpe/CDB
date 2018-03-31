@@ -35,11 +35,8 @@ public class Company implements ModelClass {
 			return false;
 		}
 		Company other = (Company) obj;
-		if (id != other.id) {
-			return false;
-		}
-		return true;
-	}
+        return id == other.id;
+    }
 	
 	public long getId() {
 		return id;
@@ -67,9 +64,8 @@ public class Company implements ModelClass {
 
 	@Override
 	public String toString() {
-		String res = "Company " + this.name + "(" + this.id + ")\n";
-		
-		return res;
+
+		return "Company " + this.name + "(" + this.id + ")\n";
 	}
 	
 }

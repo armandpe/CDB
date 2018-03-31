@@ -52,6 +52,7 @@ public class PaginationTag extends SimpleTagSupport {
 		this.limit = limit;
 	}
 
+	@SuppressWarnings("FieldCanBeLocal")
 	private long span = 7; //Should be odd
 
 	public long getCurrentPage() {
@@ -70,7 +71,7 @@ public class PaginationTag extends SimpleTagSupport {
 		this.maxPage = nbPage;
 	}
 
-	public void doTag() throws JspException, IOException {
+	public void doTag() throws IOException {
 
 		JspWriter out = getJspContext().getOut();
 		StringBuilder pagination = new StringBuilder();
@@ -103,7 +104,7 @@ public class PaginationTag extends SimpleTagSupport {
 		}
 
 		if (currentPage < (maxPage)) {
-			pagination.append(getCode((long) (currentPage + 1), ">", false));
+			pagination.append(getCode(currentPage + 1, ">", false));
 			pagination.append(getCode(maxPage, ">>", false));
 		}
 

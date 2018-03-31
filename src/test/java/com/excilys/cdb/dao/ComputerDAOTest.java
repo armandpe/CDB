@@ -146,10 +146,10 @@
 //
 //	@Test
 //	public void testGetCount() {
-//		long count;
+//		long getCount;
 //		try {
-//			count = ComputerDAO.getInstance().getCount((String) null);
-//			assertTrue(count == 3);
+//			getCount = ComputerDAO.getInstance().getCount((String) null);
+//			assertTrue(getCount == 3);
 //		} catch (FailedDAOOperationException e) {
 //			LOGGER.error(Main.getErrorMessage("Error getCount", e.getMessage()));
 //			fail();

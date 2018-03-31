@@ -31,9 +31,9 @@ public class ComputerValidator implements Validator {
 		this.computerService = computerService;
 	}
 
-	private void checkId(long id, Errors errors) throws InvalidIdException {
+	private void checkId(long id, Errors errors) {
 
-		if (id < 0 && id != 0) {
+		if (id > 0) {
 			try {
 				if (!computerService.getById(id).isPresent()) {
 					errors.reject("Cannot find requested computer");
@@ -48,7 +48,7 @@ public class ComputerValidator implements Validator {
 
 	public void checkCompanyId(long companyId) throws InvalidIdException {
 
-		if (companyId < 0 && companyId != 0) {
+		if (companyId < 0) {
 			try {
 				if (!computerService.getById(companyId).isPresent()) {
 					throw new InvalidIdException("Incorrect id value");
@@ -88,7 +88,7 @@ public class ComputerValidator implements Validator {
 	public void checkName(String computerName) throws InvalidNameException {
 		if (computerName == null) {
 			throw new InvalidNameException("Null name");
-		} else if (computerName.trim() == null || computerName.trim() == "") {
+		} else if (computerName.trim() == "") {
 			throw new InvalidNameException("Empty name");
 		} else {
 			Pattern regex = Pattern.compile("[$,:;=?@#|'<>.^*()%!-]");
@@ -99,6 +99,7 @@ public class ComputerValidator implements Validator {
 		}
 	}
 
+	@SuppressWarnings("NullableProblems")
 	@Override
 	public boolean supports(Class<?> type) {
 		return ComputerDTO.class.equals(type) || PageData.class.equals(type);
@@ -112,11 +113,7 @@ public class ComputerValidator implements Validator {
 		
 		ComputerDTO computerDTO = (ComputerDTO) object;
 
-		try {
-			checkId(computerDTO.getId(), errors);
-		} catch (InvalidIdException e) {
-			errors.reject(e.getMessage());
-		}
+		checkId(computerDTO.getId(), errors);
 
 		try {
 			checkName(computerDTO.getName());

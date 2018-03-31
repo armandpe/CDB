@@ -10,12 +10,12 @@ $(function() {
 
 	// Click on a checkbox
 	$(".cb").click(function() {
-		if ($(".cb").length == $(".cb:checked").length) {
+		if ($(".cb").length === $(".cb:checked").length) {
 			$("#selectall").prop("checked", true);
 		} else {
 			$("#selectall").prop("checked", false);
 		}
-		if ($(".cb:checked").length != 0) {
+		if ($(".cb:checked").length !== 0) {
 			$("#deleteSelected").enable();
 		} else {
 			$("#deleteSelected").disable();
@@ -76,7 +76,7 @@ $(document).keydown(function(e) {
 	switch (e.keyCode) {
 	//DEL key
 	case 46:
-		if($(".editMode").is(":visible") && $(".cb:checked").length != 0) {
+		if($(".editMode").is(":visible") && $(".cb:checked").length !== 0) {
 			$.fn.deleteSelected();
 		}   
 		break;
