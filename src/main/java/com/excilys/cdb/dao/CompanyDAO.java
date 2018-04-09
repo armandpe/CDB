@@ -23,8 +23,7 @@ public class CompanyDAO implements ICompanyDAO {
 
 	private EntityManagerFactory entityManagerFactory;
 	
-	public CompanyDAO(ComputerDAO computerDAO, EntityManagerFactory entityManagerFactory) {
-        ComputerDAO computerDAO1 = computerDAO;
+	public CompanyDAO(EntityManagerFactory entityManagerFactory) {
 		this.entityManagerFactory = entityManagerFactory;
 	}
 

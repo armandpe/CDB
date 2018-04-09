@@ -2,9 +2,10 @@ package com.excilys.cdb.model;
 
 import java.time.LocalDate;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -65,17 +66,14 @@ public class Computer implements ModelClass {
     @JoinColumn(name = "company_id")
     private Company company;
 
-    @Column(name = "discontinued")
 	private LocalDate discontinued;
 
 	@Id
-	@Column(name = "id")
+	@GeneratedValue (strategy = GenerationType.IDENTITY)
 	private long id;
 
-    @Column(name = "introduced")
 	private LocalDate introduced;
 
-    @Column(name = "name")
 	private String name;
 
     private Computer() { }

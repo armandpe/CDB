@@ -55,7 +55,6 @@ public class SpringConfig {
 			@Override
 			public void addTransformer(ClassTransformer arg0) {
 				// TODO Auto-generated method stub
-
 			}
 
 			@Override

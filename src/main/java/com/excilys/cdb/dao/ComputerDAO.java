@@ -31,17 +31,17 @@ public class ComputerDAO implements IComputerDAO {
 	public ComputerDAO(EntityManagerFactory entityManagerFactory) {
 		this.entityManagerFactory = entityManagerFactory;
 	}
-	
+
 	@Override
 	public List<Computer> getAll(long offset, long limit, String search, ComputerOrderBy orderByVar, boolean asc) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-		
+
 		JPAQuery<Computer> query = new JPAQuery<Void>(entityManager).select(qComputer).from(qComputer).offset(offset).limit(limit);
-		
+
 		if (search != null) {
 			query = query.where(qComputer.name.startsWith(search));
 		}
-		
+
 		switch (orderByVar) {
 		case COMPANY_NAME:
 			query = query.orderBy(asc ? qComputer.company.name.asc() : qComputer.company.name.desc());
@@ -56,8 +56,8 @@ public class ComputerDAO implements IComputerDAO {
 			query = query.orderBy(asc ? qComputer.name.asc() : qComputer.name.desc());
 			break;
 		}
-		
-		
+
+
 		List<Computer> result = query.fetch();
 		entityManager.close();
 		return result;
@@ -95,11 +95,8 @@ public class ComputerDAO implements IComputerDAO {
 		EntityTransaction entityTransaction = entityManager.getTransaction();
 		entityTransaction.begin();
 
-		new JPAUpdateClause(entityManager, qComputer).set(qComputer.introduced, computer.getIntroduced())
-		.set(qComputer.discontinued, computer.getDiscontinued())
-		.set(qComputer.company, computer.getCompany())
-		.execute();
-
+		entityManager.persist(computer);
+		
 		entityTransaction.commit();
 		entityManager.close();
 	}
@@ -111,13 +108,13 @@ public class ComputerDAO implements IComputerDAO {
 		EntityTransaction entityTransaction = entityManager.getTransaction();
 
 		entityTransaction.begin();
-		
+
 		new JPAUpdateClause(entityManager, qComputer).where(qComputer.id.eq(computer.getId()))
-				.set(qComputer.name, computer.getName())
-				.set(qComputer.introduced, computer.getIntroduced())
-				.set(qComputer.discontinued, computer.getDiscontinued())
-				.set(qComputer.company, computer.getCompany())
-				.execute();
+		.set(qComputer.name, computer.getName())
+		.set(qComputer.introduced, computer.getIntroduced())
+		.set(qComputer.discontinued, computer.getDiscontinued())
+		.set(qComputer.company, computer.getCompany())
+		.execute();
 		entityTransaction.commit();
 		entityManager.close();
 	}

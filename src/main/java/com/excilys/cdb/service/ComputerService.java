@@ -84,7 +84,7 @@ public class ComputerService implements IComputerService {
     }
 
     @Override
-    public long getCount() throws FailedDAOOperationException{
+    public long getCount() throws FailedDAOOperationException {
 	    return getCount(null);
     }
 
