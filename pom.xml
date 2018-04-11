@@ -180,12 +180,6 @@
 				<artifactId>jstl-impl</artifactId>
 				<version>${jstl}</version>
 			</dependency>
-			<!-- persistence -->
-<!-- 			<dependency>
-				<groupId>javax.persistence</groupId>
-				<artifactId>persistence-api</artifactId>
-				<version>${persistence}</version>
-			</dependency> -->
 		</dependencies>
 	</dependencyManagement>
 	<modules>

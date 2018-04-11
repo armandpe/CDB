@@ -70,7 +70,13 @@ public class ComputerDAO implements IComputerDAO {
 	@Override
 	public long getCount(String search) throws FailedDAOOperationException {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-		long count = new JPAQuery<Void>(entityManager).select(qComputer).from(qComputer).fetchCount();
+		JPAQuery<Computer> jpaQuery = new JPAQuery<Void>(entityManager).select(qComputer).from(qComputer);
+		
+		if (search != null) {
+			jpaQuery = jpaQuery.where(qComputer.name.startsWith(search));
+		}
+				
+		long count = jpaQuery.fetchCount();
 		entityManager.close();
 		return count;
 	}
