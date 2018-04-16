@@ -46,7 +46,7 @@
 				Database </a>
 			<div class="pull-right">
 				<a href="?langue=fr"><img src="img/fr.png" height="24"
-					width="24" /></a> <a href="?langue=en"><img src="img/en.png"
+					width="24" alt="FR" /></a> <a href="?langue=en"><img src="img/en.png"
 					alt="EN"></a>
 			</div>
 		</div>
@@ -56,10 +56,6 @@
 			<h1 id="homeTitle">${pageData.count}
 				<spring:message code="computersFound" />
 			</h1>
-			<img src="img/fr.png" height="24" width="24" />
-			<img src="../img/fr.png" height="24" width="24"/>
-			<img src="resources/img/fr.png" height="24" width="24"/>
-			
 			
 			<div id="actions" class="form-horizontal">
 				<div class="pull-left">

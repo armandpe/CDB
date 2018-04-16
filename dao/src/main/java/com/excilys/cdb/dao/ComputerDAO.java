@@ -6,6 +6,7 @@ import java.util.Optional;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
+import javax.persistence.PersistenceContext;
 
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,17 +21,13 @@ import com.querydsl.jpa.impl.JPAUpdateClause;
 @Repository
 public class ComputerDAO implements IComputerDAO {
 
-	private EntityManagerFactory entityManagerFactory;
+	@PersistenceContext
+	private EntityManager entityManager;
 
 	private QComputer qComputer = QComputer.computer;
 
-	public ComputerDAO(EntityManagerFactory entityManagerFactory) {
-		this.entityManagerFactory = entityManagerFactory;
-	}
-
 	@Override
 	public List<Computer> getAll(long offset, long limit, String search, ComputerOrderBy orderByVar, boolean asc) {
-		EntityManager entityManager = entityManagerFactory.createEntityManager();
 
 		JPAQuery<Computer> query = new JPAQuery<Void>(entityManager).select(qComputer).from(qComputer).offset(offset).limit(limit);
 
@@ -61,7 +58,6 @@ public class ComputerDAO implements IComputerDAO {
 
 	@Override
 	public Optional<Computer> getById(long id) throws FailedDAOOperationException {
-		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		Optional<Computer> result = Optional.ofNullable(new JPAQuery<Void>(entityManager).select(qComputer).from(qComputer).where(qComputer.id.eq(id)).fetchOne());
 		entityManager.close();
 		return result;
@@ -69,7 +65,6 @@ public class ComputerDAO implements IComputerDAO {
 
 	@Override
 	public long getCount(String search) throws FailedDAOOperationException {
-		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		JPAQuery<Computer> jpaQuery = new JPAQuery<Void>(entityManager).select(qComputer).from(qComputer);
 		
 		if (search != null) {
@@ -83,7 +78,6 @@ public class ComputerDAO implements IComputerDAO {
 
 	@Override
 	public void deleteById(long id) throws FailedDAOOperationException {
-		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		EntityTransaction entityTransaction = entityManager.getTransaction();
 		entityTransaction.begin();
 		new JPADeleteClause(entityManager, qComputer).where(qComputer.id.eq(id)).execute();	
@@ -93,7 +87,6 @@ public class ComputerDAO implements IComputerDAO {
 
 	@Override
 	public void create(Computer computer) throws FailedDAOOperationException {
-		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		EntityTransaction entityTransaction = entityManager.getTransaction();
 		entityTransaction.begin();
 
@@ -106,7 +99,6 @@ public class ComputerDAO implements IComputerDAO {
 	@Override
 	@Transactional
 	public void update(Computer computer) throws FailedDAOOperationException {
-		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		EntityTransaction entityTransaction = entityManager.getTransaction();
 
 		entityTransaction.begin();
