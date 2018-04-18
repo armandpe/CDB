@@ -94,7 +94,7 @@ public class ComputerController {
 	}
 
 	@PostMapping("/" + Spring.NAME_ADD)
-	@PreAuthorize("hasRole('ADMIN') OR hasRole(USER)")
+	@PreAuthorize("hasRole('ADMIN')")
 	public String addComputer(@ModelAttribute(Spring.COMPUTER_DTO) @Validated(ComputerDTO.class) ComputerDTO computerDTO, BindingResult result,
 			Model model, RedirectAttributes redirectAttributes)
 					throws ServletException, IOException {
@@ -201,7 +201,7 @@ public class ComputerController {
 	}
 
 	@GetMapping("/" + Spring.NAME_ADD)
-	@PreAuthorize("hasRole('ADMIN') OR hasRole(USER)")
+	@PreAuthorize("hasRole('ADMIN') OR hasRole('USER')")
 	public String getAddComputer(Model model) throws ServletException, IOException {		
 
 		List<String> errors = setRequestCompanies(model);
@@ -211,7 +211,7 @@ public class ComputerController {
 	}
 
 	@GetMapping("/" + Spring.NAME_DASHBOARD)
-	@PreAuthorize("hasRole('ADMIN') OR hasRole(USER)")
+	@PreAuthorize("hasRole('ADMIN') OR hasRole('USER')")
 	public String getDashboard(@RequestParam(value = Spring.LIMIT, required = false) String limitString,
 			@RequestParam(value = Spring.SEARCH, required = false) String searchString,
 			@RequestParam(value = Spring.PAGE, required = false) String pageString,

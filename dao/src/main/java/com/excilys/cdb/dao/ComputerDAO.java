@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.PersistenceContext;
 
@@ -13,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.excilys.cdb.model.Computer;
 import com.excilys.cdb.model.QComputer;
-
 import com.querydsl.jpa.impl.JPADeleteClause;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAUpdateClause;
@@ -74,29 +72,20 @@ public class ComputerDAO implements IComputerDAO {
 	}
 
 	@Override
+	@Transactional
 	public void deleteById(long id) throws FailedDAOOperationException {
-		EntityTransaction entityTransaction = entityManager.getTransaction();
-		entityTransaction.begin();
 		new JPADeleteClause(entityManager, qComputer).where(qComputer.id.eq(id)).execute();	
-		entityTransaction.commit();
 	}
 
 	@Override
+	@Transactional
 	public void create(Computer computer) throws FailedDAOOperationException {
-		EntityTransaction entityTransaction = entityManager.getTransaction();
-		entityTransaction.begin();
-
 		entityManager.persist(computer);
-		
-		entityTransaction.commit();
 	}
 
 	@Override
 	@Transactional
 	public void update(Computer computer) throws FailedDAOOperationException {
-		EntityTransaction entityTransaction = entityManager.getTransaction();
-
-		entityTransaction.begin();
 
 		new JPAUpdateClause(entityManager, qComputer).where(qComputer.id.eq(computer.getId()))
 		.set(qComputer.name, computer.getName())
@@ -104,7 +93,6 @@ public class ComputerDAO implements IComputerDAO {
 		.set(qComputer.discontinued, computer.getDiscontinued())
 		.set(qComputer.company, computer.getCompany())
 		.execute();
-		entityTransaction.commit();
 	}
 
 }
