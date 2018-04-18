@@ -52,14 +52,12 @@ public class ComputerDAO implements IComputerDAO {
 
 
 		List<Computer> result = query.fetch();
-		entityManager.close();
 		return result;
 	}
 
 	@Override
 	public Optional<Computer> getById(long id) throws FailedDAOOperationException {
 		Optional<Computer> result = Optional.ofNullable(new JPAQuery<Void>(entityManager).select(qComputer).from(qComputer).where(qComputer.id.eq(id)).fetchOne());
-		entityManager.close();
 		return result;
 	}
 
@@ -72,7 +70,6 @@ public class ComputerDAO implements IComputerDAO {
 		}
 				
 		long count = jpaQuery.fetchCount();
-		entityManager.close();
 		return count;
 	}
 
@@ -82,7 +79,6 @@ public class ComputerDAO implements IComputerDAO {
 		entityTransaction.begin();
 		new JPADeleteClause(entityManager, qComputer).where(qComputer.id.eq(id)).execute();	
 		entityTransaction.commit();
-		entityManager.close();
 	}
 
 	@Override
@@ -93,7 +89,6 @@ public class ComputerDAO implements IComputerDAO {
 		entityManager.persist(computer);
 		
 		entityTransaction.commit();
-		entityManager.close();
 	}
 
 	@Override
@@ -110,7 +105,6 @@ public class ComputerDAO implements IComputerDAO {
 		.set(qComputer.company, computer.getCompany())
 		.execute();
 		entityTransaction.commit();
-		entityManager.close();
 	}
 
 }

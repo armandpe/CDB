@@ -13,7 +13,7 @@ import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-@ComponentScan(basePackages = { "com.excilys.cdb" }) 
+@ComponentScan(basePackages = { "com.excilys.cdb.dao", "com.excilys.cdb.service", "com.excilys.cdb.web", "com.excilys.cdb.core" }) 
 @PropertySource(value = "classpath:connection.properties")
 @EnableTransactionManagement(proxyTargetClass = true)
 public class SpringConfig {

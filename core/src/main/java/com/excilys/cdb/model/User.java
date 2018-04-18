@@ -1,11 +1,15 @@
-package com.excilys.cdb.web.spring.security;
+package com.excilys.cdb.model;
 
 import java.util.List;
 
+import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.Table;
 
+@Entity
+@Table(name = "users")
 public class User {
 	private Boolean enabled;
  	

@@ -15,6 +15,8 @@ import javax.servlet.ServletException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
@@ -68,29 +70,31 @@ public class ComputerController {
 	@GetMapping("/")
 	public String index(Model model, Principal principal) {
 		model.addAttribute("message", "You are logged in as " + principal.getName());
-		return "redirect:" + NAME_DASHBOARD;
+		return "redirect:" + Spring.NAME_LOGIN;
 	}
 
 
-	@GetMapping("/login")
+	@GetMapping("/" + Spring.NAME_LOGIN)
 	public String login(ModelMap model, @RequestParam(value = "error", required = false) String error,
 			@RequestParam(value = "logout", required = false) String logout) {
+		
+		logger.error("controller-login : " + logout);
+		
 		if (error != null) {
-			System.out.println("Erreur login");
+			logger.error("Login failed");
 			model.addAttribute("error", "Invalid username and password!");
-
 		}
 
-		if (logout != null) {
-			System.out.println("Connection successful");
-			model.addAttribute("msg", "You've been logged out successfully.");
-			return "redirect:" + NAME_DASHBOARD;
+		if (logout == null) {
+			logger.error("Login successful");
+			model.addAttribute("msg", "Connection successful");
 		}
 
-		return "login";
+		return Spring.NAME_LOGIN;
 	}
 
 	@PostMapping("/" + Spring.NAME_ADD)
+	@PreAuthorize("hasRole('ADMIN') OR hasRole(USER)")
 	public String addComputer(@ModelAttribute(Spring.COMPUTER_DTO) @Validated(ComputerDTO.class) ComputerDTO computerDTO, BindingResult result,
 			Model model, RedirectAttributes redirectAttributes)
 					throws ServletException, IOException {
@@ -150,6 +154,7 @@ public class ComputerController {
 	}
 
 	@DeleteMapping("/" + Spring.NAME_DASHBOARD)
+	@PreAuthorize("hasRole('ADMIN')")
 	public String deleteComputers(@RequestParam(value = Spring.DELETE_SELECTION, required = false) String selection, Model model)
 			throws ServletException, IOException {
 		List<String> errors = new ArrayList<>();
@@ -173,6 +178,7 @@ public class ComputerController {
 	}
 
 	@PostMapping("/" + Spring.NAME_EDIT)
+	@PreAuthorize("hasRole('ADMIN')")
 	public String editComputer(@ModelAttribute(Spring.COMPUTER_DTO) @Validated(ComputerDTO.class) ComputerDTO computerDTO, BindingResult result,
 			Model model, RedirectAttributes redirectAttributes)
 					throws ServletException, IOException {
@@ -195,6 +201,7 @@ public class ComputerController {
 	}
 
 	@GetMapping("/" + Spring.NAME_ADD)
+	@PreAuthorize("hasRole('ADMIN') OR hasRole(USER)")
 	public String getAddComputer(Model model) throws ServletException, IOException {		
 
 		List<String> errors = setRequestCompanies(model);
@@ -204,6 +211,7 @@ public class ComputerController {
 	}
 
 	@GetMapping("/" + Spring.NAME_DASHBOARD)
+	@PreAuthorize("hasRole('ADMIN') OR hasRole(USER)")
 	public String getDashboard(@RequestParam(value = Spring.LIMIT, required = false) String limitString,
 			@RequestParam(value = Spring.SEARCH, required = false) String searchString,
 			@RequestParam(value = Spring.PAGE, required = false) String pageString,
@@ -246,6 +254,7 @@ public class ComputerController {
 	}
 
 	@GetMapping("/" + Spring.NAME_EDIT)
+	@PreAuthorize("hasRole('ADMIN')")
 	public String getEditComputer(@RequestParam(value = Spring.ID, required = true) String idString,
 			@RequestParam(value = Spring.ERRORS, required = false) List<String> errors,
 			Model model, RedirectAttributes redirectAttributes)

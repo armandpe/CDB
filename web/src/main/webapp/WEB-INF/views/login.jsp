@@ -20,7 +20,6 @@
 				<a href="?langue=fr">FR</a> <a href="?langue=en">EN</a>
 			</div>
 		</div>
-
 	</header>
 	<section id="main">
 		<form action="${loginUrl}" method="post">
@@ -43,8 +42,7 @@
 			<button type="submit" class="btn">Log in</button>
 		</form>
 	</section>
-	<script src=" js/jquery.min.js"></script>
 	<script src="js/bootstrap.min.js"></script>
-	<script src="js/errors.js"></script>
+	<script src=" js/jquery.min.js"></script>
 </body>
 </html>
