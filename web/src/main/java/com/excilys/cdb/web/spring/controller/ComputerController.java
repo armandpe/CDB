@@ -22,7 +22,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.WebDataBinder;
@@ -31,6 +30,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -77,22 +78,32 @@ public class ComputerController {
 		return "redirect:" + Spring.NAME_DASHBOARD;
 	}
 
-
 	@GetMapping(Spring.NAME_LOGIN)
 	public ModelAndView login(@RequestParam(value = "error", required = false) String error, @RequestParam(value = "logout", required = false) String logout) {
 	  ModelAndView model = new ModelAndView();
 	  if (error != null) {
 		model.addObject("error", "Invalid username and password!");
 	  }
-
+	  
 	  if (logout != null) {
-		model.addObject("msg", "You've been logged out successfully.");
-	  }
+		model.addObject("logout", "You've been logged out successfully.");
+	  } 
+	  
 	  model.setViewName(Spring.NAME_LOGIN);
 
 	  return model;
 	}
 
+	@GetMapping(Spring.NAME_REGISTER)
+	public String getRegister() {
+		return Spring.NAME_REGISTER;
+	}
+	
+	@PostMapping(Spring.NAME_REGISTER)
+	public String postRegister() {
+		return Spring.NAME_REGISTER;
+	}
+	
 	@GetMapping("/" + Spring.NAME_403)
 	public String error404() throws ServletException, IOException {
 		return Spring.NAME_403;

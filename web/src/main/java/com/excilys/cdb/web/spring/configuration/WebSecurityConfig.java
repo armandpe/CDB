@@ -16,11 +16,11 @@ import com.excilys.cdb.constant.Spring;
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	private DriverManagerDataSource dataSource;
-	
+
 	public WebSecurityConfig(DriverManagerDataSource dataSource) {
 		this.dataSource = dataSource;
 	}
-	
+
 	@Autowired
 	public void configAuthentication(AuthenticationManagerBuilder auth) throws Exception {
 		auth.jdbcAuthentication().dataSource(dataSource)
@@ -30,16 +30,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				+ "from authorities where username=?")
 		.passwordEncoder(NoOpPasswordEncoder.getInstance());
 	}
-	
+
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-	    http.authorizeRequests()
-	        .antMatchers("/", "/dashboard", "/addComputer", "/editComputer").hasAnyRole("ADMIN", "USER")
-	        .and().formLogin().loginPage("/login").defaultSuccessUrl("/dashboard")
-	        .and().logout().logoutUrl("/logout").logoutSuccessUrl("/dashboard")
-	        .permitAll()
-	        .and().exceptionHandling().accessDeniedPage("/" + Spring.NAME_403);;
-}
-	
-}
+		http.authorizeRequests()
+		.antMatchers("/", "/" + Spring.NAME_DASHBOARD, "/" + Spring.NAME_ADD, "/" + Spring.NAME_EDIT).hasAnyRole("ADMIN", "USER")
+		.and().formLogin().loginPage("/" + Spring.NAME_LOGIN).defaultSuccessUrl("/" + Spring.NAME_DASHBOARD)
+		.and().logout().logoutUrl("/" + Spring.NAME_LOGOUT).logoutSuccessUrl("/" + Spring.NAME_LOGIN + "?logout")
+		.permitAll()
+		.and().exceptionHandling().accessDeniedPage("/" + Spring.NAME_403);;
+	}
 
+}

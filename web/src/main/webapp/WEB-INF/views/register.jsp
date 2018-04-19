@@ -23,12 +23,6 @@
 	</header>
 	<section id="main">
 		<form:form action="login" method="post">
-			<c:if test="${error != null}">
-				<p>Invalid username and password.</p>
-			</c:if>
-			<c:if test="${logout != null}">
-				<p>You have been logged out.</p>
-			</c:if>
 			<p>
 				<label for="username">Username</label>
 				<form:input type="text" id="username" name="username" path="username" placeholder="jean" required="required"/>
@@ -37,12 +31,15 @@
 				<label for="password">Password</label>
 				<form:password type="password" id="password" name="password" path="password" required="required"/>
 			</p>
+			<p>
+				<label for="password2">Password validation</label>
+				<form:password type="password" id="password2" name="password2" path="password2" required="required" />
+			</p>
 			<input type="hidden" name="${_csrf.parameterName}"
 				value="${_csrf.token}" />
-			<button type="submit" class="btn" id="loginButton">Log in</button>
+			<button type="submit" class="btn" id="registerButton">Register</button>
 		</form:form>
-		<a href="register" class="btn" type="button">Create a new account</a>
 	</section>
-	<script src="js/login.js"></script>
+	<script src="js/register.js"></script>
 </body>
 </html>

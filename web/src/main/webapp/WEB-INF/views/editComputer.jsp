@@ -31,7 +31,6 @@
 					<form:form action="editComputer" method="POST"
 						modelAttribute="computerDTO">
 						<input type="hidden" value="${computerDTO.id}" id="id" name="id" />
-						<!-- TODO: Change this value with the computer id -->
 						<fieldset>
 							<div class="form-group">
 								<label for="computerName">Computer name</label>

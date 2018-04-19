@@ -9,6 +9,7 @@ public final class Spring {
 	public static final String NAME_DASHBOARD = "dashboard";
 	public static final String NAME_LOGIN = "login";
 	public static final String NAME_LOGOUT = "logout";
+	public static final String NAME_REGISTER = "register";
 	public static final String NAME_403 = "403";
 	public static final String NAME_404 = "404";
 	public static final String NAME_500 = "500";
