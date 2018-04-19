@@ -55,9 +55,9 @@
 			<a class="navbar-brand" href="dashboard"> Application - Computer
 				Database </a>
 			<div class="pull-right">
-				<a href="?langue=fr"><img src="img/fr.png" height="24"
-					width="24" alt="FR" /></a> <a href="?langue=en"><img
-					src="img/en.png" alt="EN"></a>
+				<a href="javascript:formSubmit()">Logout</a> <br> <br> <a href="?langue=fr"><img
+					src="img/fr.png" height="24" width="24" alt="FR"/></a> <a
+					href="?langue=en"><img src="img/en.png" alt="EN"></a>
 			</div>
 		</div>
 	</header>
@@ -76,18 +76,6 @@
 							type="submit" id="searchsubmit" value="Filter by name"
 							class="btn btn-primary" />
 					</form>
-				</div>
-				<div class="pull-right">
-					<c:choose>
-						<c:when test="${not empty username}">
-							<a>${username}</a>
-							<a href="javascript:formSubmit()">Logout</a>
-						</c:when>
-						<c:otherwise>
-							<a href="login">Log in</a>
-							<a href="addUser">Register</a>
-						</c:otherwise>
-					</c:choose>
 				</div>
 
 				<div class="pull-right">

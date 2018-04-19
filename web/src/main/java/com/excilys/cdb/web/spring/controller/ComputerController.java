@@ -93,7 +93,6 @@ public class ComputerController {
 	  return model;
 	}
 
-
 	@GetMapping("/" + Spring.NAME_403)
 	public String error404() throws ServletException, IOException {
 		return Spring.NAME_403;
