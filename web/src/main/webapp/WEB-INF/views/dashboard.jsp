@@ -40,14 +40,24 @@
 		</c:when>
 	</c:choose>
 
+	<form action="logout" method="post" id="logoutForm">
+		<input type="hidden" name="${_csrf.parameterName}"
+			value="${_csrf.token}" />
+	</form>
+	<script>
+	function formSubmit() {
+		document.getElementById("logoutForm").submit();
+	}
+</script>
+
 	<header class="navbar navbar-inverse navbar-fixed-top">
 		<div class="container">
 			<a class="navbar-brand" href="dashboard"> Application - Computer
 				Database </a>
 			<div class="pull-right">
 				<a href="?langue=fr"><img src="img/fr.png" height="24"
-					width="24" alt="FR" /></a> <a href="?langue=en"><img src="img/en.png"
-					alt="EN"></a>
+					width="24" alt="FR" /></a> <a href="?langue=en"><img
+					src="img/en.png" alt="EN"></a>
 			</div>
 		</div>
 	</header>
@@ -56,7 +66,7 @@
 			<h1 id="homeTitle">${pageData.count}
 				<spring:message code="computersFound" />
 			</h1>
-			
+
 			<div id="actions" class="form-horizontal">
 				<div class="pull-left">
 					<form id="searchForm" action="#" method="GET" class="form-inline">
@@ -67,6 +77,19 @@
 							class="btn btn-primary" />
 					</form>
 				</div>
+				<div class="pull-right">
+					<c:choose>
+						<c:when test="${not empty username}">
+							<a>${username}</a>
+							<a href="javascript:formSubmit()">Logout</a>
+						</c:when>
+						<c:otherwise>
+							<a href="login">Log in</a>
+							<a href="addUser">Register</a>
+						</c:otherwise>
+					</c:choose>
+				</div>
+
 				<div class="pull-right">
 					<a class="btn btn-success" id="addComputer" href="addComputer">Add
 						Computer</a> <a class="btn btn-default" id="editComputer" href="#"

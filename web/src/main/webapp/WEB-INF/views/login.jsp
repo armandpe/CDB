@@ -22,11 +22,11 @@
 		</div>
 	</header>
 	<section id="main">
-		<form action="${loginUrl}" method="post">
-			<c:if test="${param.error != null}">
+		<form action="login" method="post">
+			<c:if test="${error != null}">
 				<p>Invalid username and password.</p>
 			</c:if>
-			<c:if test="${param.logout != null}">
+			<c:if test="${logout != null}">
 				<p>You have been logged out.</p>
 			</c:if>
 			<p>
@@ -42,7 +42,5 @@
 			<button type="submit" class="btn">Log in</button>
 		</form>
 	</section>
-	<script src="js/bootstrap.min.js"></script>
-	<script src=" js/jquery.min.js"></script>
 </body>
 </html>

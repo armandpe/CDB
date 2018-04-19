@@ -16,7 +16,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
@@ -29,6 +32,7 @@ import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.excilys.cdb.constant.Spring;
@@ -70,35 +74,47 @@ public class ComputerController {
 	@GetMapping("/")
 	public String index(Model model, Principal principal) {
 		model.addAttribute("message", "You are logged in as " + principal.getName());
-		return "redirect:" + Spring.NAME_LOGIN;
+		return "redirect:" + Spring.NAME_DASHBOARD;
 	}
 
 
-	@GetMapping("/" + Spring.NAME_LOGIN)
-	public String login(ModelMap model, @RequestParam(value = "error", required = false) String error,
-			@RequestParam(value = "logout", required = false) String logout) {
-		
-		logger.error("controller-login : " + logout);
-		
-		if (error != null) {
-			logger.error("Login failed");
-			model.addAttribute("error", "Invalid username and password!");
-		}
+	@GetMapping(Spring.NAME_LOGIN)
+	public ModelAndView login(@RequestParam(value = "error", required = false) String error, @RequestParam(value = "logout", required = false) String logout) {
+	  ModelAndView model = new ModelAndView();
+	  if (error != null) {
+		model.addObject("error", "Invalid username and password!");
+	  }
 
-		if (logout == null) {
-			logger.error("Login successful");
-			model.addAttribute("msg", "Connection successful");
-		}
+	  if (logout != null) {
+		model.addObject("msg", "You've been logged out successfully.");
+	  }
+	  model.setViewName(Spring.NAME_LOGIN);
 
-		return Spring.NAME_LOGIN;
+	  return model;
 	}
 
+
+	@GetMapping("/" + Spring.NAME_403)
+	public String error404() throws ServletException, IOException {
+		return Spring.NAME_403;
+	}
+	
+	@GetMapping("/" + Spring.NAME_404)
+	public String error403() throws ServletException, IOException {
+		return Spring.NAME_404;
+	}
+	
+	@GetMapping("/" + Spring.NAME_500)
+	public String error500() throws ServletException, IOException {
+		return Spring.NAME_500;
+	}
+	
 	@PostMapping("/" + Spring.NAME_ADD)
 	@PreAuthorize("hasRole('ADMIN')")
 	public String addComputer(@ModelAttribute(Spring.COMPUTER_DTO) @Validated(ComputerDTO.class) ComputerDTO computerDTO, BindingResult result,
 			Model model, RedirectAttributes redirectAttributes)
 					throws ServletException, IOException {
-
+		addUsernameAsParameter(model);
 
 		if (result.hasErrors()) {
 			logger.info(result.getAllErrors().toString());
@@ -152,6 +168,14 @@ public class ComputerController {
 			throw new InvalidInputException("Invalid orderby value");
 		}	
 	}
+	
+	public void addUsernameAsParameter(Model model) {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		if (!(auth instanceof AnonymousAuthenticationToken)) {
+			UserDetails userDetail = (UserDetails) auth.getPrincipal();	
+			model.addAttribute("username", userDetail.getUsername());
+		}
+	}
 
 	@DeleteMapping("/" + Spring.NAME_DASHBOARD)
 	@PreAuthorize("hasRole('ADMIN')")
@@ -159,6 +183,8 @@ public class ComputerController {
 			throws ServletException, IOException {
 		List<String> errors = new ArrayList<>();
 
+		addUsernameAsParameter(model);
+		
 		if (selection != null) {
 			String[] toDeleteList = selection.split(",");
 
@@ -183,6 +209,8 @@ public class ComputerController {
 			Model model, RedirectAttributes redirectAttributes)
 					throws ServletException, IOException {
 
+		addUsernameAsParameter(model);
+		
 		if (result.hasErrors()) {
 			logger.info(result.getAllErrors().toString());
 			List<String> errors = Arrays.asList(result.getAllErrors().stream().map(x -> x.getCode()).toArray(String[]::new));
@@ -204,6 +232,7 @@ public class ComputerController {
 	@PreAuthorize("hasRole('ADMIN') OR hasRole('USER')")
 	public String getAddComputer(Model model) throws ServletException, IOException {		
 
+		addUsernameAsParameter(model);
 		List<String> errors = setRequestCompanies(model);
 		model.addAttribute(Spring.ERRORS, new Gson().toJson(errors));
 		model.addAttribute(Spring.COMPUTER_DTO, new ComputerDTO());
@@ -220,6 +249,8 @@ public class ComputerController {
 			Model model)
 					throws ServletException, IOException {
 
+		addUsernameAsParameter(model);
+		
 		boolean orderByChanged = !Spring.ORDER_BY_DESC.equals(orderByChangedString);
 		limitString = limitString != null ? limitString : Spring.DEFAULT_LIMIT;
 		searchString = searchString != null ? searchString : Spring.DEFAULT_SEARCH;
@@ -259,6 +290,8 @@ public class ComputerController {
 			@RequestParam(value = Spring.ERRORS, required = false) List<String> errors,
 			Model model, RedirectAttributes redirectAttributes)
 					throws ServletException, IOException {
+		errors = errors == null ? new ArrayList<String>() : errors;
+		addUsernameAsParameter(model);
 		long id = 0;
 		try {
 			id = Long.parseLong(idString);
@@ -270,7 +303,6 @@ public class ComputerController {
 		}
 
 		Optional<Computer> gottenComputer = Optional.empty();
-		errors = errors == null ? new ArrayList<>() : errors;
 
 		try {
 			gottenComputer = computerService.getById(id);
