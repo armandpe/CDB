@@ -30,8 +30,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -40,8 +38,10 @@ import com.excilys.cdb.constant.Spring;
 import com.excilys.cdb.dao.ComputerOrderBy;
 import com.excilys.cdb.dao.FailedDAOOperationException;
 import com.excilys.cdb.model.Computer;
+import com.excilys.cdb.model.User;
 import com.excilys.cdb.service.ICompanyService;
 import com.excilys.cdb.service.IComputerService;
+import com.excilys.cdb.service.UserService;
 import com.excilys.cdb.service.pagemanager.PageManagerComplete;
 import com.excilys.cdb.utils.LogMessageGenerator;
 import com.excilys.cdb.web.dto.CompanyDTO;
@@ -51,6 +51,7 @@ import com.excilys.cdb.web.dto.ComputerMapper;
 import com.excilys.cdb.web.validator.ComputerValidator;
 import com.excilys.cdb.web.validator.InputValidator;
 import com.excilys.cdb.web.validator.InvalidInputException;
+import com.excilys.cdb.web.validator.UserValidator;
 import com.google.gson.Gson;
 
 @Controller
@@ -58,18 +59,28 @@ public class ComputerController {
 
 	private IComputerService computerService;
 	private ICompanyService companyService;
+	private UserService userService;
 	private ComputerValidator computerValidator;
+	private UserValidator userValidator;
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 
-	public ComputerController(IComputerService computerService, ICompanyService companyService, ComputerValidator computerValidator) {
+	public ComputerController(IComputerService computerService, ICompanyService companyService, UserService userService,
+			ComputerValidator computerValidator, UserValidator userValidator) {
 		this.computerService = computerService;
 		this.computerValidator = computerValidator;
 		this.companyService = companyService;
+		this.userValidator = userValidator;
+		this.userService = userService;
 	}
 
-	@InitBinder
-	protected void initBinder(WebDataBinder binder) {
+	@InitBinder("computer")
+	protected void initComputerBinder(WebDataBinder binder) {
 		binder.setValidator(computerValidator);
+	}
+	
+	@InitBinder("user")
+	protected void initUserBinder(WebDataBinder binder) {
+		binder.setValidator(userValidator);
 	}
 
 	@GetMapping("/")
@@ -82,6 +93,7 @@ public class ComputerController {
 	public ModelAndView login(@RequestParam(value = "error", required = false) String error, @RequestParam(value = "logout", required = false) String logout) {
 	  ModelAndView model = new ModelAndView();
 	  if (error != null) {
+		logger.error(error);
 		model.addObject("error", "Invalid username and password!");
 	  }
 	  
@@ -95,13 +107,35 @@ public class ComputerController {
 	}
 
 	@GetMapping(Spring.NAME_REGISTER)
-	public String getRegister() {
+	public String getRegister(@RequestParam(value = Spring.ERRORS, required = false) List<String> errors, Model model) {
+		errors = errors == null ? new ArrayList<>() : errors;
+		model.addAttribute(Spring.USER, new User());
 		return Spring.NAME_REGISTER;
 	}
 	
 	@PostMapping(Spring.NAME_REGISTER)
-	public String postRegister() {
-		return Spring.NAME_REGISTER;
+	public String postRegister(@ModelAttribute(Spring.USER) @Validated(User.class) User user, BindingResult result,
+			Model model, RedirectAttributes redirectAttributes) {
+		
+		if (result.hasErrors()) {
+			List<String> errors = Arrays.asList(result.getAllErrors().stream().map(DefaultMessageSourceResolvable::getCode).toArray(String[]::new));
+			logger.error(errors.toString());
+			model.addAttribute(Spring.ERRORS, new Gson().toJson(errors));
+			return Spring.NAME_REGISTER;
+		} else {
+			List<String> errors = new ArrayList<>();
+
+			try {
+				userService.create(user);
+			} catch (FailedDAOOperationException e) {
+				errors.add(e.getMessage());
+				model.addAttribute(Spring.ERRORS, new Gson().toJson(errors));
+				return Spring.NAME_REGISTER;
+			}
+
+			redirectAttributes.addAttribute(Spring.ERRORS, new Gson().toJson(errors));
+			return "redirect:" + Spring.NAME_LOGIN;
+		}
 	}
 	
 	@GetMapping("/" + Spring.NAME_403)

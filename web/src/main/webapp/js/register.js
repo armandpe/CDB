@@ -18,10 +18,10 @@ document.getElementById("registerButton").onclick = function () {
     } 
     
     var password2 = new String(document.getElementById("password2").value);
-    if (password2 !== password) {
-        alert("Passwords must be the same");
+    if (!(password2.valueOf() === password.valueOf())) {
+        alert("Passwords must be the same : " + password2 + " != " + password);
         return false;
     }
-    
+
     return true;
 };

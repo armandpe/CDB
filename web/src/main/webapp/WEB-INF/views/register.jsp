@@ -11,7 +11,7 @@
 <link href="css/font-awesome.css" rel="stylesheet" media="screen">
 <link href="css/main.css" rel="stylesheet" media="screen">
 </head>
-<body>
+<body onload='$.fn.alert(${errors});'>
 	<header class="navbar navbar-inverse navbar-fixed-top">
 		<div class="container">
 			<a class="navbar-brand" href="dashboard"> Application - Computer
@@ -22,24 +22,26 @@
 		</div>
 	</header>
 	<section id="main">
-		<form:form action="login" method="post">
+		<form:form action="register" method="post" modelAttribute="user">
 			<p>
 				<label for="username">Username</label>
-				<form:input type="text" id="username" name="username" path="username" placeholder="jean" required="required"/>
+				<form:input type="text" id="username" name="username" path="username" required="required" pattern=".{3,}"/>
 			</p>
 			<p>
 				<label for="password">Password</label>
-				<form:password type="password" id="password" name="password" path="password" required="required"/>
+				<form:input type="password" id="password" name="password" path="password" required="required" pattern=".{6,}"/>
 			</p>
 			<p>
-				<label for="password2">Password validation</label>
-				<form:password type="password" id="password2" name="password2" path="password2" required="required" />
+				<label for="password2">Password confirmation</label>
+				<input type="password" id="password2" name="password2" required="required" pattern=".{6,}"/>
 			</p>
 			<input type="hidden" name="${_csrf.parameterName}"
 				value="${_csrf.token}" />
 			<button type="submit" class="btn" id="registerButton">Register</button>
 		</form:form>
+		<a href="login" class="btn" type="button">Go back to login page</a>
 	</section>
 	<script src="js/register.js"></script>
+	<script src="js/errors.js"></script>
 </body>
 </html>

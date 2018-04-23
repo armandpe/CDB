@@ -34,6 +34,7 @@ public final class Spring {
 	public static final String COMPANY_ID = "company_id";
 	public static final String ID = "id";
 	public static final String COMPUTER_DTO = "computerDTO";
+	public static final String USER = "user";
 
 	
 	//Request attributes

@@ -1,5 +1,7 @@
 package com.excilys.cdb.web.spring.configuration;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -15,6 +17,8 @@ import com.excilys.cdb.constant.Spring;
 @EnableGlobalMethodSecurity(prePostEnabled=true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
+	private Logger logger = LoggerFactory.getLogger(this.getClass());
+	
 	private DriverManagerDataSource dataSource;
 
 	public WebSecurityConfig(DriverManagerDataSource dataSource) {
@@ -29,6 +33,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		.authoritiesByUsernameQuery("select username, authority "
 				+ "from authorities where username=?")
 		.passwordEncoder(NoOpPasswordEncoder.getInstance());
+		
+		logger.error(auth.toString());
 	}
 
 	@Override

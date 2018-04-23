@@ -31,11 +31,11 @@
 			</c:if>
 			<p>
 				<label for="username">Username</label>
-				<form:input type="text" id="username" name="username" path="username" placeholder="jean" required="required"/>
+				<input type="text" id="username" name="username" required="required" pattern=".{3,}"/>
 			</p>
 			<p>
 				<label for="password">Password</label>
-				<form:password type="password" id="password" name="password" path="password" required="required"/>
+				<input type="password" id="password" name="password" required="required" pattern=".{6,}"/>
 			</p>
 			<input type="hidden" name="${_csrf.parameterName}"
 				value="${_csrf.token}" />

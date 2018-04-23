@@ -5,6 +5,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -14,23 +15,25 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "authorities")
 public class UserRole {
-	private String role;
+ 	@Column(name = "authority")
+	private String authority;
  	
  	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
  	@JoinColumn(name = "username")
  	private User user;
+ 	
 	@Id
- 	@GeneratedValue
+ 	@GeneratedValue(strategy = GenerationType.IDENTITY) 
  	@Column(name = "user_role_id")
  	private int userRoleId;
 
 	public UserRole() {
-		this.role = "ROLE_USER";
+		this.authority = "ROLE_USER";
 	}
 
 	public UserRole(User user, String role) {
 		this.user = user;
-		this.role = role;
+		this.authority = role;
 	}
 
 	@Override
@@ -42,10 +45,10 @@ public class UserRole {
 		if (getClass() != obj.getClass())
 			return false;
 		UserRole other = (UserRole) obj;
-		if (role == null) {
-			if (other.role != null)
+		if (authority == null) {
+			if (other.authority != null)
 				return false;
-		} else if (!role.equals(other.role))
+		} else if (!authority.equals(other.authority))
 			return false;
 		if (user == null) {
 			if (other.user != null)
@@ -58,7 +61,7 @@ public class UserRole {
 	}
 
 	public String getRole() {
-		return role;
+		return authority;
 	}
 
 	public User getUser() {
@@ -73,14 +76,14 @@ public class UserRole {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((role == null) ? 0 : role.hashCode());
+		result = prime * result + ((authority == null) ? 0 : authority.hashCode());
 		result = prime * result + ((user == null) ? 0 : user.hashCode());
 		result = prime * result + userRoleId;
 		return result;
 	}
 
 	public void setRole(String role) {
-		this.role = role;
+		this.authority = role;
 	}
 
 	public void setUser(User user) {
