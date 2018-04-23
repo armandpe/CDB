@@ -44,7 +44,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		.and().formLogin().loginPage("/" + Spring.NAME_LOGIN).defaultSuccessUrl("/" + Spring.NAME_DASHBOARD)
 		.and().logout().logoutUrl("/" + Spring.NAME_LOGOUT).logoutSuccessUrl("/" + Spring.NAME_LOGIN + "?logout")
 		.permitAll()
-		.and().exceptionHandling().accessDeniedPage("/" + Spring.NAME_403);;
+		.and().exceptionHandling().accessDeniedPage("/" + Spring.NAME_403);
+		http.authorizeRequests().antMatchers("/companies").permitAll();
 	}
 
 }

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 
 import com.excilys.cdb.model.Company;
 import com.excilys.cdb.model.QCompany;
+import com.querydsl.jpa.impl.JPADeleteClause;
 import com.querydsl.jpa.impl.JPAQuery;
 
 @Repository
@@ -45,4 +46,8 @@ public class CompanyDAO implements ICompanyDAO {
 		return result;
 	}
 
+	@Override
+	public void delete(long id) throws FailedDAOOperationException {
+		new JPADeleteClause(entityManager, qCompany).where(qCompany.id.eq(id)).execute();	
+	}
 }

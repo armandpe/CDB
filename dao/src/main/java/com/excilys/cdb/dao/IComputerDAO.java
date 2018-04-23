@@ -15,4 +15,6 @@ public interface IComputerDAO extends DAO<Computer> {
 	long getCount(String search) throws FailedDAOOperationException;
 
 	void deleteById(long id) throws FailedDAOOperationException;
+	
+	List<Computer> getAllByCompany(long companyId);
 }

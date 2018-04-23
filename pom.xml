@@ -27,6 +27,8 @@
 		<service>1.0.0</service>
 		<core>1.0.0</core>
 		<web>1.0.0</web>
+		<jackson>2.9.5</jackson>
+		<jaxb-api>2.3.0</jaxb-api>
 	</properties>
 	<packaging>pom</packaging>
 	<dependencyManagement>
@@ -189,6 +191,18 @@
 				<groupId>org.glassfish.web</groupId>
 				<artifactId>jstl-impl</artifactId>
 				<version>${jstl}</version>
+			</dependency>
+			<!-- Jackson -->
+			<dependency>
+				<groupId>com.fasterxml.jackson.core</groupId>
+				<artifactId>jackson-databind</artifactId>
+				<version>${jackson}</version>
+			</dependency>
+			<dependency>
+				<groupId>javax.xml.bind</groupId>
+				<artifactId>jaxb-api</artifactId>
+				<version>${jaxb-api}</version>
+				<scope>runtime</scope>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

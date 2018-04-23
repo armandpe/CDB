@@ -9,4 +9,6 @@ public interface ICompanyService extends Service<Company> {
     List<Company> getAll() throws FailedDAOOperationException;
 
     long getCount() throws FailedDAOOperationException;
+    
+    void delete(long id) throws FailedDAOOperationException;
 }

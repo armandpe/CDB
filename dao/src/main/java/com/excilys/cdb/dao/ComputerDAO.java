@@ -94,4 +94,8 @@ public class ComputerDAO implements IComputerDAO {
 		.execute();
 	}
 
+	@Override
+	public List<Computer> getAllByCompany(long companyId) {
+		return new JPAQuery<Void>(entityManager).select(qComputer).from(qComputer).where(qComputer.id.eq(companyId)).fetch();
+	}
 }
