@@ -6,6 +6,8 @@ import java.util.Optional;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +19,8 @@ import com.querydsl.jpa.impl.JPAUpdateClause;
 
 @Repository
 public class ComputerDAO implements IComputerDAO {
+	
+	protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@PersistenceContext
 	private EntityManager entityManager;
@@ -96,6 +100,6 @@ public class ComputerDAO implements IComputerDAO {
 
 	@Override
 	public List<Computer> getAllByCompany(long companyId) {
-		return new JPAQuery<Void>(entityManager).select(qComputer).from(qComputer).where(qComputer.id.eq(companyId)).fetch();
+		return new JPAQuery<Void>(entityManager).select(qComputer).from(qComputer).where(qComputer.company.id.eq(companyId)).fetchAll().fetch();
 	}
 }

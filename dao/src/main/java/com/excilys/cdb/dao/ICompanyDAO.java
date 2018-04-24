@@ -10,4 +10,8 @@ public interface ICompanyDAO extends DAO<Company> {
 	long getCount() throws FailedDAOOperationException;
 	
     void delete(long id) throws FailedDAOOperationException;
+    
+    public void create(Company company) throws FailedDAOOperationException;
+    
+    public void update(Company company) throws FailedDAOOperationException;
 }

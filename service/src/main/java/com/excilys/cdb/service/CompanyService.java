@@ -69,7 +69,8 @@ public class CompanyService implements ICompanyService {
         boolean currentMethodException = false;
 		try {
         	if (companyDAO.getById(id).isPresent()) {
-        		for(Computer computer : computerDAO.getAllByCompany(id)) {
+        		List<Computer> toDelete = computerDAO.getAllByCompany(id);
+        		for(Computer computer : toDelete) {
         			computerDAO.deleteById(computer.getId());
         		}
             	companyDAO.delete(id);
@@ -82,6 +83,33 @@ public class CompanyService implements ICompanyService {
         	if (!currentMethodException) {
         		e.setMessage(getDaoClassFullName() + " : delete method failed");
         	}
+            throw e;
+        }
+	}
+	
+	@Override
+	public void create(Company company) throws FailedDAOOperationException {
+        try {
+            companyDAO.create(company);
+        } catch (FailedDAOOperationException e) {
+            e.setMessage(getDaoClassFullName() + " : creation failed ");
+            throw e;
+        }
+	}
+	
+	@Override
+	public void update(Company company) throws FailedDAOOperationException {
+        Optional<Company> companyFound = getById(company.getId());
+		
+		if (!companyFound.isPresent()) {
+        	FailedDAOOperationException e = new FailedDAOOperationException();
+        	e.setMessage(getDaoClassFullName() + " : update failed - company not found");
+        }
+		
+		try {
+            companyDAO.update(company);
+        } catch (FailedDAOOperationException e) {
+            e.setMessage(getDaoClassFullName() + " : update failed ");
             throw e;
         }
 	}

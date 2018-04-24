@@ -36,7 +36,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		
 		logger.error(auth.toString());
 	}
-
+	
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http.authorizeRequests()
@@ -46,6 +46,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		.permitAll()
 		.and().exceptionHandling().accessDeniedPage("/" + Spring.NAME_403);
 		http.authorizeRequests().antMatchers("/companies").permitAll();
+		http.csrf().disable();
 	}
 
 }

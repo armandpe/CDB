@@ -1,7 +1,8 @@
 package com.excilys.cdb.model;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
@@ -10,10 +11,9 @@ import javax.persistence.Table;
 public class Company implements ModelClass {
 	
 	@Id
-	@Column(name = "id")
+	@GeneratedValue (strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(name = "name")
 	private String name;
 
 	public Company() { } 
@@ -38,7 +38,7 @@ public class Company implements ModelClass {
         return id == other.id;
     }
 	
-	public long getId() {
+	public Long getId() {
 		return id;
 	}
 	
@@ -54,7 +54,7 @@ public class Company implements ModelClass {
 		return result;
 	}
 
-	public void setId(long id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
