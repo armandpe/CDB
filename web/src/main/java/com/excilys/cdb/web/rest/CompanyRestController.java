@@ -21,7 +21,7 @@ import com.excilys.cdb.model.Company;
 import com.excilys.cdb.service.ICompanyService;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:4200/web")
+@CrossOrigin(origins = "http://localhost:4200")
 public class CompanyRestController {
 	
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -33,7 +33,6 @@ public class CompanyRestController {
 	}
 	
 	@GetMapping("/companies")
-	@CrossOrigin(origins = "http://localhost:4200/web")
     public List<Company> getAll() {
 		try {
 			return companyService.getAll();
