@@ -1,5 +1,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 
 <!DOCTYPE html>
 <html>
@@ -24,24 +25,24 @@
 	<section id="main">
 		<form:form action="login" method="post">
 			<c:if test="${error != null}">
-				<p>Invalid username and password.</p>
+				<p><spring:message code="invalidLogin"/></p>
 			</c:if>
 			<c:if test="${logout != null}">
-				<p>You have been logged out.</p>
+				<p><spring:message code="loggedOut"/></p>
 			</c:if>
 			<p>
-				<label for="username">Username</label>
+				<label for="username"><spring:message code="username"/></label>
 				<input type="text" id="username" name="username" required="required" pattern=".{3,}"/>
 			</p>
 			<p>
-				<label for="password">Password</label>
+				<label for="password"><spring:message code="password"/></label>
 				<input type="password" id="password" name="password" required="required" pattern=".{3,}"/>
 			</p>
 			<input type="hidden" name="${_csrf.parameterName}"
 				value="${_csrf.token}" />
-			<button type="submit" class="btn" id="loginButton">Log in</button>
+			<button type="submit" class="btn" id="loginButton"><spring:message code="login"/></button>
 		</form:form>
-		<a href="register" class="btn" type="button">Create a new account</a>
+		<a href="register" class="btn" type="button"><spring:message code="registerLink"/></a>
 	</section>
 	<script src="js/login.js"></script>
 </body>
