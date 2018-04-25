@@ -29,11 +29,11 @@
 			</p>
 			<p>
 				<label for="password">Password</label>
-				<form:input type="password" id="password" name="password" path="password" required="required" pattern=".{6,}"/>
+				<form:input type="password" id="password" name="password" path="password" required="required" pattern=".{3,}"/>
 			</p>
 			<p>
 				<label for="password2">Password confirmation</label>
-				<input type="password" id="password2" name="password2" required="required" pattern=".{6,}"/>
+				<input type="password" id="password2" name="password2" required="required" pattern=".{3,}"/>
 			</p>
 			<input type="hidden" name="${_csrf.parameterName}"
 				value="${_csrf.token}" />

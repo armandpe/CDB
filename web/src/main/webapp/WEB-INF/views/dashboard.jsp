@@ -2,6 +2,8 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib prefix="custom" uri="/WEB-INF/cdb.tld"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec"
+	uri="http://www.springframework.org/security/tags"%>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 
 <!DOCTYPE html>
@@ -55,9 +57,9 @@
 			<a class="navbar-brand" href="dashboard"> Application - Computer
 				Database </a>
 			<div class="pull-right">
-				<a href="javascript:formSubmit()">Logout</a> <br> <br> <a href="?langue=fr"><img
-					src="img/fr.png" height="24" width="24" alt="FR"/></a> <a
-					href="?langue=en"><img src="img/en.png" alt="EN"></a>
+				<a href="javascript:formSubmit()">Logout</a> <br> <br> <a
+					href="?langue=fr"><img src="img/fr.png" height="24" width="24"
+					alt="FR" /></a> <a href="?langue=en"><img src="img/en.png" alt="EN"></a>
 			</div>
 		</div>
 	</header>
@@ -78,11 +80,13 @@
 					</form>
 				</div>
 
-				<div class="pull-right">
-					<a class="btn btn-success" id="addComputer" href="addComputer">Add
-						Computer</a> <a class="btn btn-default" id="editComputer" href="#"
-						onclick="$.fn.toggleEditMode();">Edit</a>
-				</div>
+				<sec:authorize access="hasRole('ADMIN')">
+					<div class="pull-right">
+						<a class="btn btn-success" id="addComputer" href="addComputer">Add
+							Computer</a> <a class="btn btn-default" id="editComputer" href="#"
+							onclick="$.fn.toggleEditMode();">Edit</a>
+					</div>
+				</sec:authorize>
 			</div>
 		</div>
 
@@ -123,7 +127,13 @@
 						<tr>
 							<td class="editMode"><input type="checkbox" name="cb"
 								class="cb" value="${computer.id}"></td>
-							<td><a href="editComputer?id=${computer.id}" onclick="">${computer.name}</a></td>
+
+							<sec:authorize access="hasRole('ADMIN')">
+								<td><a href="editComputer?id=${computer.id}" onclick="">${computer.name}</a></td>
+							</sec:authorize>
+							<sec:authorize access="!hasRole('ADMIN')">
+								<td>${computer.name}</td>
+							</sec:authorize>
 							<td>${computer.introduced}</td>
 							<td>${computer.discontinued}</td>
 							<td>${computer.companyName}</td>

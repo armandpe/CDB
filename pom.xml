@@ -57,6 +57,11 @@
 			<!-- Spring & hibernate -->
 			<dependency>
 				<groupId>org.springframework.security</groupId>
+				<artifactId>spring-security-taglibs</artifactId>
+				<version>${spring}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.security</groupId>
 				<artifactId>spring-security-web</artifactId>
 				<version>${spring}</version>
 			</dependency>

@@ -35,7 +35,7 @@
 			</p>
 			<p>
 				<label for="password">Password</label>
-				<input type="password" id="password" name="password" required="required" pattern=".{6,}"/>
+				<input type="password" id="password" name="password" required="required" pattern=".{3,}"/>
 			</p>
 			<input type="hidden" name="${_csrf.parameterName}"
 				value="${_csrf.token}" />
