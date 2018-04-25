@@ -73,7 +73,7 @@ public class CompanyRestController {
 	
 	@PostMapping("/companies")
 	public HttpStatus create(@RequestBody Company company) {
-		if (company == null || company.getId() == null) {
+		if (company == null) {
 			logger.error("Create - Null company");
 			return HttpStatus.I_AM_A_TEAPOT;
 		}
